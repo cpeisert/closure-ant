@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<project name="antclosuretools-test" basedir="." default="test">
+
+  <!--
+  ==============================================================================
+    Inputs to the build process.
+  ==============================================================================
+  -->
+
+  <property name="test.src.dir" location="${basedir}/src" />
+  <property name="test.lib.dir" location="${basedir}/lib" />
+  <import file="${test.lib.dir}/antunit.xml" />
+  <property name="antunit.dir" location="${basedir}/antunit" />
+
+  <property name="antclosuretools.dir" location="${basedir}/.." />
+  <property name="antclosuretools.lib.dir" location="${antclosuretools.dir}/lib" />
+  <property name="antclosuretools.xml" 
+      location="${antclosuretools.dir}/build/antclosuretools.xml" />
+  <import file="${antclosuretools.xml}" />
+  <property name="antclosuretools.jar" 
+      location="${antclosuretools.dir}/build/antclosuretools.jar" />
+
+  <condition property="antclosuretools.jar.available">
+    <available file="${antclosuretools.jar}" />
+  </condition>
+
+  <path id="test.classpath">
+    <fileset dir="${antclosuretools.lib.dir}" includes="**/*.jar" />
+    <fileset dir="${test.lib.dir}" includes="**/*.jar" />
+    <pathelement location="${antclosuretools.jar}" />
+  </path>
+
+
+  <!--
+  ==============================================================================
+    Outputs from the build process.
+  ==============================================================================
+  -->
+
+  <property name="test.build.dir" location="${basedir}/build" />
+  <property name="test.classes.dir" location="${test.build.dir}/classes" />
+
+
+  <!--
+  ==============================================================================
+    TARGETS
+  ==============================================================================
+  -->
+
+  <target name="init" description="Initialize the build directory.">
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${test.classes.dir}" />
+  </target>
+
+
+  <target name="clean" description="Delete all files created by this script.">
+    <delete dir="${test.build.dir}" />
+  </target>
+
+
+  <target name="compile" depends="init" description="Compiles the Java source.">
+    <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}"
+        classpathref="test.classpath" debug="on" deprecation="on"
+        includeantruntime="false"
+        source="1.6" target="1.6">
+      <compilerarg value="-Xlint"/>
+    </javac>
+  </target>
+  
+  
+  <target name="junit-test" depends="compile" description="Run JUnit tests.">
+    <fail unless="antclosuretools.jar.available"
+        message="Tests aborted. File not found: [${antclosuretools.jar}]" />
+
+    <junit printsummary="on" fork="true" forkmode="once" showoutput="true">
+      <classpath refid="test.classpath" />
+      <classpath>
+        <pathelement location="${test.classes.dir}" />
+      </classpath>
+      <formatter usefile="false"
+          classname="org.closureextensions.junit.CustomJUnitResultFormatter" />
+      <batchtest haltonfailure="true">
+        <fileset dir="${test.classes.dir}">
+          <include name="**/org/antclosuretools/**/*Test.class" />
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+
+  <target name="antunit-test" depends="compile"
+      description="Run AntUnit tests.">
+    <fail unless="antclosuretools.jar.available"
+        message="Tests aborted. File not found: [${antclosuretools.jar}]" />
+    
+    <antunit>
+      <plainlistener loglevel="info" />
+      <fileset dir="${antunit.dir}" includes="**/*Test.xml" />
+    </antunit>
+  </target>
+  
+  <target name="test" depends="junit-test, antunit-test">
+
+  </target>
+</project>

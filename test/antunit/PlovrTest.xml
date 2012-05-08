@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+================================================================================
+  AntUnit tests for plovr.
+================================================================================
+-->
+<project name="plovr-test" default="test">
+
+  <dirname property="antunit.dir" file="${ant.file.plovr-test}" />
+
+  <property name="test.dir" location="${antunit.dir}/.." />
+  <property name="test-projects.dir" location="${test.dir}/test_projects" />
+  <property name="test.build.dir" location="${test.dir}/build" />
+  <property name="test.lib.dir" location="${test.dir}/lib" />
+  <import file="${test.lib.dir}/antunit.xml" />
+
+  <property name="plovr_modules.dir"
+      location="${test-projects.dir}/plovr_modules" />
+  <property name="plovr_modules.build.dir"
+      location="${test.build.dir}/antunit/plovr_modules" />
+  <property name="plovr_inherits.build.dir"
+      location="${test.build.dir}/antunit/plovr_inherits" />
+
+  <property name="antclosuretools.dir" location="${test.dir}/.." />
+  <property name="antclosuretools.xml"
+      location="${antclosuretools.dir}/build/antclosuretools.xml" />
+  <import file="${antclosuretools.xml}" />
+
+  <import file="${test.dir}/test_projects/project101/project101.xml" />
+
+  
+  <!--
+  =============================================================================
+    Set up and tear down
+  =============================================================================
+  -->
+
+  <!-- Executed once for this test suite before all other targets. -->
+  <target name="suiteSetUp">
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${project101.output.dir}" />
+  </target>
+
+  <!--
+  =============================================================================
+    Tests
+  =============================================================================
+  -->
+
+  <target name="test_plovrMode=config">
+
+    <plovr configID="project101" configFile="${project101.config.json}"
+        plovrMode="config">
+      <inputs dir="${project101.js.dir}" includes="**/*.js" />
+    </plovr>
+
+    <assertFileExists file="${project101.config.json}" />
+
+    <assertResourceContains resource="${project101.config.json}"
+        value='"id": "project101"' />
+  </target>
+
+
+  <target name="test_plovrMode=build_simple">
+
+    <plovr plovrMode="build" forceRecompile="true"
+        configID="project101" configFile="${project101.config.json}"
+        outputFile="${project101.plovr.simple-compiled.js}">
+      <inputs dir="${project101.js.dir}" includes="**/*.js" />
+      <compiler
+          compilationMode="simple"
+          prettyPrint="true"
+          sourcemapFormat="V3"
+          sourcemapOutputFile="${project101.sourcemap.json}">
+        <define name="goog.DEBUG" value="false" type="boolean" />
+        <define name="goog.LOCALE" value="de" type="string" />
+      </compiler>
+    </plovr>
+
+    <assertFileExists file="${project101.config.json}" />
+    <assertResourceContains resource="${project101.config.json}"
+        value='"id": "project101",' />
+    <assertResourceContains resource="${project101.config.json}"
+        value='"goog.DEBUG": false' />
+    <assertResourceContains resource="${project101.config.json}"
+        value='"goog.LOCALE": "de"' />
+
+    <assertFileExists file="${project101.sourcemap.json}" />
+    <assertResourceContains resource="${project101.sourcemap.json}"
+        value='"version":3' />
+
+    <assertFileExists file="${project101.plovr.simple-compiled.js}" />
+    <!-- Test "define": goog.DEBUG = false -->
+    <assertResourceContains resource="${project101.plovr.simple-compiled.js}"
+        value="goog.DEBUG = !1" />
+    <!-- Test "define": goog.LOCALE = "de" -->
+    <assertResourceContains resource="${project101.plovr.simple-compiled.js}"
+        value='goog.LOCALE = "de"' />
+  </target>
+
+
+  <target name="test_plovrMode=build_alternate-closure-library">
+
+    <plovr plovrMode="build" forceRecompile="true"
+        configID="project101" configFile="${project101.config.json}"
+        outputFile="${project101.plovr.simple-compiled.js}"
+        closureLibrary="${closure-library.dir}">
+      <inputs dir="${project101.js.dir}" includes="**/*.js" />
+      <compiler compilationMode="simple" prettyPrint="true" />
+    </plovr>
+
+    <assertFileExists file="${project101.plovr.simple-compiled.js}" />
+    <assertResourceDoesntContain value='goog.NODE_JS ? eval("global")'
+        resource="${project101.plovr.simple-compiled.js}" />
+  </target>
+
+
+  <target name="test_plovrMode=build_advanced">
+
+    <plovr plovrMode="build" forceRecompile="true"
+        configID="project101" configFile="${project101.config.json}"
+        outputFile="${project101.plovr.advanced-compiled.js}">
+      <inputs dir="${project101.js.dir}" includes="**/*.js" />
+      <compiler compilationMode="advanced">
+        <compilercheck name="checkVars" value="WARNING" />
+      </compiler>
+    </plovr>
+
+    <assertFileExists file="${project101.config.json}" />
+    <assertResourceContains resource="${project101.config.json}"
+        value='"id": "project101",' />
+
+    <assertFileExists file="${project101.plovr.advanced-compiled.js}" />
+  </target>
+
+
+  <target name="test_twoNestedCompilerElements">
+    <expectfailure>
+      <plovr configID="project101" configFile="${project101.config.json}"
+          plovrMode="build" outputFile="${project101.plovr.simple-compiled.js}">
+        <inputs dir="${project101.js.dir}" includes="**/*.js" />
+        <!-- Illegal to have more than one nested <compiler> element. -->
+        <compiler compilationMode="simple" />
+        <compiler compilationMode="simple" />
+      </plovr>
+    </expectfailure>
+  </target>
+
+
+  <target name="test_skipCompilationIfOutputFileUpToDate">
+    <logcapturer />
+    <plovr configID="project101" configFile="${project101.config.json}"
+        plovrMode="build" outputFile="${project101.plovr.simple-compiled.js}">
+      <inputs dir="${project101.js.dir}" includes="**/*.js" />
+      <compiler compilationMode="simple" />
+    </plovr>
+
+    <!-- Compilation should be skipped. -->
+    <plovr configID="project101" configFile="${project101.config.json}"
+        plovrMode="build" outputFile="${project101.plovr.simple-compiled.js}">
+      <inputs dir="${project101.js.dir}" includes="**/*.js" />
+      <compiler compilationMode="simple" />
+    </plovr>
+
+    <assertLogContains text="Output file up-to-date. Build skipped." />
+  </target>
+
+
+  <!--
+    The following test is based on the plovr module test data here:
+    http://code.google.com/p/plovr/source/browse/#hg%2Ftestdata%2Fmodules
+  -->
+  <target name="test_modules">
+
+    <mkdir dir="${plovr_modules.build.dir}" />
+    <copy todir="${plovr_modules.build.dir}">
+      <fileset dir="${plovr_modules.dir}" includes="*.html" />
+    </copy>
+
+    <plovr plovrMode="build" forceRecompile="true"
+        configID="module-example"
+        configFile="${plovr_modules.build.dir}/plovr-config.json"
+        moduleOutputPath="${plovr_modules.build.dir}/module_%s.js"
+        moduleProductionURI="${plovr_modules.build.dir}/module_%s.js"
+        globalScopeName="__plovr__">
+      <compiler compilationMode="advanced" warningLevel="VERBOSE" />
+      <module name="app">
+        <inputs includes="app*.js" dir="${plovr_modules.dir}" />
+      </module>
+      <module name="api">
+        <inputs includes="api*.js" dir="${plovr_modules.dir}" />
+        <dep module="app" />
+      </module>
+      <module name="settings">
+        <inputs includes="settings*.js" dir="${plovr_modules.dir}" />
+        <dep module="app" />
+      </module>
+    </plovr>
+
+    <assertFileExists file="${plovr_modules.build.dir}/plovr-config.json" />
+    <assertFileExists file="${plovr_modules.build.dir}/module_app.js" />
+  </target>
+
+
+  <target name="test_inherits">
+
+    <property name="root-config.json"
+        location="${plovr_inherits.build.dir}/root-config.json" />
+    <property name="child-config.json"
+        location="${plovr_inherits.build.dir}/child-config.json" />
+    <property name="project101.simple.js"
+        location="${plovr_inherits.build.dir}/project101.simple-compiled.js" />
+
+    <mkdir dir="${plovr_inherits.build.dir}" />
+    <plovr plovrMode="CONFIG"
+        configID="root-config"
+        configFile="${root-config.json}">
+      <compiler
+          compilationMode="simple"
+          prettyPrint="true">
+        <define name="goog.DEBUG" value="false" type="boolean" />
+        <define name="goog.LOCALE" value="de" type="string" />
+        <idgenerator idgenerator="goog.events.getUniqueId" />
+      </compiler>
+    </plovr>
+    <assertFileExists file="${root-config.json}" />
+
+    <plovr configID="child-config"
+        inherits="${root-config.json}"
+        configFile="${child-config.json}"
+        outputFile="${project101.simple.js}">
+      <inputs dir="${project101.js.dir}" includes="**/*.js" />
+    </plovr>
+
+    <assertFileExists file="${child-config.json}" />
+    <assertFileExists file="${project101.simple.js}" />
+    <!-- Test "define": goog.DEBUG = false -->
+    <assertResourceContains resource="${project101.simple.js}"
+        value="goog.DEBUG = !1" />
+    <!-- Test "define": goog.LOCALE = "de" -->
+    <assertResourceContains resource="${project101.simple.js}"
+        value='goog.LOCALE = "de"' />
+  </target>
+
+
+  <target name="test_plovrMode=jsdoc">
+
+    <plovr configID="project101"
+        configFile="${project101.config.json}"
+        plovrMode="jsdoc"
+        jsdocHtmlOutputPath="${project101.plovr.jsdoc}">
+      <inputs dir="${project101.js.dir}" includes="**/*.js" />
+    </plovr>
+
+    <assertFileExists file="${project101.plovr.jsdoc}" />
+  </target>
+
+
+  <target name="test_plovrMode=serve_simple">
+    <copy file="${project101.plovr-server-test_simple.html}"
+        todir="${project101.output.dir}" />
+
+    <plovr configID="project101" configFile="${project101.config.json}"
+        plovrMode="serve" outputFile="${project101.plovr.simple-compiled.js}">
+      <inputs dir="${project101.js.dir}" includes="**/*.js" />
+      <compiler compilationMode="simple" prettyPrint="true">
+      </compiler>
+    </plovr>
+
+    <assertFileExists file="${project101.config.json}" />
+    <assertFileExists file="${project101.plovr.simple-compiled.js}" />
+
+    <echo message="To complete the plovr server test, open: ${project101.plovr-server-test_simple.output.html}" />
+  </target>
+
+
+  <!-- Run this test suite. -->
+  <target name="test">
+    <antunit>
+      <plainlistener loglevel="info" />
+      <file file="${antunit.dir}/PlovrTest.xml" />
+    </antunit>
+  </target>
+
+</project>

@@ -1,0 +1,560 @@
+/*
+ * Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS-IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.closureextensions.ant;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
+import java.io.File;
+import java.util.List;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.FileSet;
+
+import org.builderplus.OutputMode;
+
+import org.closureextensions.ant.types.CompilerOptionsComplete;
+import org.closureextensions.ant.types.CompilerOptionsFactory;
+import org.closureextensions.ant.types.Directory;
+import org.closureextensions.ant.types.StringNestedElement;
+import org.closureextensions.common.deps.ManifestBuilder;
+import org.closureextensions.common.JsClosureSourceFile;
+import org.closureextensions.common.SourceFileFactory;
+import org.closureextensions.common.util.AntUtil;
+import org.closureextensions.common.util.FileUtil;
+
+/**
+ * Builder Plus Ant task. Builder Plus is similar to Closure Builder,
+ * except that the "list" mode has been replaced with "manifest" mode and the
+ * "script" mode has been renamed "raw" to match plovr. In addition, Builder
+ * Plus is implemented in Java, whereas Closure Builder is implemented in
+ * Python. The default task name is {@code builder-plus} as defined in
+ * "closure-ant-tasks.xml".
+ *
+ * <p>The locations of the Closure Compiler is defined in
+ * "closure-ant-tasks.xml", which should be included in your build file as
+ * follows:</p>
+ *
+ * <p>{@literal <import file="your/path/to/closure-ant-tasks.xml" />}</p>
+ *
+ * <p><i>Verify that the paths defined in "closure-ant-tasks.xml" are correct
+ * for your local configuration.</i></p>
+ *
+ * <p>For more information about Closure Builder, see
+ * <a target="_blank"
+ * href="https://developers.google.com/closure/library/docs/closurebuilder">
+ * Using ClosureBuilder</a>.</p>
+ *
+ *
+ * TODO(cpeisert): Move the Ant-style documentation below into separate doc
+ * files.
+ *
+ * <ul class="blockList">
+ * <li class="blockList">
+ * <h3>Attributes</h3>
+ *
+ * <table class="overviewSummary" border="0" cellpadding="3" cellspacing="0">
+ * <col width="20%"/>
+ * <col width="60%"/>
+ * <col width="20%"/>
+ * <thead>
+ * <tr><th>Attribute Name</th><th>Description</th><th>Required</th></tr>
+ * </thead>
+ * <tbody>
+ * <tr class="altColor"><td id="closureBuilderPythonScript">
+ *     <b>closureBuilderPythonScript</b></td><td>The Closure Builder Python
+ *     script.</td><td>No, as long as your build file imports
+ *     closureextensions.xml</td></tr>
+ * <tr class="rowColor"><td id="compilerJar"><b>compilerJar</b></td><td>The
+ *     Closure Compiler jar file.</td><td>No, as long as your build file
+ *     imports closureextensions.xml</td></tr>
+ * <tr class="rowColor"><td id="forceRecompile"><b>forceRecompile</b></td><td>
+ *     Determines if the Closure Compiler should always recompile the output
+ *     file, even if none of the input files have changed since the output
+ *     file was last modified.</td><td>No. Defaults to {@code false}.</td></tr>
+ * <tr class="altColor"><td id="inputManifest"><b>inputManifest</b></td><td>
+ *     Specifies a file containing a list of file paths to JavaScript sources
+ *     to be included in the compilation, where each line in the manifest is
+ *     a file path.</td><td>No</td></tr>
+ * <tr class="altColor"><td id="outputFile"><b>outputFile</b></td><td>Output
+ *     file name. If not specified, write to standard output.</td><td>No</td>
+ *     </tr>
+ * <tr class="altColor"><td id="outputManifest"><b>outputManifest</b></td><td>
+ *     Prints out a list of all the files in the compilation. This will not
+ *     include files that got dropped because they were not required.</td>
+ *     <td>No</td></tr>
+ * <tr class="rowColor"><td id="outputMode"><b>outputMode</b></td><td>The
+ *     type of output to generate. Options are "script" for a single script
+ *     containing the contents of all the files concatenated together or
+ *     "compiled" to produce compiled output with the Closure Compiler.
+ *     Unlike the closurebuilder.py command line interface, there is no "list"
+ *     output mode. Instead, a manifest may be saved by setting the attribute
+ *     "outputManifest".</td>
+ *     <td>No. Defaults to "compile".</td></tr>
+ * <tr class="altColor"><td id="pythonExecutable"><b>pythonExecutable</b></td>
+ *     <td>The python interpreter executable.</td><td>No. Defaults to
+ *     "python".</td></tr>
+ * </tbody>
+ * </table>
+ * </li>
+ * </ul>
+ *
+ *
+ * <ul class="blockList">
+ * <li class="blockList">
+ * <h3>Nested Elements</h3>
+ *
+ * <table class="overviewSummary" border="0" cellpadding="3" cellspacing="0">
+ * <col width="20%"/>
+ * <col width="80%"/>
+ * <thead>
+ * <tr><th>Element Name</th><th>Description</th></tr>
+ * </thead>
+ * <tbody>
+ * <tr class="altColor"><td id="compiler"><b>compiler</b></td><td>Options for
+ *     the Closure Compiler. For documentation see
+ *     {@link org.closureextensions.ant.types.ClosureCompiler}</td></tr>
+ * <tr class="rowColor"><td id="inputs"><b>inputs</b></td><td>Input files to
+ *    be compiled. Each input file and its transitive dependencies will be
+ *    included in the compiled output. The {@literal <inputs>} element is an
+ *    Ant <a href="http://ant.apache.org/manual/Types/fileset.html">FileSet</a>
+ *    (i.e. it supports FileSet's attributes and nested elements).
+ *
+ *    <p><b>Note</b>: <i>As of February 2012, the closurebuilder.py Python
+ *    script does not include files passed to the {@code --input} flag as
+ *    source files for the build but merely extracts the provided namespaces.
+ *    However, this Ant task includes {@literal <inputs>} in the sources to
+ *    be compiled, similar to how plovr treats its
+ *    <a href="http://plovr.com/options.html#inputs">inputs</a> configuration
+ *    option.</i></p></td></tr>
+ * <tr class="altColor"><td id="namespace"><b>namespace</b></td><td>A namespace
+ *     to calculate dependencies for. The {@literal <namespace>} element has a
+ *     {@code value} attribute that accepts a Closure namespace. A Closure
+ *     namespace is a dot-delimited path expression declared with a call to
+ *     {@code goog.provide()} (for example, "goog.array" or "foo.bar").
+ *     Namespaces provided by {@literal <namespace>} elements will be combined
+ *     with those provided by {@literal <inputs>}.</td></tr>
+ * <tr class="rowColor"><td id="roots"><b>roots</b></td><td>Roots are directory
+ *     paths to be traversed to build dependencies. The {@literal <root>}
+ *     element has a {@code directory} attribute to specify a directory path.
+ *     </td></tr>
+ * <tr class="altColor"><td id="sources"><b>sources</b></td><td>Sources are
+ *     JavaScript source files available to the build process that will be
+ *     used if they are transitively required by one of the {@code namespaces}
+ *     or {@code inputs}. The {@literal <sources>} element is an Ant
+ *     <a href="http://ant.apache.org/manual/Types/fileset.html">FileSet</a>
+ *     (i.e. it supports FileSet's attributes and nested elements).</td></tr>
+ * </tbody>
+ * </table>
+ * </li>
+ * </ul>
+ *
+ * @author cpeisert@gmail.com (Christopher Peisert)
+ */
+public final class BuilderPlusTask extends Task {
+
+  // Attributes
+  private File compilerJar;
+  private boolean forceRecompile;
+  private File inputManifest;
+  private boolean keepAllSources;
+  private boolean keepMoochers;
+  private boolean keepOriginalOrder;
+  private File outputFile;
+  private File outputManifest;
+  private OutputMode outputMode;
+
+  // Nested elements
+  private CompilerOptionsComplete compilerOptions;
+  private final List<FileSet> mainSources; // Program entry points
+  private final List<StringNestedElement> namespaces;
+  private final List<Directory> roots;
+  private final List<FileSet> sources;
+
+
+  /**
+   * Constructs a new Ant task for Closure Builder.
+   */
+  public BuilderPlusTask() {
+    // Attributes
+    this.compilerJar = null;
+    this.forceRecompile = false;
+    this.inputManifest = null;
+    this.keepAllSources = false;
+    this.keepMoochers = false;
+    this.keepOriginalOrder = false;
+    this.outputFile = null;
+    this.outputManifest = null;
+    this.outputMode = OutputMode.COMPILED;
+
+    // Nested elements
+    this.compilerOptions = null;
+    this.mainSources = Lists.newArrayList();
+    this.namespaces = Lists.newArrayList();
+    this.roots = Lists.newArrayList();
+    this.sources = Lists.newArrayList();
+  }
+
+
+  // Attribute setters
+
+  /** @param file the Closure Compiler jar file */
+  public void setCompilerJar(File file) {
+    this.compilerJar = file;
+  }
+
+  /**
+   * @param forceRecompile determines if the Closure Compiler should always
+   *     recompile the {@code outputFile}, even if none of the input files
+   *     (externs or sources) have changed since the {@code outputFile} was
+   *     last modified. Defaults to {@code false}.
+   */
+  public void setForceRecompile(boolean forceRecompile) {
+    this.forceRecompile = forceRecompile;
+  }
+
+  /**
+   * Specifies a file containing a list of JavaScript sources to be included
+   * in the compilation, where each line in the manifest is a file path.
+   *
+   * @param inputManifest the input manifest file
+   */
+  public void setInputManifest(File inputManifest) {
+    this.inputManifest = inputManifest;
+  }
+
+  /**
+   * Whether all sources should be passed to the Closure Compiler, i.e.,
+   * no sources are pruned irrespective of the transitive dependencies of
+   * the program entry points. This option is useful for compiling libraries.
+   *
+   * @param keepAllSources whether all sources should be passed to the
+   *     Closure Compiler. Defaults to {@code false}.
+   */
+  public void setKeepAllSources(boolean keepAllSources) {
+    this.keepAllSources = keepAllSources;
+  }
+
+  /**
+   * Whether "moochers" (i.e. source files that do not provide any namespaces,
+   * though they may goog.require namespaces) may be dropped during the
+   * dependency pruning process. If {@code true}, these files are always kept
+   * as well as any files they depend on. If {@code false}, these files may be
+   * dropped during dependency pruning.
+   *
+   * <p><b>Note: </b> this option has no effect if {@link #keepAllSources} is
+   * set to {@code true} (i.e. if dependency pruning is turned off).</p>
+   *
+   * <p>See <a target="_blank"
+   * href="http://code.google.com/p/closure-compiler/source/browse/trunk/src/com/google/javascript/jscomp/DependencyOptions.java">
+   * DependencyOptions.java</a></p>
+   *
+   * @param keepMoochers if {@code true}, moochers and their dependencies are
+   *     always kept. Defaults to {@code false}.
+   */
+  public void setKeepMoochers(boolean keepMoochers) {
+    this.keepMoochers = keepMoochers;
+  }
+
+  /**
+   * Whether sources should be kept in their original order or topologically
+   * sorted based on their dependencies.
+   *
+   * @param keepOriginalOrder if {@code true}, sources will be kept in their
+   *     original order, otherwise they will be topologically sorted based on
+   *     their dependencies. Defaults to {@code false}.
+   */
+  public void setKeepOriginalOrder(boolean keepOriginalOrder) {
+    this.keepOriginalOrder = keepOriginalOrder;
+  }
+
+  /** @param file the file to write output to instead of standard output */
+  public void setOutputFile(File file) {
+    this.outputFile = file;
+  }
+
+  /**
+   * Prints out a list of all the files in the compilation. This will not
+   * include files that got dropped because they were not required.
+   *
+   * @param outputManifest the output manifest file name
+   */
+  public void setOutputManifest(File outputManifest) {
+    this.outputManifest = outputManifest;
+  }
+
+  /**
+   * Sets the output mode. Output is sent to standard out by default. In
+   * COMPILED and RAW mode, output may be sent to a file by setting {@link
+   * #outputFile}. In MANIFEST mode, output may be sent to a file by settings
+   * {@link #outputManifest}.
+   *
+   * @param mode the output mode. Options: COMPILED, MANIFEST, RAW. Defaults
+   *     to COMPILED.
+   * @throws BuildException if {@code mode} is not a valid option
+   */
+  public void setOutputMode(String mode) {
+    if (OutputMode.COMPILED.toString().equalsIgnoreCase(mode)) {
+      this.outputMode = OutputMode.COMPILED;
+    } else if (OutputMode.MANIFEST.toString().equalsIgnoreCase(mode)) {
+      this.outputMode = OutputMode.MANIFEST;
+    } else if (OutputMode.RAW.toString().equalsIgnoreCase(mode)) {
+      this.outputMode = OutputMode.RAW;
+    } else {
+      throw new BuildException("Attribute \"outputMode\" expected to be "
+          + "one of COMPILED, MANIFEST, or RAW but was \"" + mode + "\"");
+    }
+  }
+
+
+  // Nested element setters
+
+  /**
+   * @return a new instance of {@link CompilerOptionsComplete}
+   * @throws BuildException if {@literal <compiler>} nested element already
+   *     used in the current Closure Builder Ant task
+   */
+  public CompilerOptionsComplete createCompiler() {
+    if (this.compilerOptions == null) {
+      this.compilerOptions =
+          CompilerOptionsFactory.newCompilerOptionsComplete();
+    } else {
+      throw new BuildException("nested element <compiler> may only be used "
+          + "once per <" + getTaskName() + "> task");
+    }
+    return this.compilerOptions;
+  }
+
+  /** @param mainSources program entry points */
+  public void addMainSources(FileSet mainSources) {
+    this.mainSources.add(mainSources);
+  }
+
+  /** @param namespace a Closure namespace */
+  public void addNamespace(StringNestedElement namespace) {
+    this.namespaces.add(namespace);
+  }
+
+  /** @param root path to be traversed to build the dependencies */
+  public void addRoot(Directory root) {
+    this.roots.add(root);
+  }
+
+  /**
+   * @param sourceFiles source files available to the build process that will
+   *     be used if they are transitively required by one of the
+   *     {@code namespaces} or {@code inputs}
+   */
+  public void addSources(FileSet sourceFiles) {
+    this.sources.add(sourceFiles);
+  }
+
+  /**
+   * Execute the Closure Builder task.
+   *
+   * @throws BuildException on error.
+   */
+  public void execute() {
+    File manifest = createManifest();
+    List<String> currentSources = FileUtil.readlines(manifest);
+    Joiner manifestJoiner = Joiner.on(String.format("%n")).skipNulls();
+
+    if (this.outputManifest != null) {
+      FileUtil.write(manifestJoiner.join(currentSources), this.outputManifest);
+    }
+
+    if (OutputMode.COMPILED == this.outputMode) {
+      runClosureCompiler(manifest);
+    }
+    if (OutputMode.MANIFEST == this.outputMode) {
+      if (this.outputManifest == null) {
+        log(manifestJoiner.join(currentSources));
+      }
+    }
+    if (OutputMode.RAW == this.outputMode) {
+      writeRawConcatenationOfSources(currentSources);
+    }
+  }
+
+  /**
+   * Create a script comprised of the concatenated contents of {@code sources}.
+   * The script will be written to {@link #outputFile} if set, otherwise to
+   * standard output.
+   *
+   * @param sources the sources to concatenate
+   */
+  private void writeRawConcatenationOfSources(List<String> sources) {
+    StringBuilder rawScript = new StringBuilder();
+
+    for (String path : sources) {
+      rawScript.append(FileUtil.toString(new File(path)));
+    }
+    if (this.outputFile != null) {
+      FileUtil.write(rawScript.toString(), this.outputFile);
+    } else {
+      System.out.println(rawScript.toString());
+    }
+  }
+
+  /**
+   * Run the Closure Compiler with the help of {@link ClosureCompilerTask}.
+   *
+   * @param manifest a manifest file listing all of the sources for the build
+   * @throws BuildException if the manifest file is {@code null}
+   */
+  private void runClosureCompiler(File manifest) {
+    if (this.compilerJar == null) {
+      String closureCompilerPath =
+          SharedAntProperty.CLOSURE_COMPILER_JAR.getValue(getProject());
+      if (closureCompilerPath != null) {
+        this.compilerJar = new File(closureCompilerPath);
+      } else {
+        throw new BuildException("\"compilerJar\" is not set. The Closure "
+            + "Compiler is required for output mode COMPILED. Verify "
+            + "that your build file imports \"closure-ant-tasks.xml\" and "
+            + "that the property locations are correct for your machine.");
+      }
+    }
+
+    ClosureCompilerTask compilerTask = new ClosureCompilerTask(this);
+    if (this.compilerOptions != null) {
+      compilerTask.protectedSetCompilerOptions(this.compilerOptions);
+    }
+
+    compilerTask.setForceRecompile(this.forceRecompile);
+    if (this.outputFile != null) {
+      compilerTask.setOutputFile(this.outputFile.getAbsolutePath());
+    }
+    if (this.compilerJar != null) {
+      compilerTask.setCompilerJar(this.compilerJar);
+    }
+    if (manifest != null) {
+      compilerTask.setInputManifest(manifest.getAbsolutePath());
+    } else {
+      throw new BuildException("manifest file was null");
+    }
+    compilerTask.execute();
+  }
+
+  /**
+   * Creates a manifest suitable for the Closure Compiler. Such a manifest is
+   * an ordered list of JavaScript source files derived from the transitive
+   * dependencies of the program entry points. Program entry points are
+   * specified as either namespaces or "main" sources (i.e. source files
+   * that must be included in the manifest). The transitive dependencies are
+   * defined by calls to {@code goog.provide()} and {@code goog.require()}. A
+   * stable topological sort is used to make sure that an input always comes
+   * after its dependencies, unless the flag {@link #keepOriginalOrder} is set
+   * to {@code true}, in which case the sources are not sorted.
+   *
+   * @return a manifest file containing a list of the sources after
+   *     dependency management
+   * @throws BuildException on error
+   */
+  private File createManifest() {
+    // Source-file entry points.
+    List<JsClosureSourceFile> sourceEntryPoints = Lists.newArrayList();
+
+    // Additional sources
+    List<JsClosureSourceFile> sources = Lists.newArrayList();
+
+    log("Scanning paths...");
+
+    List<String> paths = null;
+
+    // Process inputManifest attribute.
+    if (this.inputManifest != null) {
+      paths = FileUtil.readlines(this.inputManifest);
+      for (String path : paths) {
+        JsClosureSourceFile sourceFile =
+            SourceFileFactory.newJsSourceFile(new File(path));
+        sourceEntryPoints.add(sourceFile);
+      }
+    }
+
+    // Process <mainSources> nested elements.
+    paths = AntUtil.getFilePathsFromCollectionOfFileSet(
+        getProject(), this.mainSources);
+    for (String path : paths) {
+      JsClosureSourceFile sourceFile =
+          SourceFileFactory.newJsSourceFile(new File(path));
+      sourceEntryPoints.add(sourceFile);
+    }
+
+    // Process <namespace> nested elements.
+    List<String> namespaceEntryPoints = Lists.newArrayList();
+    for (StringNestedElement namespace : this.namespaces) {
+      namespaceEntryPoints.add(namespace.getValue());
+    }
+
+    // Process <sources> nested elements.
+    paths =
+        AntUtil.getFilePathsFromCollectionOfFileSet(getProject(), this.sources);
+    for (String path : paths) {
+      JsClosureSourceFile sourceFile =
+          SourceFileFactory.newJsSourceFile(new File(path));
+      sources.add(sourceFile);
+    }
+
+    // Process <root> nested elements.
+    for (Directory dir : this.roots) {
+      paths = FileUtil.scanDirectory(dir.getDirectory(),
+          /* includes */ ImmutableList.of("**/*.js"),
+          /* excludes */ ImmutableList.of(".*"));
+      for (String path : paths) {
+        JsClosureSourceFile sourceFile =
+            SourceFileFactory.newJsSourceFile(new File(path));
+        sources.add(sourceFile);
+      }
+    }
+
+    ManifestBuilder<JsClosureSourceFile> builder =
+        new ManifestBuilder<JsClosureSourceFile>();
+    builder.mainSources(sourceEntryPoints);
+    builder.sources(sources);
+    builder.namespaces(namespaceEntryPoints)
+        .keepAllSources(this.keepAllSources)
+        .keepMoochers(this.keepMoochers)
+        .keepOriginalOrder(this.keepOriginalOrder);
+
+    log(builder.getAllSourcesInOriginalOrder().size() + " sources scanned.");
+
+    log("Building dependency tree...");
+
+    BuildCache cache = new BuildCache(this);
+    File tempManifest = cache.createTempFile("temp_manifest_["
+        + getTaskName() + "].txt");
+
+    List<JsClosureSourceFile> manifestList = null;
+
+    try {
+      manifestList = builder.toManifestList();
+    } catch (Exception e) {
+      throw new BuildException(e);
+    }
+
+    log(manifestList.size() + " dependencies in final manifest.");
+
+    FileUtil.write(
+        Joiner.on(String.format("%n")).skipNulls().join(manifestList),
+        tempManifest);
+
+    return tempManifest;
+  }
+}

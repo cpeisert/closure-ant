@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+  ** INSTRUCTIONS **
+
+  This file (closure-ant-tasks.xml) is a collection of Ant properties specifying
+  the locations of the Google Closure Tools on your machine as well as task
+  definitions for each of Closure Tool Ant tasks. To use the Ant Closure Tools,
+  add the following line to your build file:
+
+  <import file="closure-ant-tasks.xml" />
+
+
+  ** Recommended Setup **
+
+  1) Create a directory for Google Closure Tools
+       Examples
+       Linux: "/usr/local/closure-tools" or
+              "/home/<your-username>/closure-tools"
+       Windows: "C:\Users\<your-username>\closure-tools"
+
+  2) If you are not using plovr [http://plovr.org], then create the following
+     subdirectories:
+
+       * closure-tools/closure-compiler
+       * closure-tools/closure-library
+       * closure-tools/closure-stylesheets
+       * closure-tools/closure-templates
+
+     If using plovr, then you only need the following directories since plovr
+     already includes the Closure Compiler, Closure Library, and Closure
+     Templates:
+
+       * closure-tools/closure-stylesheets
+       * closure-tools/plovr
+
+  4) Build Java jar files from the command line:
+       Closure Compiler
+         * Change to directory closure-tools/closure-compiler
+         * Run the command: ant jar
+       Closure Stylesheets
+         * Change to directory closure-tools/closure-stylesheets
+         * Run the command: ant jar
+       Closure Templates
+         * Change to directory closure-tools/closure-stylesheets
+         * Run the command: ant SoyToJsSrcCompiler
+       plovr
+         * Change to directory closure-tools/plovr
+         * Run the command: ant jar
+         * NOTE: plovr may fail to build on Windows. If the build fails,
+           download the latest prebuilt jar from:
+           http://code.google.com/p/plovr/downloads/list
+           Either copy the prebuilt jar to
+           "closure-tools\plovr\build\plovr.jar" or update the property
+           "plovr.jar" below to point to your plovr jar file.
+
+  5) Optionally install Closure Linter (a.k.a. gjslint)
+
+  6) Make sure the property "closure-tools.dir" below points to the
+     "closure-tools" directory that you created in step 1.
+
+  NOTE: Do _NOT_ change property names. Only update the values.
+
+  7) Place a copy of closure-ant-tasks.jar in your project's library directory.
+
+  8) Update the property "closure-ant-tasks.jar" below to point to your local
+     copy.
+-->
+<project name="closure-ant-tasks" basedir=".">
+
+  <dirname property="closure-ant-tasks.xml.basedir"
+      file="${ant.file.closure-ant-tasks}"/>
+
+  <!--
+    Change the location of "closure-ant-tasks.jar" to point to your local copy.
+    The default setting assumes that closure-ant-tasks.jar is located in the
+    same directory as closure-ant-tasks.xml.
+  -->
+  <property name="closure-ant-tasks.jar"
+      location="${closure-ant-tasks.xml.basedir}/antclosuretools.jar" />
+
+  <!--
+    Change the location of "closure-tools.dir" to point to your local copy.
+  -->
+  <property name="closure-tools.dir" location="/usr/local/closure-tools" />
+
+  <property name="closure-library.dir"
+      location="${closure-tools.dir}/closure-library" />
+  <property name="closure-builder.dir"
+      location="${closure-library.dir}/closure/bin/build" />
+  <property name="closurebuilder.py"
+      location="${closure-builder.dir}/closurebuilder.py" />
+  <property name="depswriter.py"
+      location="${closure-builder.dir}/depswriter.py" />
+
+  <property name="closure-compiler.dir"
+      location="${closure-tools.dir}/closure-compiler" />
+  <property name="closure-compiler.jar"
+      location="${closure-compiler.dir}/build/compiler.jar" />
+  <property name="outputwrapper" value="(function(){%output%})();" />
+
+  <property name="closure-stylesheets.dir"
+      location="${closure-tools.dir}/closure-stylesheets" />
+  <property name="closure-stylesheets.jar"
+      location="${closure-stylesheets.dir}/build/closure-stylesheets.jar" />
+
+  <property name="closure-templates.dir"
+      location="${closure-tools.dir}/closure-templates" />
+  <property name="closure-templates.jar"
+      location="${closure-templates.dir}/build/SoyToJsSrcCompiler.jar" />
+  <property name="soyutils.js"
+      location="${closure-templates.dir}/javascript/soyutils.js" />
+  <property name="soyutils_usegoog.js"
+      location="${closure-templates.dir}/javascript/soyutils_usegoog.js" />
+
+  <property name="closure-linter.py" value="gjslint" />
+
+  <property name="plovr.dir" location="${closure-tools.dir}/plovr" />
+  <property name="plovr.jar" location="${plovr.dir}/build/plovr.jar" />
+
+
+  <!--
+  ==============================================================================
+    Task Definitions
+  ==============================================================================
+  -->
+
+  <taskdef name="builder-plus" classpath="${closure-ant-tasks.jar}"
+      classname="org.closureextensions.ant.BuilderPlusTask" />
+
+  <taskdef name="closure-builder-python" classpath="${closure-ant-tasks.jar}"
+      classname="org.closureextensions.ant.ClosureBuilderPythonTask" />
+
+  <taskdef name="closure-compiler" classpath="${closure-ant-tasks.jar}"
+      classname="org.closureextensions.ant.ClosureCompilerTask" />
+
+  <taskdef name="deps-writer" classpath="${closure-ant-tasks.jar}"
+      classname="org.closureextensions.ant.DepsWriterTask" />
+
+  <taskdef name="deps-writer-python" classpath="${closure-ant-tasks.jar}"
+      classname="org.closureextensions.ant.DepsWriterPythonTask" />
+
+  <taskdef name="plovr" classpath="${closure-ant-tasks.jar}"
+      classname="org.closureextensions.ant.PlovrTask" />
+
+  <taskdef name="plovr-soyweb" classpath="${closure-ant-tasks.jar}"
+      classname="org.closureextensions.ant.PlovrSoyWebTask" />
+
+  <taskdef name="soy-msg-extractor" classpath="${closure-ant-tasks.jar}"
+      classname="org.closureextensions.ant.SoyMsgExtractorTask" />
+</project>
+

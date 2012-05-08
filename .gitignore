@@ -1,0 +1,42 @@
+# Numerous always-ignore extensions
+*.a
+*.diff
+*.err
+*.exe
+*.iml
+*.ipr
+*.iws
+*.log
+*.orig
+*.rej
+*.swo
+*.swp
+*.vi
+*~
+\#*#
+
+
+
+# Files to ignore
+chromedriver
+
+# OS or Editor folders
+.DS_Store
+.cache
+.directory
+.idea
+META-INF
+nbproject
+.project
+.settings
+thumbs.db
+
+
+# Folders to ignore
+.closure_ant_tasks/
+bin/
+build/
+.hg/
+publish/
+.svn/
+*~/

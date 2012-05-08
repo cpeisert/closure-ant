@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+================================================================================
+  AntUnit tests for Closure Compiler.
+================================================================================
+-->
+<project name="closure-compiler-test" default="test">
+
+  <dirname property="antunit.dir" file="${ant.file.closure-compiler-test}" />
+
+  <property name="test.dir" location="${antunit.dir}/.." />
+  <property name="test-projects.dir" location="${test.dir}/test_projects" />
+  <property name="test.build.dir" location="${test.dir}/build" />
+  <property name="test.lib.dir" location="${test.dir}/lib" />
+  <import file="${test.lib.dir}/antunit.xml" />
+
+  <property name="antclosuretools.dir" location="${test.dir}/.." />
+  <property name="antclosuretools.lib.dir" location="${antclosuretools.dir}/lib" />
+  <property name="antclosuretools.build.dir"
+      location="${antclosuretools.dir}/build" />
+  <property name="antclosuretools.xml"
+      location="${antclosuretools.build.dir}/antclosuretools.xml" />
+  <import file="${antclosuretools.xml}" />
+
+  <path id="test.classpath">
+    <fileset dir="${antclosuretools.lib.dir}" includes="**/*.jar" />
+    <fileset dir="${test.lib.dir}" includes="**/*.jar" />
+  </path>
+
+  <import file="${test.dir}/test_projects/project101/project101.xml" />
+
+  
+  <!--
+  =============================================================================
+    Set up and tear down
+  =============================================================================
+  -->
+
+  <!-- Executed once for this test suite before all other targets. -->
+  <target name="suiteSetUp">
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${project101.output.dir}" />
+  </target>
+
+
+  <!--
+  =============================================================================
+    Tests
+  =============================================================================
+  -->
+
+  <target name="test_WHITESPACE_ONLY">
+    <!-- Use Closure Builder to generate a source manifest. -->
+    <closure-builder-python outputMode="compiled"
+        outputManifest="${project101.outputManifest}"
+        outputFile="${project101.whitespace-compiled.output.js}">
+      <namespace value="${project101.namespace}" />
+      <root directory="${project101.js.dir}" />
+      <root directory="${closure-library.dir}" />
+      <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
+    </closure-builder-python>
+
+    <closure-compiler forceRecompile="true"
+        compilationlevel="WHITESPACE_ONLY"
+        inputManifest="${project101.outputManifest}"
+        outputFile="${project101.whitespace-compiled.output.js}"
+        prettyPrint="true">
+    </closure-compiler>
+
+    <assertFileExists file="${project101.whitespace-compiled.output.js}" />
+    <assertResourceContains
+        resource="${project101.whitespace-compiled.output.js}"
+        value="var COMPILED = false" />
+    <delete file="${project101.output.dir}/temp_manifest.txt" />
+  </target>
+
+
+  <target name="test_SIMPLE_OPTIMIZATIONS">
+    <!--
+      Also test the following:
+      * manageClosureDependencies
+      * outputFile
+      * prettyPrint
+      * <namespaceEntryPoint>
+      * <sources>
+      * <define>
+      * <compilerCheck>
+      * <flag>
+    -->
+    <closure-compiler forceRecompile="true"
+        compilationLevel="SIMPLE_OPTIMIZATIONS"
+        manageClosureDependencies="true"
+        outputFile="${project101.simple-compiled.output.js}"
+        prettyPrint="true">
+      <namespaceentrypoint value="${project101.namespace}" />
+      <sources dir="${project101.js.dir}" includes="**/*.js" />
+      <sources dir="${closure-library.dir}" includes="**/*.js" />
+      <define name="goog.DEBUG" value="false" type="boolean" />
+      <define name="goog.LOCALE" value="de" type="string" />
+      <compilercheck name="checkVars" value="WARNING" />
+      <flag name="--logging_level" value="INFO" />
+    </closure-compiler>
+
+    <assertFileExists file="${project101.simple-compiled.output.js}" />
+
+    <!-- Test "define": goog.DEBUG = false -->
+    <assertResourceContains
+        resource="${project101.simple-compiled.output.js}"
+        value="goog.DEBUG = !1" />
+
+    <!-- Test "define": goog.LOCALE = "de" -->
+    <assertResourceContains
+        resource="${project101.simple-compiled.output.js}"
+        value='goog.LOCALE = "de"' />
+  </target>
+
+
+  <target name="test_ADVANCED_OPTIMIZATIONS">
+    <!--
+      Also test the following:
+      * onlyClosureDependencies
+      * outputFile
+      * <namespaceEntryPoint>
+      * <sources>
+    -->
+    <closure-compiler forceRecompile="true"
+        compilationLevel="ADVANCED_OPTIMIZATIONS"
+        outputFile="${project101.advanced-compiled.output.js}"
+        onlyClosureDependencies="true">
+      <namespaceentrypoint value="${project101.namespace}" />
+      <sources dir="${project101.js.dir}" includes="**/*.js" />
+      <sources dir="${closure-library.dir}" includes="**/*.js" />
+    </closure-compiler>
+
+    <assertFileExists file="${project101.advanced-compiled.output.js}" />
+  </target>
+
+
+  <target name="test_skipCompilationIfOutputFileUpToDate">
+    <logcapturer />
+    <!-- Use Closure Builder to generate a source manifest. -->
+    <closure-builder-python outputMode="compiled"
+        outputManifest="${project101.outputManifest}"
+        outputFile="${project101.whitespace-compiled.output.js}">
+      <namespace value="${project101.namespace}" />
+      <root directory="${project101.js.dir}" />
+      <root directory="${closure-library.dir}" />
+      <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
+    </closure-builder-python>
+
+    <closure-compiler
+        compilationlevel="WHITESPACE_ONLY"
+        inputManifest="${project101.outputManifest}"
+        outputFile="${project101.whitespace-compiled.output.js}"
+        prettyPrint="true">
+    </closure-compiler>
+
+    <!-- Compilation should be skipped. -->
+    <closure-compiler
+        compilationlevel="WHITESPACE_ONLY"
+        inputManifest="${project101.outputManifest}"
+        outputFile="${project101.whitespace-compiled.output.js}"
+        prettyPrint="true">
+    </closure-compiler>
+
+    <assertLogContains text="Output file up-to-date. Compilation skipped." />
+  </target>
+
+
+  <target name="test_InputManifestAndOutputManifest">
+    <!-- Use Closure Builder to create a manifest to use as inputManifest for
+         Closure Compiler task. -->
+    <property name="closure-builder.manifest.txt"
+        location="${project101.output.dir}/closure-builder.manifest.txt" />
+    <property name="closure-compiler.manifest.txt"
+        location="${project101.output.dir}/closure-compiler.manifest.txt" />
+
+    <closure-builder-python outputMode="compiled"
+        outputManifest="${closure-builder.manifest.txt}"
+        outputFile="${project101.whitespace-compiled.output.js}">
+      <namespace value="${project101.namespace}" />
+      <root directory="${project101.js.dir}" />
+      <root directory="${closure-library.dir}" />
+      <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
+    </closure-builder-python>
+
+    <assertFileExists file="${closure-builder.manifest.txt}" />
+
+    <closure-compiler forceRecompile="true"
+        inputManifest="${closure-builder.manifest.txt}"
+        outputManifest="${closure-compiler.manifest.txt}"
+        outputfile="${project101.simple-compiled.output.js}"
+        compilationLevel="simple"
+        prettyPrint="true">
+      <define name="goog.LOCALE" value="fr" type="string" />
+    </closure-compiler>
+
+    <assertFileExists file="${closure-compiler.manifest.txt}" />
+    <assertFileExists file="${project101.simple-compiled.output.js}" />
+    <assertResourceContains resource="${project101.simple-compiled.output.js}"
+        value='goog.LOCALE = "fr"' />
+  </target>
+
+
+  <property name="exclude-closure-library.input.dir"
+      location="${test-projects.dir}/exclude-closure-library" />
+  <property name="exclude-closure-library.output.dir"
+      location="${test.build.dir}/antunit/exclude-closure-library" />
+  <property name="exclude-closure-library.simple-compiled.js"
+      location="${exclude-closure-library.output.dir}/test.simple-compiled.js" />
+
+  <target name="test_process_closure_primitives">
+    <mkdir dir="${exclude-closure-library.output.dir}" />
+    <copy todir="${exclude-closure-library.output.dir}">
+      <fileset dir="${exclude-closure-library.input.dir}" includes="*.html" />
+    </copy>
+    <closure-compiler forceRecompile="true"
+        processClosurePrimitives="true"
+        compilationLevel="simple"
+        outputfile="${exclude-closure-library.simple-compiled.js}"
+        prettyPrint="true">
+      <namespaceentrypoint value="test" />
+      <sourcelist dir="${exclude-closure-library.input.dir}"
+        files="mylib.js, test.js" />
+    </closure-compiler>
+
+    <assertFileExists file="${exclude-closure-library.simple-compiled.js}" />
+    <assertResourceDoesntContain
+        resource="${exclude-closure-library.simple-compiled.js}"
+        value="goog.provide(" />
+  </target>
+
+
+  <!-- Run this test suite. -->
+  <target name="test">
+    <antunit>
+      <plainlistener loglevel="info" />
+      <file file="${antunit.dir}/ClosureCompilerTest.xml" />
+    </antunit>
+  </target>
+</project>

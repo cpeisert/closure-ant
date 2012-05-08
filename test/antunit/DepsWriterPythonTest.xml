@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+================================================================================
+  AntUnit tests for Deps Writer task that wraps the Python script depswriter.py.
+================================================================================
+-->
+<project name="deps-writer-python-test" default="test">
+
+  <dirname property="antunit.dir" file="${ant.file.deps-writer-python-test}" />
+
+  <property name="test.dir" location="${antunit.dir}/.." />
+  <property name="test-projects.dir" location="${test.dir}/test_projects" />
+  <property name="test.build.dir" location="${test.dir}/build" />
+  <property name="test.antunit.output.dir"
+      location="${test.build.dir}/antunit" />
+  <property name="deps-writer.output.dir"
+      location="${test.antunit.output.dir}/deps-writer" />
+  <property name="test.lib.dir" location="${test.dir}/lib" />
+  <import file="${test.lib.dir}/antunit.xml" />
+
+  <property name="antclosuretools.dir" location="${test.dir}/.." />
+  <property name="antclosuretools.lib.dir"
+      location="${antclosuretools.dir}/lib" />
+  <property name="antclosuretools.build.dir"
+      location="${antclosuretools.dir}/build" />
+  <property name="antclosuretools.xml"
+      location="${antclosuretools.build.dir}/antclosuretools.xml" />
+  <import file="${antclosuretools.xml}" />
+
+  <import file="${test.dir}/test_projects/project101/project101.xml" />
+
+  
+  <!--
+  =============================================================================
+    Set up and tear down
+  =============================================================================
+  -->
+
+  <!-- Executed once for this test suite before all other targets. -->
+  <target name="suiteSetUp">
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${test.antunit.output.dir}" />
+    <mkdir dir="${deps-writer.output.dir}" />
+    <mkdir dir="${project101.output.dir}" />
+  </target>
+
+
+  <!--
+  =============================================================================
+    Tests
+  =============================================================================
+  -->
+
+  <target name="test_rootAndRootWithPrefix">
+    <property name="output.deps.js"
+        location="${deps-writer.output.dir}/deps.js" />
+
+    <!-- Create the Closure Library deps.js file. -->
+    <deps-writer-python outputfile="${output.deps.js}">
+      <root dirpath="${closure-library.dir}/third_party/closure/goog"
+          prefix="../../third_party/closure/goog" />
+      <root dirpath="${closure-library.dir}/closure/goog" />
+    </deps-writer-python>
+
+    <assertFileExists file="${output.deps.js}" />
+    <assertResourceContains resource="${output.deps.js}"
+        value="goog.addDependency('../../third_party/closure/goog/osapi/osapi.js', ['goog.osapi'], []);" />
+    <assertResourceContains resource="${output.deps.js}"
+        value="goog.addDependency('webgl/webgl.js', ['goog.webgl'], []);" />
+  </target>
+
+
+  <target name="test_filePath">
+    <property name="output.deps.js"
+        location="${deps-writer.output.dir}/project101.deps.js" />
+
+    <deps-writer-python outputfile="${output.deps.js}">
+      <path filepath="${project101.js.dir}${file.separator}project101.js" />
+    </deps-writer-python>
+
+    <assertFileExists file="${output.deps.js}" />
+    <assertResourceContains resource="${output.deps.js}"
+        value="${project101.js.dir}${file.separator}project101.js', ['project101'], ['goog.date.Date', 'goog.dom']);" />
+  </target>
+
+
+  <target name="test_filePathWithDepsPath">
+    <property name="output.deps.js"
+        location="${deps-writer.output.dir}/project101.deps.js" />
+
+    <deps-writer-python outputfile="${output.deps.js}">
+      <path filepath="${project101.js.dir}${file.separator}project101.js"
+          depspath="../../../project101.js" />
+    </deps-writer-python>
+
+    <assertFileExists file="${output.deps.js}" />
+    <assertResourceContains resource="${output.deps.js}"
+        value="goog.addDependency('../../../project101.js', ['project101'], ['goog.date.Date', 'goog.dom']);" />
+  </target>
+
+
+  <target name="test_sources">
+    <property name="output.deps.js"
+        location="${deps-writer.output.dir}/project101.deps.js" />
+
+    <deps-writer-python outputfile="${output.deps.js}">
+      <sources dir="${project101.js.dir}" includes="**/*.js" />
+    </deps-writer-python>
+
+    <assertFileExists file="${output.deps.js}" />
+    <assertResourceContains resource="${output.deps.js}"
+        value="project101.js', ['project101'], ['goog.date.Date', 'goog.dom']);" />
+  </target>
+
+  
+  <!-- Run this test suite. -->
+  <target name="test">
+    <antunit>
+      <file file="${antunit.dir}/DepsWriterPythonTest.xml" />
+      <plainlistener loglevel="info" />
+    </antunit>
+  </target>
+</project>

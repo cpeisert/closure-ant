@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+================================================================================
+  AntUnit tests for the Builder Plus command line interface.
+================================================================================
+-->
+<project name="builder-plus-cli-test" default="test">
+
+  <dirname property="antunit.dir" 
+      file="${ant.file.builder-plus-cli-test}" />
+
+  <property name="test.dir" location="${antunit.dir}/.." />
+  <property name="test-projects.dir" location="${test.dir}/test_projects" />
+  <property name="test.build.dir" location="${test.dir}/build" />
+  <property name="test.lib.dir" location="${test.dir}/lib" />
+  <import file="${test.lib.dir}/antunit.xml" />
+
+  <property name="antclosuretools.dir" location="${test.dir}/.." />
+  <property name="antclosuretools.lib.dir" location="${antclosuretools.dir}/lib" />
+  <property name="antclosuretools.build.dir"
+      location="${antclosuretools.dir}/build" />
+  <property name="antclosuretools.xml"
+      location="${antclosuretools.build.dir}/antclosuretools.xml" />
+  <import file="${antclosuretools.xml}" />
+
+  <import file="${test.dir}/test_projects/project101/project101.xml" />
+
+  <property name="builderplus.jar"
+      location="${antclosuretools.build.dir}/builderplus.jar" />
+  <property name="flagfile.txt"
+      location="${project101.output.dir}/compiler_flagfile.txt" />
+
+  <path id="test.classpath">
+    <fileset dir="${antclosuretools.lib.dir}" includes="**/*.jar" />
+    <fileset dir="${test.lib.dir}" includes="**/*.jar" />
+  </path>
+
+  
+  <!--
+  =============================================================================
+    Set up and tear down
+  =============================================================================
+  -->
+
+  <!-- Executed once for this test suite before all other targets. -->
+  <target name="suiteSetUp">
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${project101.output.dir}" />
+  </target>
+
+
+  <!--
+  =============================================================================
+    Tests
+  =============================================================================
+  -->
+
+  <target name="test_outputMode=RAW">
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value='--output_file="${project101.raw.output.js}"' />
+      <arg line="--output_mode 'raw'" />
+      <arg line="--namespace '${project101.namespace}'" />
+      <arg line='--root "${project101.js.dir}"' />
+      <arg line='--root "${closure-library.dir}"' />
+    </java>
+
+    <assertFileExists file="${project101.raw.output.js}" />
+    <assertResourceContains resource="${project101.raw.output.js}"
+        value="project101.displayMessage = function(message)" />
+  </target>
+
+
+  <target name="test_keepMoochers">
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg line="--keep_moochers" />
+      <arg value='--output_file="${project101.raw.output.js}"' />
+      <arg line="--output_mode 'raw'" />
+      <arg line="--namespace '${project101.namespace}'" />
+      <arg line='--root "${project101.js.dir}"' />
+      <arg line='--root "${closure-library.dir}"' />
+    </java>
+
+    <assertFileExists file="${project101.raw.output.js}" />
+    <assertResourceContains resource="${project101.raw.output.js}"
+        value="It is satisfying to mooch off of goog.date.Date" />
+  </target>
+
+
+  <target name="test_whitespace-compiled">
+    <echo file="${flagfile.txt}"
+        message="--compilation_level=WHITESPACE_ONLY --formatting=PRETTY_PRINT" />
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value="--force_recompile" />
+      <arg value='--output_file="${project101.whitespace-compiled.output.js}"' />
+      <arg line="--output_mode 'compiled'" />
+      <arg line="--namespace '${project101.namespace}'" />
+      <arg line='--root "${project101.js.dir}"' />
+      <arg line='--root "${closure-library.dir}"' />
+      <arg line='--flagfile "${flagfile.txt}"' />
+    </java>
+
+    <assertFileExists file="${project101.whitespace-compiled.output.js}" />
+    <assertResourceContains
+        resource="${project101.whitespace-compiled.output.js}"
+        value="var COMPILED = false;" />
+  </target>
+
+  
+  <target name="test_simple-compiled">
+    <echo file="${flagfile.txt}"
+        message='--compilation_level=SIMPLE_OPTIMIZATIONS
+        --formatting=PRETTY_PRINT --define goog.DEBUG=false
+        --define goog.LOCALE="de" --jscomp_warning=checkVars
+        --logging_level=INFO' />
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value="--force_recompile" />
+      <arg value='--output_file="${project101.simple-compiled.output.js}"' />
+      <arg line="--output_mode=compiled" />
+      <arg line="--namespace '${project101.namespace}'" />
+      <arg line='--root "${project101.js.dir}"' />
+      <arg line='--root "${closure-library.dir}"' />
+      <arg line='--flagfile "${flagfile.txt}"' />
+    </java>
+
+    <assertFileExists file="${project101.simple-compiled.output.js}" />
+
+    <!-- Test "define": goog.DEBUG = false -->
+    <assertResourceContains
+        resource="${project101.simple-compiled.output.js}"
+        value="goog.DEBUG = !1" />
+
+    <!-- Test "define": goog.LOCALE = "de" -->
+    <assertResourceContains
+        resource="${project101.simple-compiled.output.js}"
+        value='goog.LOCALE = "de"' />
+  </target>
+
+  
+  <target name="test_advanced-compiled">
+    <echo file="${flagfile.txt}"
+        message='--compilation_level=ADVANCED_OPTIMIZATIONS' />
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value="--force_recompile" />
+      <arg value='--output_file="${project101.advanced-compiled.output.js}"' />
+      <arg line="--output_mode=compiled" />
+      <arg line="--namespace '${project101.namespace}'" />
+      <arg line='--root "${project101.js.dir}"' />
+      <arg line='--root "${closure-library.dir}"' />
+      <arg line='--flagfile "${flagfile.txt}"' />
+    </java>
+
+    <assertFileExists file="${project101.advanced-compiled.output.js}" />
+  </target>
+  
+
+  <target name="test_outputMode=MANIFEST">
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value='--output_manifest="${project101.outputManifest}"' />
+      <arg line="--output_mode 'MANIFEST'" />
+      <arg line="--main_source '${project101.js.dir}/project101.js'" />
+      <arg line='--root "${closure-library.dir}"' />
+    </java>
+
+    <assertFileExists file="${project101.outputManifest}" />
+    <assertResourceContains resource="${project101.outputManifest}"
+        value="base.js" />
+    <assertResourceContains resource="${project101.outputManifest}"
+        value="project101.js" />
+  </target>
+
+
+  <target name="test_outputManifest">
+    <property name="base.js"
+        location="${closure-library.dir}/closure/goog/base.js" />
+
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value='--output_manifest="${project101.outputManifest}"' />
+      <arg value='--output_file="${project101.raw.output.js}"' />
+      <arg line="--output_mode 'raw'" />
+      <arg line="--main_source '${project101.js.dir}/project101.js'" />
+      <arg line='--root "${closure-library.dir}"' />
+    </java>
+
+    <assertFileExists file="${project101.outputManifest}" />
+
+    <pathconvert property="base.js_current-platform">
+      <fileset file="${base.js}" />
+    </pathconvert>
+    <assertResourceContains resource="${project101.outputManifest}"
+        value="${base.js_current-platform}" />
+    <assertResourceContains resource="${project101.outputManifest}"
+        value="project101.js" />
+  </target>
+
+
+  <target name="test_skipCompilationIfOutputFileUpToDate">
+    <logcapturer />
+    <echo file="${flagfile.txt}"
+        message='--compilation_level=WHITESPACE_ONLY --formatting=PRETTY_PRINT' />
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value='--output_file="${project101.whitespace-compiled.output.js}"' />
+      <arg line="--output_mode=compiled" />
+      <arg line="--namespace '${project101.namespace}'" />
+      <arg line='--root "${project101.js.dir}"' />
+      <arg line='--root "${closure-library.dir}"' />
+      <arg line='--flagfile "${flagfile.txt}"' />
+    </java>
+
+    <!-- Compilation should be skipped. -->
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value='--output_file="${project101.whitespace-compiled.output.js}"' />
+      <arg line="--output_mode=compiled" />
+      <arg line="--namespace '${project101.namespace}'" />
+      <arg line='--root "${project101.js.dir}"' />
+      <arg line='--root "${closure-library.dir}"' />
+      <arg line='--flagfile "${flagfile.txt}"' />
+    </java>
+
+    <assertLogContains text="Output file up-to-date. Compilation skipped." />
+  </target>
+  
+  <!-- Run this test suite. -->
+  <target name="test">
+    <antunit>
+      <file file="${antunit.dir}/BuilderPlusCLITest.xml" />
+      <plainlistener loglevel="info" />
+    </antunit>
+  </target>
+</project>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+================================================================================
+  Properties and configuration settings for "project101" project.
+================================================================================
+-->
+<project name="project101">
+
+  <dirname property="project101.dir" file="${ant.file.project101}" />
+  <property name="test.dir" location="${project101.dir}/../.." />
+  <property name="antunit.dir" location="${test.dir}/antunit" />
+  <property name="antunit.build.dir" location="${test.dir}/build/antunit" />
+
+  <property name="project101.namespace" value="project101" />
+  <property name="project101.js.dir" location="${project101.dir}/js" />
+  <property name="project101.output.dir"
+      location="${antunit.build.dir}/project101" />
+  <property name="project101.outputManifest"
+      location="${project101.output.dir}/outputManifest.txt" />
+  <property name="project101.raw.output.js"
+      location="${project101.output.dir}/project101.raw.js" />
+  <property name="project101.whitespace-compiled.output.js"
+      location="${project101.output.dir}/project101.whitespace-compiled.js" />
+  <property name="project101.simple-compiled.output.js"
+      location="${project101.output.dir}/project101.simple-compiled.js" />
+  <property name="project101.advanced-compiled.output.js"
+      location="${project101.output.dir}/project101.advanced-compiled.js" />
+  <property name="project101.sourcemap.json"
+        location="${project101.output.dir}/sourcemap.json" />
+
+
+  <!-- plovr properties -->
+  <property name="project101.config.json"
+      location="${project101.output.dir}/plovr-config.json" />
+  <property name="project101.plovr.simple-compiled.js"
+      location="${project101.output.dir}/project101.plovr.simple-compiled.js" />
+  <property name="project101.plovr.advanced-compiled.js"
+      location="${project101.output.dir}/project101.plovr.advanced-compiled.js" />
+  <property name="project101.plovr-server-test_simple.html"
+      location="${test.dir}/test_projects/project101/html/plovrServerTest_simple-mode.html" />
+  <property name="project101.plovr-server-test_simple.output.html"
+      location="${project101.output.dir}/plovrServerTest_simple-mode.html" />
+  <property name="project101.plovr.jsdoc"
+      location="${project101.output.dir}/plovr-jsdoc" />
+
+
+  <!-- HTML file properties -->
+  <property name="project101.html.dir" location="${project101.dir}/html" />
+  <property name="project101.html.template"
+      location="${project101.html.dir}/index_template.html" />
+  <property name="project101.output.index.html"
+      location="${project101.output.dir}/index.html" />
+  <property name="project101.index.html.title" value="Project101" />
+
+</project>
