@@ -254,7 +254,7 @@ import org.closureextensions.ant.PlovrConfig;
  * </li>
  * </ul>
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public interface CompilerOptionsForPlovr extends CompilerOptionsBasic {
 

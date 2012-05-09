@@ -21,7 +21,7 @@ import com.google.common.base.Preconditions;
 /**
  * Compilation levels supported by Closure Compiler.
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public enum CompilationLevel {
 

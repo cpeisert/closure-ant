@@ -44,7 +44,7 @@ import java.util.List;
  * {@link org.closureextensions.ant.ClosureBuilderPythonTask}, and
  * {@link org.closureextensions.ant.PlovrTask}.</p>
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public abstract class AbstractClosureCompiler extends ProjectComponent {
 

@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
  * Static factory class to create new instances of {@link CompilerOptionsBasic},
  * {@link CompilerOptionsComplete}, and {@link CompilerOptionsForPlovr}.
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class CompilerOptionsFactory {
   private CompilerOptionsFactory() {}

@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 /**
  * Entry point for Builder Plus command line interface.
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class Main {
 

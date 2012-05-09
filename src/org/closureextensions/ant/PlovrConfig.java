@@ -38,7 +38,7 @@ import org.closureextensions.ant.types.PlovrOutputModuleCollection;
  * href="http://plovr.com/options.html">plovr config options</a> as shown
  * in the <a href="#field_detail"><b>Field Detail</b></a> below.</p>
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class PlovrConfig {
   

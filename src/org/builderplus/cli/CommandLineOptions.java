@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * Command line options for the Builder Plus command line interface.
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class CommandLineOptions {
 

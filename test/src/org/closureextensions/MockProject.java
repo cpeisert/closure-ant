@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Static utility class providing a mock Ant project for unit tests.
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class MockProject {
   private MockProject() {}

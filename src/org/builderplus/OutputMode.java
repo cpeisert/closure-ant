@@ -19,7 +19,7 @@ package org.builderplus;
 /**
  * Output modes supported by Builder Plus.
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public enum OutputMode {
 

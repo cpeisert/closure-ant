@@ -48,7 +48,7 @@ import org.closureextensions.common.util.FileUtil;
  * href="https://developers.google.com/closure/library/docs/depswriter">
  * Using DepsWriter</a>.</p>
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class DepsWriterTask extends Task {
 

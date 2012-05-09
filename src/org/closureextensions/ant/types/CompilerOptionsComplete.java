@@ -269,7 +269,7 @@ import java.io.File;
  * </li>
  * </ul>
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public interface CompilerOptionsComplete extends CompilerOptionsBasic {
   /*

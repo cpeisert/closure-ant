@@ -21,7 +21,7 @@ package org.closureextensions.ant.types;
  * {@literal <compiler>} element. {@code idgenerator} corresponds to the
  * plovr JSON config file option {@code id-generators}.
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class IdGenerator {
 

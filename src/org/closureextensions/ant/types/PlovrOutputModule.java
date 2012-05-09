@@ -119,7 +119,7 @@ import org.closureextensions.common.util.AntUtil;
  * <p>See: <a target="_blank" href="http://plovr.com/options.html#modules">
  * plovr {@code modules} option</a></p>
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class PlovrOutputModule extends DataType {
 

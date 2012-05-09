@@ -165,7 +165,7 @@ import org.closureextensions.common.util.FileUtil;
  * </li>
  * </ul>
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class BuilderPlusTask extends Task {
 

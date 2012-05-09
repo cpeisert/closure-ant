@@ -92,7 +92,7 @@ limitations under the License.
     same directory as closure-ant-tasks.xml.
   -->
   <property name="closure-ant-tasks.jar"
-      location="${closure-ant-tasks.xml.basedir}/antclosuretools.jar" />
+      location="${closure-ant-tasks.xml.basedir}/closure-ant-tasks.jar" />
 
   <!--
     Change the location of "closure-tools.dir" to point to your local copy.
@@ -160,8 +160,5 @@ limitations under the License.
 
   <taskdef name="plovr-soyweb" classpath="${closure-ant-tasks.jar}"
       classname="org.closureextensions.ant.PlovrSoyWebTask" />
-
-  <taskdef name="soy-msg-extractor" classpath="${closure-ant-tasks.jar}"
-      classname="org.closureextensions.ant.SoyMsgExtractorTask" />
 </project>
 

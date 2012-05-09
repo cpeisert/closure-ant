@@ -45,7 +45,7 @@ import java.util.Set;
  * href="http://www.amazon.com/gp/product/1449381871"><i>Closure: The
  * Definitive Guide</i></a> page 353.</p>
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class CompileTimeDefines {
   private final Map<String, JsonPrimitive> defines;

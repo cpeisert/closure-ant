@@ -45,7 +45,7 @@ import org.closureextensions.common.util.FileUtil;
  * {@code --keep_all_sources}, {@code --keep_moochers}, and {@code
  * --keep_original_order}.
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class BuilderPlusRunner {
 

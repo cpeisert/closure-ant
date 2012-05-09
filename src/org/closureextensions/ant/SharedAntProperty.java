@@ -22,7 +22,7 @@ import org.apache.tools.ant.Project;
  * Enumeration constants corresponding to the Ant properties defined in
  * "closure-ant-tasks.xml".
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public enum SharedAntProperty {
   /**

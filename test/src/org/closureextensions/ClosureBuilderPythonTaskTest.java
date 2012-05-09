@@ -27,7 +27,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 /**
  * Tests for {@link org.closureextensions.ant.ClosureBuilderPythonTask}.
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 @RunWith(BlockJUnit4ClassRunner.class)
 public final class ClosureBuilderPythonTaskTest {

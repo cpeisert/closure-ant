@@ -41,7 +41,7 @@ import org.apache.tools.ant.types.Parameter;
  * correctly serialized to the corresponding primitive JavaScript type rather
  * than a JavaScript object with a {@code value} field.</p>
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class ExperimentalCompilerOptions {
   private final Map<String, JsonPrimitive> experimentalCompilerOptions;

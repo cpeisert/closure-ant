@@ -67,7 +67,7 @@ import java.util.Set;
  * <li>externs</li>
  * </ul></p>
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public interface CompilerOptionsBasic {
 

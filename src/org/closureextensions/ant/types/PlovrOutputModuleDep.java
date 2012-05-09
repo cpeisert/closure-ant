@@ -20,7 +20,7 @@ package org.closureextensions.ant.types;
  * Data type for simple nested elements that represent the name of a module
  * dependency for the plovr task nested element {@literal <module>}.
  *
- * @author cpeisert@gmail.com (Christopher Peisert)
+ * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class PlovrOutputModuleDep {
 
