@@ -33,10 +33,10 @@ limitations under the License.
   <property name="plovr_soyweb.dir"
       location="${test-projects.dir}/plovr_soyweb" />
 
-  <property name="antclosuretools.dir" location="${test.dir}/.." />
-  <property name="antclosuretools.xml"
-      location="${antclosuretools.dir}/build/antclosuretools.xml" />
-  <import file="${antclosuretools.xml}" />
+  <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
+  <property name="closure-ant-tasks.xml"
+      location="${closure-ant-tasks.dir}/build/closure-ant-tasks.xml" />
+  <import file="${closure-ant-tasks.xml}" />
 
   <!--
   =============================================================================

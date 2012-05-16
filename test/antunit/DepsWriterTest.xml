@@ -34,14 +34,14 @@ limitations under the License.
   <property name="test.lib.dir" location="${test.dir}/lib" />
   <import file="${test.lib.dir}/antunit.xml" />
 
-  <property name="antclosuretools.dir" location="${test.dir}/.." />
-  <property name="antclosuretools.lib.dir"
-      location="${antclosuretools.dir}/lib" />
-  <property name="antclosuretools.build.dir"
-      location="${antclosuretools.dir}/build" />
-  <property name="antclosuretools.xml"
-      location="${antclosuretools.build.dir}/antclosuretools.xml" />
-  <import file="${antclosuretools.xml}" />
+  <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
+  <property name="closure-ant-tasks.lib.dir"
+      location="${closure-ant-tasks.dir}/lib" />
+  <property name="closure-ant-tasks.build.dir"
+      location="${closure-ant-tasks.dir}/build" />
+  <property name="closure-ant-tasks.xml"
+      location="${closure-ant-tasks.build.dir}/closure-ant-tasks.xml" />
+  <import file="${closure-ant-tasks.xml}" />
 
   <import file="${test.dir}/test_projects/project101/project101.xml" />
 
