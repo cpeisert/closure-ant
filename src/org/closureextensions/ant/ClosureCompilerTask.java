@@ -243,6 +243,13 @@ public final class ClosureCompilerTask extends Task
   private boolean printCommandLine;
 
   // Nested elements
+
+  // TODO(cpeisert): rename all Lists of FileSet to <name>FileSet, for example,
+  // mainSourceFileSets.
+
+  // TODO(cpeisert): rename Ant nested elements that are FileSets, to end in
+  // "FileSet", e.g., AddMainSourceFileSet(FileSet mainSourceFileSet)
+
   private final List<FileSet> mainSources;
   private final List<StringNestedElement> namespaceEntryPoints;
   private final List<FileList> sourceLists;
