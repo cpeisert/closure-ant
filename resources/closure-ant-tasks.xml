@@ -140,25 +140,44 @@ limitations under the License.
   ==============================================================================
   -->
 
-  <taskdef name="builder-plus" classpath="${closure-ant-tasks.jar}"
-      classname="org.closureextensions.ant.BuilderPlusTask" />
+  <presetdef name="builder-plus">
+    <taskdef name="builder-plus" classpath="${closure-ant-tasks.jar}"
+        classname="org.closureextensions.ant.BuilderPlusTask" />
+  </presetdef>
 
-  <taskdef name="closure-builder-python" classpath="${closure-ant-tasks.jar}"
-      classname="org.closureextensions.ant.ClosureBuilderPythonTask" />
+  <presetdef name="closure-builder-python">
+    <taskdef name="closure-builder-python" classpath="${closure-ant-tasks.jar}"
+        classname="org.closureextensions.ant.ClosureBuilderPythonTask" />
+  </presetdef>
 
-  <taskdef name="closure-compiler" classpath="${closure-ant-tasks.jar}"
-      classname="org.closureextensions.ant.ClosureCompilerTask" />
+  <presetdef name="closure-compiler">
+    <taskdef name="closure-compiler" classpath="${closure-ant-tasks.jar}"
+        classname="org.closureextensions.ant.ClosureCompilerTask" />
+  </presetdef>
 
-  <taskdef name="deps-writer" classpath="${closure-ant-tasks.jar}"
-      classname="org.closureextensions.ant.DepsWriterTask" />
+  <presetdef name="deps-writer">
+    <taskdef name="deps-writer" classpath="${closure-ant-tasks.jar}"
+        classname="org.closureextensions.ant.DepsWriterTask" />
+  </presetdef>
 
-  <taskdef name="deps-writer-python" classpath="${closure-ant-tasks.jar}"
-      classname="org.closureextensions.ant.DepsWriterPythonTask" />
+  <presetdef name="deps-writer-python">
+    <taskdef name="deps-writer-python" classpath="${closure-ant-tasks.jar}"
+        classname="org.closureextensions.ant.DepsWriterPythonTask" />
+  </presetdef>
 
-  <taskdef name="plovr" classpath="${closure-ant-tasks.jar}"
-      classname="org.closureextensions.ant.PlovrTask" />
+  <presetdef name="plovr">
+    <taskdef name="plovr" classpath="${closure-ant-tasks.jar}"
+        classname="org.closureextensions.ant.PlovrTask" />
+  </presetdef>
 
-  <taskdef name="plovr-soyweb" classpath="${closure-ant-tasks.jar}"
-      classname="org.closureextensions.ant.PlovrSoyWebTask" />
+  <presetdef name="plovr-soyweb">
+    <taskdef name="plovr-soyweb" classpath="${closure-ant-tasks.jar}"
+        classname="org.closureextensions.ant.PlovrSoyWebTask" />
+  </presetdef>
+
+  <presetdef name="stylesheets">
+    <taskdef name="stylesheets" classpath="${closure-ant-tasks.jar}"
+        classname="org.closureextensions.ant.ClosureStylesheetsTask" />
+  </presetdef>
 </project>
 
