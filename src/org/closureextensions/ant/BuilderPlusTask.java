@@ -27,7 +27,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
-import org.builderplus.OutputMode;
+import org.closureextensions.builderplus.OutputMode;
 
 import org.closureextensions.ant.types.CompilerOptionsComplete;
 import org.closureextensions.ant.types.CompilerOptionsFactory;

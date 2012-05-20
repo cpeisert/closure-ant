@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.builderplus;
+package org.closureextensions.builderplus;
 
 /**
  * Output modes supported by Builder Plus.

@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.builderplus.cli;
+package org.closureextensions.builderplus.cli;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -29,7 +29,7 @@ import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 
-import org.builderplus.OutputMode;
+import org.closureextensions.builderplus.OutputMode;
 
 import org.closureextensions.ant.ClosureCompilerTask;
 import org.closureextensions.common.deps.ManifestBuilder;

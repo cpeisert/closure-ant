@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.builderplus.cli;
+package org.closureextensions.builderplus.cli;
 
 import com.google.common.collect.Lists;
 

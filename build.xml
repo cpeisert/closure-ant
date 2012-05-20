@@ -93,7 +93,8 @@ limitations under the License.
     <manifest file="${build.dir}/BUILDER_PLUS_MANIFEST.MF">
       <attribute name="Built-By" value="${user.name}"/>
       <attribute name="Built-Date" value="${DATE_TODAY}"/>
-      <attribute name="Main-Class" value="org.builderplus.cli.Main" />
+      <attribute name="Main-Class"
+          value="org.closureextensions.builderplus.cli.Main" />
       <attribute name="Release" value="${release.stamp}"/>
     </manifest>
   </target>

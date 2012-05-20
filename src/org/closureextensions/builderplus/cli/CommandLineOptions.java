@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.builderplus.cli;
+package org.closureextensions.builderplus.cli;
 
 import com.google.common.collect.Lists;
 
 import com.google.common.collect.Sets;
-import org.builderplus.OutputMode;
+import org.closureextensions.builderplus.OutputMode;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
