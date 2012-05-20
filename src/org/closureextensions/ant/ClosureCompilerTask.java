@@ -41,16 +41,16 @@ import java.util.Set;
 
 /**
  * Closure Compiler Ant task. The default task name is {@code closure-compiler}
- * as defined in "closure-ant-tasks.xml".
+ * as defined in "task-definitions.xml".
  *
  * <p>The location of the Compiler jar file is also defined in
- * "closure-ant-tasks.xml", which should be included in your build file as
+ * "closure-tools-config.xml", which should be included in your build file as
  * follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-ant-tasks.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-ant-tasks.xml" are correct
- * for your local configuration.</i></p>
+ * <p><i>Verify that the paths defined in "closure-tools-config.xml" are
+ * correct for your local configuration.</i></p>
  *
  * <p>The options "mainSources", "sources", and "sourceList" take the place of
  * the {@code --js} command line flag to exploit Ant's built-in capabilities.
@@ -617,7 +617,7 @@ public final class ClosureCompilerTask extends Task
         this.compilerJar = new File(closureCompilerPath);
       } else {
         throw new BuildException("\"compilerJar\" is not set. Verify "
-            + "that your build file imports \"closure-ant-tasks.xml\" and "
+            + "that your build file imports \"closure-tools-config.xml\" and "
             + "that the property locations are correct for your machine.");
       }
     }

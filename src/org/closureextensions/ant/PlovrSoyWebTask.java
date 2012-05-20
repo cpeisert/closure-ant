@@ -30,16 +30,16 @@ import org.closureextensions.common.util.StringUtil;
 /**
  * Ant task for the <a target="_blank" href="http://plovr.com/soyweb.html">
  * plovr SoyWeb</a> web server. The default task name is {@code plovr-soyweb}
- * as defined in "closure-ant-tasks.xml".
+ * as defined in "task-definitions.xml".
  *
  * <p>The location of the plovr Jar file is also defined in
- * "closure-ant-tasks.xml", which should be included in your build file as
+ * "closure-tools-config.xml", which should be included in your build file as
  * follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-ant-tasks.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-ant-tasks.xml" are correct
- * for your local configuration.</i></p>
+ * <p><i>Verify that the paths defined in "closure-tools-config.xml" are
+ * correct for your local configuration.</i></p>
  *
  *
  * TODO(cpeisert): Move the Ant-style documentation below into separate doc
@@ -72,7 +72,7 @@ import org.closureextensions.common.util.StringUtil;
  *     Apache config.</td><td>No.</td></tr>
  * <tr class="rowColor"><td><b>plovrJar</b></td><td>The plovr jar file to
  *     execute.</td><td>No, as long as your build file imports
- *     closure-ant-tasks.xml.</td></tr>
+ *     closure-tools-config.xml.</td></tr>
  * <tr class="altColor"><td><b>port</b></td><td>The port on which SoyWeb will
  *     handle requests. The default is 9811 (which is one more than plovr's
  *     default port, 9810).</td><td>No.</td></tr>
@@ -234,7 +234,7 @@ public final class PlovrSoyWebTask extends Task {
       } else {
         throw new BuildException("Required attribute \"plovrJar\" is not "
             + "set. Verify that your build file imports "
-            + "\"closure-ant-tasks.xml\" and that the property paths are "
+            + "\"closure-tools-config.xml\" and that the property paths are "
             + "correct for your machine.");
       }
     }

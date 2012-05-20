@@ -58,16 +58,16 @@ import org.closureextensions.common.util.FileUtil;
  *
  * Ant task for <a target="_blank" href="http://plovr.com">plovr: a Closure
  * build tool</a>. The default task name is {@code plovr} as defined in
- * "closure-ant-tasks.xml".
+ * "task-definitions.xml".
  *
  * <p>The location of the plovr jar file is also defined in
- * "closure-ant-tasks.xml", which should be included in your build file as
+ * "closure-tools-config.xml", which should be included in your build file as
  * follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-ant-tasks.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-ant-tasks.xml" are correct
- * for your local configuration.</i></p>
+ * <p><i>Verify that the paths defined in "closure-tools-config.xml" are
+ * correct for your local configuration.</i></p>
  *
  * <p>For more information about {@code plovr}, visit
  * <a target="_blank" href="http://plovr.com">plovr.com</a>.</p>
@@ -754,7 +754,7 @@ public final class PlovrTask extends Task {
           throw new BuildException("Required attribute \"plovrJar\" is not "
               + "set. The plovr jar file is required for plovr modes "
               + "\"build\", \"jsdoc\", and \"serve\". Verify that your build "
-              + "file imports \"closure-ant-tasks.xml\" and that the property "
+              + "file imports \"closure-tools-config.xml\" and that the property "
               + "locations are correct for your machine.");
         }
       }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<antlib>
+  <taskdef name="builder-plus"
+      classname="org.closureextensions.ant.BuilderPlusTask" />
+
+  <taskdef name="closure-builder-python"
+      classname="org.closureextensions.ant.ClosureBuilderPythonTask" />
+
+  <taskdef name="closure-compiler"
+      classname="org.closureextensions.ant.ClosureCompilerTask" />
+
+  <taskdef name="deps-writer"
+      classname="org.closureextensions.ant.DepsWriterTask" />
+
+  <taskdef name="deps-writer-python"
+      classname="org.closureextensions.ant.DepsWriterPythonTask" />
+
+  <taskdef name="plovr" classname="org.closureextensions.ant.PlovrTask" />
+
+  <taskdef name="plovr-soyweb"
+      classname="org.closureextensions.ant.PlovrSoyWebTask" />
+
+  <taskdef name="soy" classname="org.closureextensions.ant.SoyTask" />
+
+  <taskdef name="stylesheets"
+      classname="org.closureextensions.ant.ClosureStylesheetsTask" />
+</antlib>

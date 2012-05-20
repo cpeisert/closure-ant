@@ -37,16 +37,16 @@ import org.closureextensions.common.util.StringUtil;
 /**
  * DepsWriter Ant task. This task is a wrapper for the original Python script
  * "depswriter.py"(located in closure-library/closure/bin/build). The default
- * task name is {@code deps-writer-python} as defined in "closure-ant-tasks.xml".
+ * task name is {@code deps-writer-python} as defined in "task-definitions.xml".
  *
  * <p>The locations of the Closure Library and DepsWriter Python script
- * are defined in "closure-ant-tasks.xml", which should be included in your
+ * are defined in "closure-tools-config.xml", which should be included in your
  * build file as follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-ant-tasks.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-ant-tasks.xml" are correct
- * for your local configuration.</i></p>
+ * <p><i>Verify that the paths defined in "closure-tools-config.xml" are
+ * correct for your local configuration.</i></p>
  *
  * <p>For more information about DepsWriter, see
  * <a target="_blank"
@@ -146,7 +146,7 @@ public final class DepsWriterPythonTask extends Task {
       } else {
         throw new BuildException("\"depsWriterPythonScript\" is "
             + "not set. Verify that your build file imports "
-            + "\"closure-ant-tasks.xml\" and that the property paths are "
+            + "\"closure-tools-config.xml\" and that the property paths are "
             + "correct for your machine.");
       }
     }

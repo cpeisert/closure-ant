@@ -14,13 +14,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<project name="closure-ant-tasks-main" basedir="." default="jar">
+<project name="closure-ant-tasks" basedir="." default="jar">
 
   <!-- Use JDK 1.6 to build jar file. Use JDK 1.7 to generate JavaDoc. -->
   <property name="JDK1.6.dir" location="/usr/lib/jvm/jdk1.6" />
   <property name="JDK1.7.dir" location="/usr/lib/jvm/jdk1.7" />
   <property name="javac1.6" location="${JDK1.6.dir}/bin/javac" />
-  <property name="javac1.7" location="${JDK1.7.dir}/bin/javac" />
   <property name="javadoc1.7" location="${JDK1.7.dir}/bin/javadoc" />
   
   <!--
@@ -33,8 +32,8 @@ limitations under the License.
   <property name="lib.dir" value="${basedir}/lib" />
   <property name="resources.dir" value="${basedir}/resources" />
   <property name="test.dir" value="${basedir}/test" />
-  <property name="closure-ant-tasks.xml"
-      value="${resources.dir}/closure-ant-tasks.xml" />
+  <property name="closure-tools-config.xml"
+      value="${resources.dir}/closure-tools-config.xml" />
                              
   <path id="classpath">
     <fileset dir="${lib.dir}" includes="**/*.jar" />
@@ -49,22 +48,28 @@ limitations under the License.
 
   <property name="build.dir" location="${basedir}/build" />
   <property name="classes.dir" location="${build.dir}/classes" />
-  <property name="classes1.7.dir"
-      location="${build.dir}/classes1.7" />
   <property name="closure-ant-tasks.jar" 
       location="${build.dir}/closure-ant-tasks.jar" />
+   <property name="closure-ant-tasks-no-ant-deps.jar"
+       location="${build.dir}/closure-ant-tasks-no-ant-deps.jar" />
+  <property name="closure-ant-tasks-no-deps.jar"
+      location="${build.dir}/closure-ant-tasks-no-deps.jar" />
   <property name="builderplus.jar" location="${build.dir}/builderplus.jar" />
 
   <property name="javadoc.dir" value="${build.dir}/javadoc" />
 
-  <!-- To release a new stable version of closure-ant-tasks, update
-    release.stamp to 'latest' or pass -Drelease.stamp=latest when running ant. -->
-  <property name="release.dir" value="${basedir}/release" />
+  <!--
+    To release a new stable version of closure-ant-tasks, change
+    release.stamp to "latest" or pass -Drelease.stamp=latest when running ant.
+
+    To release a previous stable version, update release.stamp to the
+    appropriate version tag, which is just the date the version was released
+    formatted as YYYY-MM-DD. To see all the version tags, run:
+
+    $ git tag
+  -->
   <property name="release.stamp" value="unstable" />
 
-  <condition property="build.closure-ant-tasks.xml.available">
-    <available file="${build.dir}/closure-ant-tasks.xml" />
-  </condition>
 
   <!--
   ==============================================================================
@@ -75,7 +80,7 @@ limitations under the License.
   <target name="init" description="Initialize the build directory.">
     <mkdir dir="${build.dir}" />
     <mkdir dir="${classes.dir}" />
-    <copy file="${closure-ant-tasks.xml}" todir="${build.dir}" />
+    <copy file="${closure-tools-config.xml}" todir="${build.dir}" />
     <tstamp>
       <format property="YEAR" pattern="yyyy" />
       <format property="DATE_TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
@@ -83,11 +88,13 @@ limitations under the License.
     <manifest file="${build.dir}/MANIFEST.MF">
       <attribute name="Built-By" value="${user.name}"/>
       <attribute name="Built-Date" value="${DATE_TODAY}"/>
+      <attribute name="Release" value="${release.stamp}"/>
     </manifest>
     <manifest file="${build.dir}/BUILDER_PLUS_MANIFEST.MF">
       <attribute name="Built-By" value="${user.name}"/>
       <attribute name="Built-Date" value="${DATE_TODAY}"/>
       <attribute name="Main-Class" value="org.builderplus.cli.Main" />
+      <attribute name="Release" value="${release.stamp}"/>
     </manifest>
   </target>
 
@@ -101,20 +108,27 @@ limitations under the License.
       description="Compiles the Java source using the system's default JDK.">
     <javac srcdir="${src.dir}" destdir="${classes.dir}"
         classpathref="classpath" debug="on" deprecation="on"
-        source="1.6"
-        includeantruntime="false">
+        source="1.6" includeantruntime="false">
       <compilerarg value="-Xlint"/>
     </javac>
   </target>
 
   
-  <target name="jar" depends="compile"
-      description="Creates a standalone closure-ant-tasks.jar (including the
-ant dependencies) using the system's default JDK.">
+  <target name="jar"
+      description="Do not execute this target directly. Run the 'build' target
+instead. Creates a standalone closure-ant-tasks.jar using the system's
+default JDK.&#13;&#10;">
     <jar destfile="${closure-ant-tasks.jar}" basedir="${classes.dir}" 
         update="true" manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
-      <zipfileset includes="**/*.class" src="${lib.dir}/closure-commons-no-deps.jar" />
-      <zipfileset dir="${resources.dir}" includes="*soy*" prefix="resources/" />
+
+      <zipfileset includes="task-definitions.xml" dir="${resources.dir}" />
+
+      <zipfileset includes="**/*.class"
+          src="${lib.dir}/closure-commons-no-deps.jar" />
+      <zipfileset includes="**/*.class"
+          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
+      <zipfileset includes="resources/*soy*"
+          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
 
       <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
@@ -147,14 +161,22 @@ ant dependencies) using the system's default JDK.">
   </target>
 
 
-  <target name="jar-excluding-ant-deps" depends="compile"
-      description="Creates an closure-ant-tasks.jar excluding the ant dependencies
+  <target name="jar-no-ant-deps" depends="compile"
+      description="Creates a closure-ant-tasks.jar excluding ant dependencies
 (i.e. the jar relies on the local ant installation [recommend Ant 1.8.0 or
-newer]) using the system's default JDK.">
-    <jar destfile="${closure-ant-tasks.jar}" basedir="${classes.dir}"
-        update="true" manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
-      <zipfileset includes="**/*.class" src="${lib.dir}/closure-commons-no-deps.jar" />
-      <zipfileset dir="${resources.dir}" includes="*soy*" prefix="resources/" />
+newer]) using the system's default JDK.&#13;&#10;">
+    <jar destfile="${closure-ant-tasks-no-ant-deps.jar}"
+        basedir="${classes.dir}" update="true"
+        manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
+
+      <zipfileset includes="task-definitions.xml" dir="${resources.dir}" />
+
+      <zipfileset includes="**/*.class"
+          src="${lib.dir}/closure-commons-no-deps.jar" />
+      <zipfileset includes="**/*.class"
+          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
+      <zipfileset includes="resources/*soy*"
+          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
 
       <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
@@ -168,7 +190,7 @@ newer]) using the system's default JDK.">
         <exclude name="com/google/common/net/*" />
         <exclude name="com/google/common/util/*" />
       </zipfileset>
-            
+
       <zipfileset src="${lib.dir}/jsr305-1.3.9.jar">
         <include name="javax/annotation/Nullable.class" />
       </zipfileset>
@@ -176,42 +198,57 @@ newer]) using the system's default JDK.">
   </target>
 
 
-  <target name="builder-plus-jar" depends="compile"
-      description="Creates a standalone builderplus.jar using the system's default JDK.">
+  <target name="builder-plus-jar"
+      description="Do not execute this target directly. Run the 'build' target
+instead. Creates a standalone, executable builderplus.jar using the system's
+default JDK.&#13;&#10;">
     <jar destfile="${builderplus.jar}" basedir="${classes.dir}" update="true"
         manifest="${build.dir}/BUILDER_PLUS_MANIFEST.MF" duplicate="preserve">
+
       <zipfileset includes="**/*.class" src="${lib.dir}/closure-commons-no-deps.jar" />
-      <zipfileset dir="${resources.dir}" includes="*soy*" prefix="resources/" />
 
       <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
-      <!--
-        Ant dependencies.
-      -->
-      <zipfileset src="${lib.dir}/ant-1.8.2.jar">
-        <exclude name="org/apache/tools/zip/*" />
-        <exclude name="org/apache/tools/ant/dispatch/*" />
-        <exclude name="org/apache/tools/ant/filters/*" />
-        <exclude name="org/apache/tools/ant/input/*" />
-        <exclude name="org/apache/tools/ant/listener/*" />
+      <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
+
+      <zipfileset includes="**/*.class" src="${lib.dir}/guava-12.0.jar">
+        <exclude name="com/google/common/annotations/*" />
+        <exclude name="com/google/common/cache/*" />
+        <exclude name="com/google/common/eventbus/*" />
+        <exclude name="com/google/common/hash/*" />
+        <exclude name="com/google/common/math/*" />
+        <exclude name="com/google/common/net/*" />
+        <exclude name="com/google/common/util/*" />
       </zipfileset>
+
+      <zipfileset src="${lib.dir}/ant-1.8.2.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/ant-launcher-1.8.2.jar" />
     </jar>
   </target>
 
 
-  <target name="build" depends="jar, builder-plus-jar"
-      description="Creates standalone closure-ant-tasks.jar and builderplus.jar
-using the system's default JDK." />
-
-
   <target name="jar-no-deps" depends="compile"
       description="Creates a non-standalone closure-ant-tasks.jar excluding
-dependencies (i.e. no ant, gson, or guava classes).">
-    <jar destfile="${closure-ant-tasks.jar}" basedir="${classes.dir}"
+dependencies (i.e. no ant, gson, or guava classes). However, all dependencies
+in the package org.closureextensions are included (for example,
+closure-commons and closure-template-extensions).&#13;&#10;">
+    <jar destfile="${closure-ant-tasks-no-deps.jar}" basedir="${classes.dir}"
         update="false" manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
-      <zipfileset dir="${resources.dir}" includes="*soy*" prefix="resources/" />
+      
+      <zipfileset includes="task-definitions.xml" dir="${resources.dir}" />
+
+      <zipfileset includes="**/*.class"
+          src="${lib.dir}/closure-commons-no-deps.jar" />
+      <zipfileset includes="org/closureextensions/**/*.class"
+          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
+      <zipfileset includes="resources/*soy*"
+          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
     </jar>
   </target>
+  
+  
+  <target name="build" depends="compile, jar, builder-plus-jar"
+      description="Creates standalone closure-ant-tasks.jar and executable
+builderplus.jar using the system's default JDK.&#13;&#10;" />
   
 
   <!--
@@ -230,90 +267,9 @@ dependencies (i.e. no ant, gson, or guava classes).">
       <compilerarg value="-Xlint"/>
     </javac>
   </target>
-
-
-  <target name="jar_1.6" depends="compile_1.6"
-      description="Creates a standalone closure-ant-tasks.jar using JDK 1.6.">
-    <jar destfile="${closure-ant-tasks.jar}" basedir="${classes.dir}"
-        update="true" manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
-      <zipfileset includes="**/*.class" src="${lib.dir}/closure-commons-no-deps.jar" />
-      <zipfileset dir="${resources.dir}" includes="*soy*" prefix="resources/" />
-
-      <zipfileset src="${lib.dir}/gson-2.1.jar" includes="**/*.class" />
-      <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
-      
-      <zipfileset includes="**/*.class" src="${lib.dir}/guava-12.0.jar">
-        <exclude name="com/google/common/annotations/*" />
-        <exclude name="com/google/common/cache/*" />
-        <exclude name="com/google/common/eventbus/*" />
-        <exclude name="com/google/common/hash/*" />
-        <exclude name="com/google/common/math/*" />
-        <exclude name="com/google/common/net/*" />
-        <exclude name="com/google/common/util/*" />
-      </zipfileset>
-      
-      <zipfileset src="${lib.dir}/jsr305-1.3.9.jar">
-        <include name="javax/annotation/Nullable.class" />
-      </zipfileset>
-      <!--
-        Ant dependencies.
-      -->
-      <zipfileset src="${lib.dir}/ant-1.8.2.jar">
-        <exclude name="org/apache/tools/zip/*" />
-        <exclude name="org/apache/tools/ant/dispatch/*" />
-        <exclude name="org/apache/tools/ant/filters/*" />
-        <exclude name="org/apache/tools/ant/input/*" />
-        <exclude name="org/apache/tools/ant/listener/*" />
-      </zipfileset>
-      <zipfileset includes="**/*.class" src="${lib.dir}/ant-launcher-1.8.2.jar" />
-    </jar>
-  </target>
-
-
-  <target name="builder-plus-jar_1.6" depends="compile_1.6"
-      description="Creates a standalone builderplus.jar using JDK 1.6.">
-    <jar destfile="${builderplus.jar}" basedir="${classes.dir}" update="true"
-        manifest="${build.dir}/BUILDER_PLUS_MANIFEST.MF" duplicate="preserve">
-      <zipfileset includes="**/*.class" src="${lib.dir}/closure-commons-no-deps.jar" />
-      <zipfileset dir="${resources.dir}" includes="*soy*" prefix="resources/" />
-
-      <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
-      <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
-      <zipfileset includes="**/*.class" src="${lib.dir}/guava-12.0.jar"/>
-      <zipfileset src="${lib.dir}/jsr305-1.3.9.jar">
-        <include name="javax/annotation/Nullable.class" />
-      </zipfileset>
-      <!--
-        Ant dependencies.
-      -->
-      <zipfileset src="${lib.dir}/ant-1.8.2.jar">
-        <exclude name="org/apache/tools/zip/*" />
-        <exclude name="org/apache/tools/ant/dispatch/*" />
-        <exclude name="org/apache/tools/ant/filters/*" />
-        <exclude name="org/apache/tools/ant/input/*" />
-        <exclude name="org/apache/tools/ant/listener/*" />
-      </zipfileset>
-      <zipfileset includes="**/*.class" src="${lib.dir}/ant-launcher-1.8.2.jar" />
-    </jar>
-  </target>
-
-
-  <target name="compile_1.7" depends="init"
-      description="Compiles the Java sources using JDK 1.7.">
-    <mkdir dir="${classes1.7.dir}" />
-    <javac executable="${javac1.7}"
-        srcdir="${src.dir}" destdir="${classes1.7.dir}"
-        classpathref="classpath" debug="on" deprecation="on"
-        includeantruntime="false"
-        source="1.7"
-        target="1.7">
-      <compilerarg value="-Xlint"/>
-    </javac>
-  </target>
   
 
   <target name="javadoc_1.7"
-      depends="compile_1.7"
       description="Generates complete javadoc using JDK 1.7.">
     <mkdir dir="${javadoc.dir}" />
     <javadoc executable="${javadoc1.7}" 
@@ -323,29 +279,35 @@ dependencies (i.e. no ant, gson, or guava classes).">
         author="false"
         windowtitle="Ant Closure Tools"
         classpathref="classpath"
-        doctitle="Ant Closure Tools (${release.stamp})"
-        bottom='&lt;div id="copyright" style="float:left">&lt;p>Copyright (C) 2012-${YEAR}, Christopher Peisert&lt;/p>&lt;/div>'>
+        doctitle="Ant Closure Tools">
       <link href="http://docs.oracle.com/javase/7/docs/api/" />
       <link href="http://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/" />
       <link href="http://docs.guava-libraries.googlecode.com/git/javadoc/" />
       <link href="http://evgeny-goldin.org/javadoc/ant/api/" />
+      <!-- TODO(cpeisert): Add link to closure-commons once API docs published -->
+      <!-- TODO(cpeisert): Add link to closure-template-extensions once API docs published -->
+      <bottom>
+        <![CDATA[
+        <div id="copyright" style="float:left">
+          <p>Copyright (C) 2012-${YEAR}, Christopher Peisert</p>
+        </div>
+        ]]>
+      </bottom>
     </javadoc>
-    <delete dir="${classes1.7.dir}" />
   </target>
 
   
   <target name="release" 
-      depends="jar_1.6, builder-plus-jar_1.6, javadoc_1.7"
+      depends="compile_1.6, jar, builder-plus-jar, javadoc_1.7"
       description="Creates standalone closure-ant-tasks.jar and builderplus.jar
-using JDK 1.6 and generates JavaDoc using JDK 1.7.">
+using JDK 1.6 and generates JavaDoc using JDK 1.7.&#13;&#10;">
+    <move file="${closure-ant-tasks.jar}"
+        tofile="${build.dir}/closure-ant-tasks-${release.stamp}.jar" />
   </target>
   
   
   <target name="test" depends="build"
       description="Run all JUnit and AntUnit tests.">
-    <fail unless="build.closure-ant-tasks.xml.available"
-        message="Tests aborted. File not found:
-[build/closure-ant-tasks.xml]." />
     <ant dir="${test.dir}" target="test" inheritAll="false" />
   </target>
 </project>

@@ -33,7 +33,8 @@ thumbs.db
 
 
 # Folders to ignore
-.closure_ant_tasks/
+.builder-plus/
+.closure-ant-tasks/
 bin/
 build/
 .hg/

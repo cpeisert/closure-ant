@@ -38,9 +38,9 @@ limitations under the License.
       location="${test.build.dir}/antunit/plovr_inherits" />
 
   <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
-  <property name="closure-ant-tasks.xml"
-      location="${closure-ant-tasks.dir}/build/closure-ant-tasks.xml" />
-  <import file="${closure-ant-tasks.xml}" />
+  <property name="closure-tools-config.xml"
+      location="${closure-ant-tasks.dir}/build/closure-tools-config.xml" />
+  <import file="${closure-tools-config.xml}" />
 
   <import file="${test.dir}/test_projects/project101/project101.xml" />
 

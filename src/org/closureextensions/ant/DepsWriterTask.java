@@ -40,7 +40,7 @@ import org.closureextensions.common.util.FileUtil;
  * DepsWriter Ant task. This task provides a Java implementation to generate
  * deps files rather than the original Python script "depswriter.py" (located
  * in  closure-library/closure/bin/build). The default task name is {@code
- * deps-writer} as defined in "closure-ant-tasks.xml". To use the original
+ * deps-writer} as defined in "task-definitions.xml". To use the original
  * depswriter python script, see {@link DepsWriterPythonTask}.
  *
  * <p>For more information about DepsWriter, see

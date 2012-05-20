@@ -20,7 +20,7 @@ import org.apache.tools.ant.Project;
 
 /**
  * Enumeration constants corresponding to the Ant properties defined in
- * "closure-ant-tasks.xml".
+ * "closure-tools-config.xml".
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */

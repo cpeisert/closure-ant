@@ -45,15 +45,15 @@ import org.closureextensions.common.util.FileUtil;
  * "script" mode has been renamed "raw" to match plovr. In addition, Builder
  * Plus is implemented in Java, whereas Closure Builder is implemented in
  * Python. The default task name is {@code builder-plus} as defined in
- * "closure-ant-tasks.xml".
+ * "task-definitions.xml".
  *
- * <p>The locations of the Closure Compiler is defined in
- * "closure-ant-tasks.xml", which should be included in your build file as
+ * <p>The location of the Closure Compiler is defined in
+ * "closure-tools-config.xml", which should be included in your build file as
  * follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-ant-tasks.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-ant-tasks.xml" are correct
+ * <p><i>Verify that the paths defined in "closure-tools-config.xml" are correct
  * for your local configuration.</i></p>
  *
  * <p>For more information about Closure Builder, see
@@ -427,7 +427,7 @@ public final class BuilderPlusTask extends Task {
       } else {
         throw new BuildException("\"compilerJar\" is not set. The Closure "
             + "Compiler is required for output mode COMPILED. Verify "
-            + "that your build file imports \"closure-ant-tasks.xml\" and "
+            + "that your build file imports \"closure-tools-config.xml\" and "
             + "that the property locations are correct for your machine.");
       }
     }
@@ -549,10 +549,20 @@ public final class BuilderPlusTask extends Task {
       throw new BuildException(e);
     }
 
-    log(manifestList.size() + " dependencies in final manifest.");
+    List<String> manifestFilePaths = Lists.newArrayList();
+
+    for (JsClosureSourceFile jsClosureSourceFile : manifestList) {
+      if (!jsClosureSourceFile.getAbsolutePath().isEmpty()) {
+        manifestFilePaths.add(jsClosureSourceFile.getAbsolutePath());
+      } else {
+        manifestFilePaths.add(jsClosureSourceFile.getName());
+      }
+    }
+
+    log(manifestFilePaths.size() + " dependencies in final manifest.");
 
     FileUtil.write(
-        Joiner.on(String.format("%n")).skipNulls().join(manifestList),
+        Joiner.on(String.format("%n")).skipNulls().join(manifestFilePaths),
         tempManifest);
 
     return tempManifest;

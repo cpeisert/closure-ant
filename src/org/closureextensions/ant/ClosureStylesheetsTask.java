@@ -33,16 +33,16 @@ import org.closureextensions.common.util.FileUtil;
 
 /**
  * Closure Stylesheets Ant task. The default task name is {@code stylesheets}
- * as defined in "closure-ant-tasks.xml".
+ * as defined in "task-definitions.xml".
  *
  * <p>The location of the Closure Stylesheets jar file is also defined in
- * "closure-ant-tasks.xml", which should be included in your build file as
+ * "closure-tools-config.xml", which should be included in your build file as
  * follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-ant-tasks.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-ant-tasks.xml" are correct
- * for your local configuration.</i></p>
+ * <p><i>Verify that the paths defined in "closure-tools-config.xml" are
+ * correct for your local configuration.</i></p>
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
@@ -181,7 +181,7 @@ public final class ClosureStylesheetsTask extends Task {
         this.stylesheetsJar = new File(stylesheetsJarPath);
       } else {
         throw new BuildException("\"stylesheetsJar\" is not set. Verify "
-            + "that your build file imports \"closure-ant-tasks.xml\" and "
+            + "that your build file imports \"closure-tools-config.xml\" and "
             + "that the property locations are correct for your machine.");
       }
     }

@@ -171,7 +171,7 @@ public final class BuilderPlusRunner {
     if (this.compilerJar == null) {
       throw new IllegalStateException("\"compilerJar\" is not set. The Closure "
           + "Compiler is required for output mode COMPILED. Verify "
-          + "that your build file imports \"closure-ant-tasks.xml\" and "
+          + "that your build file imports \"closure-tools-config.xml\" and "
           + "that the property locations are correct for your machine.");
     }
 
@@ -278,15 +278,22 @@ public final class BuilderPlusRunner {
     new File(".builder-plus").mkdir();
     File tempManifest = new File(".builder-plus/temp_manifest.txt");
 
-    List<JsClosureSourceFile> manifestList = null;
+    List<JsClosureSourceFile> manifestList = builder.toManifestList();
+    List<String> manifestFilePaths = Lists.newArrayList();
 
-    manifestList = builder.toManifestList();
+    for (JsClosureSourceFile jsClosureSourceFile : manifestList) {
+      if (!jsClosureSourceFile.getAbsolutePath().isEmpty()) {
+        manifestFilePaths.add(jsClosureSourceFile.getAbsolutePath());
+      } else {
+        manifestFilePaths.add(jsClosureSourceFile.getName());
+      }
+    }
 
-    System.out.println(manifestList.size() + " dependencies in final "
+    System.out.println(manifestFilePaths.size() + " dependencies in final "
         + "manifest.");
 
     FileUtil.write(
-        Joiner.on(String.format("%n")).skipNulls().join(manifestList),
+        Joiner.on(String.format("%n")).skipNulls().join(manifestFilePaths),
         tempManifest);
 
     return tempManifest;
