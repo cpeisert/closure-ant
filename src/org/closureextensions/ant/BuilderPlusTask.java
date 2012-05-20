@@ -483,7 +483,7 @@ public final class BuilderPlusTask extends Task {
       paths = FileUtil.readlines(this.inputManifest);
       for (String path : paths) {
         JsClosureSourceFile sourceFile =
-            SourceFileFactory.newJsSourceFile(new File(path));
+            SourceFileFactory.newJsClosureSourceFile(new File(path));
         sourceEntryPoints.add(sourceFile);
       }
     }
@@ -493,7 +493,7 @@ public final class BuilderPlusTask extends Task {
         getProject(), this.mainSources);
     for (String path : paths) {
       JsClosureSourceFile sourceFile =
-          SourceFileFactory.newJsSourceFile(new File(path));
+          SourceFileFactory.newJsClosureSourceFile(new File(path));
       sourceEntryPoints.add(sourceFile);
     }
 
@@ -508,7 +508,7 @@ public final class BuilderPlusTask extends Task {
         AntUtil.getFilePathsFromCollectionOfFileSet(getProject(), this.sources);
     for (String path : paths) {
       JsClosureSourceFile sourceFile =
-          SourceFileFactory.newJsSourceFile(new File(path));
+          SourceFileFactory.newJsClosureSourceFile(new File(path));
       sources.add(sourceFile);
     }
 
@@ -519,7 +519,7 @@ public final class BuilderPlusTask extends Task {
           /* excludes */ ImmutableList.of(".*"));
       for (String path : paths) {
         JsClosureSourceFile sourceFile =
-            SourceFileFactory.newJsSourceFile(new File(path));
+            SourceFileFactory.newJsClosureSourceFile(new File(path));
         sources.add(sourceFile);
       }
     }

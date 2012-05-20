@@ -253,7 +253,7 @@ builderplus.jar using the system's default JDK.&#13;&#10;" />
 
   <!--
     For "release" builds, use JDK 1.6 to compile sources for the jar file and
-    JDK 1.7 to compile sources for JavaDoc.
+    JDK 1.7 to generate JavaDoc.
   -->
   
   <target name="compile_1.6" depends="init"
@@ -299,10 +299,13 @@ builderplus.jar using the system's default JDK.&#13;&#10;" />
   
   <target name="release" 
       depends="compile_1.6, jar, builder-plus-jar, javadoc_1.7"
-      description="Creates standalone closure-ant-tasks.jar and builderplus.jar
-using JDK 1.6 and generates JavaDoc using JDK 1.7.&#13;&#10;">
+      description="Creates standalone closure-ant-tasks-&lt;release.stamp>.jar
+and builderplus-&lt;release.stamp>.jar using JDK 1.6 and generates JavaDoc using
+JDK 1.7.&#13;&#10;">
     <move file="${closure-ant-tasks.jar}"
         tofile="${build.dir}/closure-ant-tasks-${release.stamp}.jar" />
+    <move file="${builderplus.jar}"
+        tofile="${build.dir}/builderplus-${release.stamp}.jar" />
   </target>
   
   

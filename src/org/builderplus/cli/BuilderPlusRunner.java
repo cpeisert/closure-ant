@@ -85,7 +85,7 @@ public final class BuilderPlusRunner {
         new Function<File, JsClosureSourceFile>() {
           @Override
           public JsClosureSourceFile apply(File source) {
-            return SourceFileFactory.newJsSourceFile(source);
+            return SourceFileFactory.newJsClosureSourceFile(source);
           }
         };
 
@@ -244,7 +244,7 @@ public final class BuilderPlusRunner {
       paths = FileUtil.readlines(this.inputManifest);
       for (String path : paths) {
         JsClosureSourceFile sourceFile =
-            SourceFileFactory.newJsSourceFile(new File(path));
+            SourceFileFactory.newJsClosureSourceFile(new File(path));
         sourceEntryPoints.add(sourceFile);
       }
     }
@@ -256,7 +256,7 @@ public final class BuilderPlusRunner {
           /* excludes */ ImmutableList.of(".*"));
       for (String path : paths) {
         JsClosureSourceFile sourceFile =
-            SourceFileFactory.newJsSourceFile(new File(path));
+            SourceFileFactory.newJsClosureSourceFile(new File(path));
         this.sources.add(sourceFile);
       }
     }

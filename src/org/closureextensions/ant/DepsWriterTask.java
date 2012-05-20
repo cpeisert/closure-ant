@@ -141,7 +141,7 @@ public final class DepsWriterTask extends Task {
       if (pair.getFilePath() == null) {
         throw new BuildException("null file path");
       }
-      JsClosureSourceFile input = SourceFileFactory.newJsSourceFile(
+      JsClosureSourceFile input = SourceFileFactory.newJsClosureSourceFile(
           new File(pair.getFilePath()));
       if (pair.getDepsPath() != null) {
         map.put(normalizePath(pair.getDepsPath()), input);
@@ -164,7 +164,7 @@ public final class DepsWriterTask extends Task {
 
       for (String relativePath : relativePaths) {
         map.put(normalizePath(new File(prefix, relativePath).getPath()),
-            SourceFileFactory.newJsSourceFile(
+            SourceFileFactory.newJsClosureSourceFile(
                 new File(dirPrefixPair.getDirPath(), relativePath)));
       }
     }
