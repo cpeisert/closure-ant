@@ -264,7 +264,7 @@ public final class ClosureCompilerTask extends Task
 
   /**
    * Constructs a new bound Closure Compiler Ant task. This is useful when
-   * wrapping the {@link ClosureCompilerTask} within another task as follows:
+   * using the {@link ClosureCompilerTask} within another task as follows:
    *
    * <p><pre>{@code
    * ClosureCompilerTask compilerTask = ClosureCompilerTask(this);
