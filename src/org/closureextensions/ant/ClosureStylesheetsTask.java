@@ -475,8 +475,6 @@ bar=b
    */
   public void execute() {
 
-    // Verify task preconditions
-
     if (this.stylesheetsJar == null) {
       String stylesheetsJarPath =
           SharedAntProperty.CLOSURE_STYLESHEETS_JAR.getValue(getProject());
@@ -488,8 +486,6 @@ bar=b
             + "that the property locations are correct for your machine.");
       }
     }
-
-    // Execute Closure Compiler.
 
     Java runner = new Java(this);
     runner.setJar(this.stylesheetsJar);
