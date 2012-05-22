@@ -19,6 +19,7 @@ package org.closureextensions.ant;
 import com.google.common.collect.Lists;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
@@ -219,9 +220,16 @@ public final class ClosureStylesheetsTask extends Task {
    * specify the orientation on a per-file or per-library basis.
    *
    * @param inputOrientation the input orientation. Options: LTR, RTL.
+   * @throws BuildException if {@code inputOrientation} is not a valid option
    */
   public void setInputOrientation(String inputOrientation) {
-    this.inputOrientation = inputOrientation;
+    if ("LTR".equalsIgnoreCase(inputOrientation)
+        || "RTL".equalsIgnoreCase(inputOrientation)) {
+      this.inputOrientation = inputOrientation.toUpperCase();
+    } else {
+      throw new BuildException("Attribute \"inputOrientation\" expected to be "
+          + "LTR or RTL but was \"" + inputOrientation + "\"");
+    }
   }
 
   /**
@@ -248,9 +256,17 @@ public final class ClosureStylesheetsTask extends Task {
    *
    * @param outputOrientation the output orientation. Options: LTR, RTL,
    *     NOCHANGE.
+   * @throws BuildException if {@code outputOrientation} is not a valid option
    */
   public void setOutputOrientation(String outputOrientation) {
-    this.outputOrientation = outputOrientation;
+    if ("LTR".equalsIgnoreCase(outputOrientation)
+        || "RTL".equalsIgnoreCase(outputOrientation)
+        || "NOCHANGE".equalsIgnoreCase(outputOrientation)) {
+      this.outputOrientation = outputOrientation.toUpperCase();
+    } else {
+      throw new BuildException("Attribute \"outputOrientation\" expected to "
+          + "be LTR, RTL, or NOCHANGE but was \"" + outputOrientation + "\"");
+    }
   }
 
   /**
@@ -329,9 +345,20 @@ bar=b
    *
    * @param outputRenamingMapFormat the output renaming map format. Options:
    *     CLOSURE_COMPILED, CLOSURE_UNCOMPILED, JSON, PROPERTIES.
+   * @throws BuildException if {@code outputRenamingMapFormat} is not a valid
+   *     option
    */
   public void setOutputRenamingMapFormat(String outputRenamingMapFormat) {
-    this.outputRenamingMapFormat = outputRenamingMapFormat;
+    if ("CLOSURE_COMPILED".equalsIgnoreCase(outputRenamingMapFormat)
+        || "CLOSURE_UNCOMPILED".equalsIgnoreCase(outputRenamingMapFormat)
+        || "JSON".equalsIgnoreCase(outputRenamingMapFormat)
+        || "PROPERTIES".equalsIgnoreCase(outputRenamingMapFormat)) {
+      this.outputRenamingMapFormat = outputRenamingMapFormat.toUpperCase();
+    } else {
+      throw new BuildException("Attribute \"outputRenamingMapFormat\" "
+          + "expected to be one of CLOSURE_COMPILED, CLOSURE_UNCOMPILED, "
+          + "JSON, or PROPERTIES but was\""+ outputRenamingMapFormat + "\"");
+    }
   }
 
   /**
@@ -371,7 +398,14 @@ bar=b
    *     Defaults to NONE.
    */
   public void setRenamingType(String renamingType) {
-    this.renamingType = renamingType;
+    if ("CLOSURE".equalsIgnoreCase(renamingType)
+        || "DEBUG".equalsIgnoreCase(renamingType)
+        || "NONE".equalsIgnoreCase(renamingType)) {
+      this.renamingType = renamingType.toUpperCase();
+    } else {
+      throw new BuildException("Attribute \"renamingType\" expected to be "
+          + "one of CLOSURE, DEBUG, or NONE but was \"" + renamingType + "\"");
+    }
   }
 
   /** @param file the Closure Stylesheets jar file */
@@ -423,7 +457,7 @@ bar=b
   }
 
   /**
-   * A whitelist of non-standard functions, like {@code alpha()}.
+   * A whitelist of non-standard functions, such as {@code alpha()}.
    *
    * @param functionsList list of non-standard functions to whitelist
    */
@@ -464,6 +498,10 @@ bar=b
     runner.setLogError(true);
     runner.setTaskName(getTaskName());
 
+    if (this.gssFunctionMapProviderClasspath != null) {
+      runner.createClasspath().append(this.gssFunctionMapProviderClasspath);
+    }
+
     CommandLineBuilder cmdlineFlags = getCommandLineOptionsExcludingSources();
     List<String> cssCurrentSources = getAllSources();
 
@@ -480,19 +518,19 @@ bar=b
       // Check if the output file is up-to-date.
 
       BuildCache cache = new BuildCache(this);
-      String currentCommandLineAndCompilerFlags =
-          runner.getCommandLine().toString() + " " + cmdlineFlags.toString();
       BuildSettings previousBuildSettings = cache.get();
       BuildSettings currentBuildSettings = new BuildSettings(
-          currentCommandLineAndCompilerFlags, cssCurrentSources);
+          cmdlineFlags.toString(), cssCurrentSources);
       // Save current build settings for the comparison with the next build.
       cache.put(currentBuildSettings);
 
       if (previousBuildSettings != null) {
-        if (ClosureBuildUtil.outputFileUpToDate(new File(this.outputFile),
+        File cssOutputFile = new File(this.outputFile);
+        if (ClosureBuildUtil.outputFileUpToDate(cssOutputFile,
             previousBuildSettings, currentBuildSettings)) {
           skipCompilation = true;
-          log("Output file up-to-date. Stylesheet compilation skipped.");
+          log("Output file \"" + cssOutputFile.getName() + "\" up-to-date. "
+              + "Stylesheet compilation skipped.");
         }
       }
     }
@@ -502,7 +540,6 @@ bar=b
           : "stylesheet";
       log("Compiling " + cssCurrentSources.size() + " " + sheetOrSheets
           + "...");
-
 
       int exitCode = runner.executeJava();
       if (exitCode != 0) {
@@ -517,30 +554,70 @@ bar=b
    * set for this task.
    *
    * @return command line options based on attribute and nested element settings
+   * @throws BuildException if obtaining the canonical path for the output file
+   *     or the outputRenamingMap throws an {@link IOException}
    */
   private CommandLineBuilder getCommandLineOptionsExcludingSources() {
     CommandLineBuilder cmdline = new CommandLineBuilder();
 
-    /*if (this.manageClosureDependencies != null) {
-      cmdline.flagAndArgument("--manage_closure_dependencies",
-          this.manageClosureDependencies.toString());
+    if(this.allowUnrecognizedFunctions != null) {
+      cmdline.flagAndArgument("--allow-unrecognized-functions",
+          this.allowUnrecognizedFunctions.toString());
     }
-    if (this.onlyClosureDependencies != null) {
-      cmdline.flagAndArgument("--only_closure_dependencies",
-          this.onlyClosureDependencies.toString());
+    if (this.copyrightNotice != null) {
+      cmdline.flagAndArgument("--copyright-notice", this.copyrightNotice);
+    }
+    if (this.gssFunctionMapProviderClassName != null) {
+      cmdline.flagAndArgument("--gss-function-map-provider",
+          this.gssFunctionMapProviderClassName);
+    }
+    if (this.inputOrientation != null) {
+      cmdline.flagAndArgument("--input-orientation", this.inputOrientation);
     }
     if (this.outputFile != null) {
-      cmdline.flagAndArgument("--js_output_file",
-          new File(this.outputFile).getAbsolutePath());
+      try {
+        cmdline.flagAndArgument("--output_file",
+            new File(this.outputFile).getCanonicalPath());
+      } catch (IOException e) {
+        throw new BuildException(e);
+      }
     }
-    if (this.outputManifest != null) {
-      cmdline.flagAndArgument("--output_manifest",
-          new File(this.outputManifest).getAbsolutePath());
+    if (this.outputOrientation != null) {
+      cmdline.flagAndArgument("--output-orientation", this.outputOrientation);
     }
-    for (StringNestedElement namespace : this.namespaceEntryPoints) {
-      cmdline.flagAndArgument("--closure_entry_point", namespace.getValue());
+    if (this.outputRenamingMap != null) {
+      try {
+        cmdline.flagAndArgument("--output-renaming-map",
+            new File(this.outputRenamingMap).getCanonicalPath());
+      } catch (IOException e) {
+        throw new BuildException(e);
+      }
     }
-    */
+    if (this.outputRenamingMapFormat != null) {
+      cmdline.flagAndArgument("--output-renaming-map-format",
+          this.outputRenamingMapFormat);
+    }
+    if (this.prettyPrint != null) {
+      cmdline.flagAndArgument("--pretty-print", this.prettyPrint.toString());
+    }
+    if (this.renamingType != null) {
+      cmdline.flagAndArgument("--rename", this.renamingType);
+    }
+
+    // Nested elements
+
+    for (String allowedFunction : this.allowedNonStandardFunctions) {
+      cmdline.flagAndArgument("--allowed-non-standard-function",
+          allowedFunction);
+    }
+    for (String excludedClass : this.classesExcludedFromRenaming) {
+      cmdline.flagAndArgument("--excluded-classes-from-renaming",
+          excludedClass);
+    }
+    for (String trueConditional : this.definedTrueConditionals) {
+      cmdline.flagAndArgument("--define", trueConditional);
+    }
+
     return cmdline;
   }
 
