@@ -18,17 +18,22 @@
 
 @import "json-styles.gss";
 
-@def BACKGROUND_COLOR rgb(34, 34, 34)
+@def TEXT_COLOR rgb(34, 34, 34)
 @def DEFAULT_FONT sans-serif
 @def DEFAULT_FONT_SIZE 1em
 
 html, button, input, select, textarea {
   font-family: DEFAULT_FONT;
-  color: BACKGROUND_COLOR;
+  color: TEXT_COLOR;
 }
 
 body {
   margin: 0;
   font-size: DEFAULT_FONT_SIZE;
   line-height: 1.4;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
 }

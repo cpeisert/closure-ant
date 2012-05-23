@@ -14,22 +14,60 @@
  * under the License.
  */
 
-goog.provide('test.json.main');
+goog.provide('test.jsonstyle');
 
 goog.require('goog.dom');
+goog.require('goog.events');
 goog.provide('goog.format.JsonPrettyPrinter');
 
-// TODO(cpeisert): create a demo app that lets a user enter JSON in a text box
-// and renders the JSON pretty-printed. Also let the user select the
-// indentation level.
+
+/** @type {string} */
+test.jsonstyle.outputElementID = "outputPrettyPrint";
+
+/** @type {string} */
+test.jsonstyle.inputTextareaID = "jsonInputTextarea";
+
+/** @type {!Element} */
+test.jsonstyle.outputElement = document.getElementById(
+    test.jsonstyle.outputElementID);
+
+/** @type {!Element} */
+test.jsonstyle.inputTextarea = document.getElementById(
+    test.jsonstyle.inputTextareaID);
+
 
 /**
- * Shares a message with the world.
+ * Pretty-print a string of JSON and insert it into an HTML element.
  *
- * @param {string} json String of JSON text to render.
- * @param {!Element} element The HTML element to insert the rendered JSON.
- * @param {number} indentation Number of spaces to indent each level.
+ * @param {string} json String of JSON to pretty print.
+ * @param {!Element} element The HTML element to insert the pretty-printed JSON.
+ * @param {number=} indentation Number of spaces to indent each level. Defaults
+ *     to 2.
  */
-test.main.renderJSON = function(json, element, indentation) {
-
+test.jsonstyle.prettyPrintJSON = function(json, element, indentation) {
+  var delimiters = new goog.format.JsonPrettyPrinter.HtmlDelimiters();
+  delimiters.indent = indentation || 2;
+  var formatter = new goog.format.JsonPrettyPrinter(delimiters);
+  element.innerHTML = formatter.format(json);
 };
+
+/**
+ * Update the "outputPrettyPrint" &lt;pre&gt; element with pretty-printed JSON
+ * based on changes to textarea "jsonInputTextarea".
+ *
+ * @param {!Event} event The change event.
+ */
+test.jsonstyle.jsonInputTextareaListener = function(event) {
+  try {
+    var prettyJSON = test.jsonstyle.prettyPrintJSON(
+        text.jsonstyle.inputTextarea.value, test.jsonstyle.outputElement);
+    test.jsonstyle.outputElement.innerHTML = prettyJSON;
+  } catch (error) {
+    test.jsonstyle.outputElement.innerHTML =
+        '<span class="error">JSON syntax error.</span>';
+  }
+}
+
+goog.events.listen(test.jsonstyle.outputElement, goog.events.EventType.CHANGE,
+    test.jsonstyle.jsonInputTextareaListener(event));
+
