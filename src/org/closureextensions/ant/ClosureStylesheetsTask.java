@@ -539,8 +539,8 @@ bar=b
 
       int exitCode = runner.executeJava();
       if (exitCode != 0) {
-        throw new BuildException("Error: " + getTaskName()
-            + " finished with exit code " + exitCode);
+        throw new BuildException("Error: <" + getTaskName()
+            + "> finished with exit code " + exitCode);
       }
     }
   }
@@ -557,8 +557,7 @@ bar=b
     CommandLineBuilder cmdline = new CommandLineBuilder();
 
     if(this.allowUnrecognizedFunctions != null) {
-      cmdline.flagAndArgument("--allow-unrecognized-functions",
-          this.allowUnrecognizedFunctions.toString());
+      cmdline.argument("--allow-unrecognized-functions");
     }
     if (this.copyrightNotice != null) {
       cmdline.flagAndArgument("--copyright-notice", this.copyrightNotice);
@@ -572,7 +571,7 @@ bar=b
     }
     if (this.outputFile != null) {
       try {
-        cmdline.flagAndArgument("--output_file",
+        cmdline.flagAndArgument("--output-file",
             new File(this.outputFile).getCanonicalPath());
       } catch (IOException e) {
         throw new BuildException(e);
@@ -594,7 +593,7 @@ bar=b
           this.outputRenamingMapFormat);
     }
     if (this.prettyPrint != null) {
-      cmdline.flagAndArgument("--pretty-print", this.prettyPrint.toString());
+      cmdline.argument("--pretty-print");
     }
     if (this.renamingType != null) {
       cmdline.flagAndArgument("--rename", this.renamingType);
