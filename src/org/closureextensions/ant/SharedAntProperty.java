@@ -50,7 +50,7 @@ public enum SharedAntProperty {
   /** The directory where Closure Stylesheets is located. */
   CLOSURE_STYLESHEETS_DIR("closure-stylesheets.dir"),
   /** The file path to the Closure Stylesheets jar file. */
-  CLOSURE_STYLESHEETS_JAR("closure-stylesheet.jar"),
+  CLOSURE_STYLESHEETS_JAR("closure-stylesheets.jar"),
   /** The directory where Closure Templates is located. */
   CLOSURE_TEMPLATES_DIR("closure-templates.dir"),
   /** The file path to the Closure Templates jar file. */
