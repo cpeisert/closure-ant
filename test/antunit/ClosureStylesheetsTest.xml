@@ -57,6 +57,16 @@ limitations under the License.
   <target name="suiteSetUp">
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${json-in-style.output.dir}" />
+    <copy file="${json-in-style.index.html}"
+        todir="${json-in-style.output.dir}" />
+
+    <!-- Compile json-in-style JavaScript. -->
+    <builder-plus outputMode="COMPILED"
+        outputfile="${json-in-style.output.js}">
+      <compiler compilationLevel="advanced" />
+      <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
+      <root directory="${closure-library.dir}" />
+    </builder-plus>
   </target>
 
 
@@ -66,6 +76,13 @@ limitations under the License.
   =============================================================================
   -->
 
+
+  <target name="testCompileGSS">
+    <stylesheets forceRecompile="true" prettyPrint="true"
+        outputFile="${json-in-style.output.css}">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="**/*.gss" />
+    </stylesheets>
+  </target>
 
   
   <!-- Run this test suite. -->
