@@ -14,14 +14,12 @@
  * under the License.
  */
 
-@charset "UTF-8";
-
 @def DEFAULT_TEXT_COLOR black;
-@def JSON_BOOLEAN_COLOR DEFAULT_TEXT_COLOR
-@def JSON_NULL red
-@def JSON_NUMBER_COLOR darkorange
+@def JSON_BOOLEAN_COLOR DEFAULT_TEXT_COLOR;
+@def JSON_NULL red;
+@def JSON_NUMBER_COLOR darkorange;
 @def JSON_PROPERTY_COLOR blue;
-@def JSON_STRING_COLOR darkgreen
+@def JSON_STRING_COLOR darkgreen;
 
 .goog-jsonprettyprinter-propertyname {
   color: JSON_PROPERTY_COLOR;

@@ -14,13 +14,14 @@
  * under the License.
  */
 
-@charset "UTF-8";
-
 @import "json-styles.gss";
 
-@def TEXT_COLOR rgb(34, 34, 34)
-@def DEFAULT_FONT sans-serif
-@def DEFAULT_FONT_SIZE 1em
+@def CONTENT_WIDTH 350px;
+@def DEFAULT_FONT sans-serif;
+@def DEFAULT_FONT_SIZE 1em;
+@def LEFT_MARGIN 15px;
+@def TEXT_COLOR rgb(34, 34, 34);
+
 
 html, button, input, select, textarea {
   font-family: DEFAULT_FONT;
@@ -28,7 +29,7 @@ html, button, input, select, textarea {
 }
 
 body {
-  margin: 0;
+  margin: LEFT_MARGIN;
   font-size: DEFAULT_FONT_SIZE;
   line-height: 1.4;
 }
@@ -36,4 +37,8 @@ body {
 .error {
   color: red;
   font-weight: bold;
+}
+
+#mainContent {
+  width: CONTENT_WIDTH;
 }

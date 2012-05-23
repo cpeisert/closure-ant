@@ -27,7 +27,6 @@ limitations under the License.
   <property name="antunit.dir" location="${test.dir}/antunit" />
   <property name="antunit.build.dir" location="${test.dir}/build/antunit" />
 
-  <property name="json-in-style.namespace" value="test.json" />
   <property name="json-in-style.js.dir" location="${json-in-style.dir}/js" />
   <property name="json-in-style.output.dir"
       location="${antunit.build.dir}/json-in-style" />

@@ -18,7 +18,9 @@ goog.provide('test.jsonstyle');
 
 goog.require('goog.dom');
 goog.require('goog.events');
-goog.provide('goog.format.JsonPrettyPrinter');
+goog.require('goog.events.Event');
+goog.require('goog.events.EventType');
+goog.require('goog.format.JsonPrettyPrinter');
 
 
 /** @type {string} */
@@ -28,12 +30,12 @@ test.jsonstyle.outputElementID = "outputPrettyPrint";
 test.jsonstyle.inputTextareaID = "jsonInputTextarea";
 
 /** @type {!Element} */
-test.jsonstyle.outputElement = document.getElementById(
-    test.jsonstyle.outputElementID);
+test.jsonstyle.outputElement = /** @type {!Element} */
+    (document.getElementById(test.jsonstyle.outputElementID));
 
 /** @type {!Element} */
-test.jsonstyle.inputTextarea = document.getElementById(
-    test.jsonstyle.inputTextareaID);
+test.jsonstyle.inputTextarea = /** @type {!Element} */
+    (document.getElementById(test.jsonstyle.inputTextareaID));
 
 
 /**
@@ -55,19 +57,18 @@ test.jsonstyle.prettyPrintJSON = function(json, element, indentation) {
  * Update the "outputPrettyPrint" &lt;pre&gt; element with pretty-printed JSON
  * based on changes to textarea "jsonInputTextarea".
  *
- * @param {!Event} event The change event.
+ * @param {!goog.events.Event} event The change event.
  */
-test.jsonstyle.jsonInputTextareaListener = function(event) {
+test.jsonstyle.inputTextareaListener = function(event) {
   try {
-    var prettyJSON = test.jsonstyle.prettyPrintJSON(
-        text.jsonstyle.inputTextarea.value, test.jsonstyle.outputElement);
-    test.jsonstyle.outputElement.innerHTML = prettyJSON;
+    test.jsonstyle.prettyPrintJSON(test.jsonstyle.inputTextarea.value,
+        test.jsonstyle.outputElement);
   } catch (error) {
     test.jsonstyle.outputElement.innerHTML =
         '<span class="error">JSON syntax error.</span>';
   }
 }
 
-goog.events.listen(test.jsonstyle.outputElement, goog.events.EventType.CHANGE,
-    test.jsonstyle.jsonInputTextareaListener(event));
+goog.events.listen(test.jsonstyle.inputTextarea, goog.events.EventType.CHANGE,
+    test.jsonstyle.inputTextareaListener);
 
