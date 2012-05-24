@@ -10,24 +10,48 @@
 
 <h2>Beautify Your JSON</h2>
 
-<section id="mainContent">
-  <label for="jsonInputTextarea">Enter plain JSON (press Tab when done):</label>
-  <textarea id="jsonInputTextarea"
-      placeholder="Enter your plain JSON here." rows="10" cols="40"
+<div id="mainContent">
+  <label for="jsonInputTextarea" class="strong">Enter JSON
+    <span class="tip"> (press Tab when done)</span>
+  </label>
+  <textarea id="jsonInputTextarea" class="standout"
+      placeholder="Enter your plain JSON here." rows="5" cols="50"
       autofocus="autofocus">
   </textarea>
 
-  <fieldset>
-    <legend>Your JSON... In style!</legend>
-    <pre id="outputPrettyPrint">
-    </pre>
-  </fieldset>
-</section>
+  <p class="strong">Your JSON in style!</p>
+  <pre id="outputPrettyPrint" class="standout">
+  </pre>
+</div>
+
+<div id="customizeStyles">
+  <div id="colorPopup" class="colorPopup standout" tabindex="0"></div>
+
+  <p class="strong">Customize JSON colors</p>
+
+  <button id="buttonPropertyName">
+    <span class="jsonStyle">Property Name</span>
+  </button>
+
+  <button id="buttonBooleanValue">
+    <span class="jsonStyle">Property Value: Boolean</span>
+  </button>
+
+  <button id="buttonNullValue">
+    <span class="jsonStyle">Property Value: Null</span>
+  </button>
+
+  <button id="buttonNumberValue">
+    <span class="jsonStyle">Property Value: Number</span>
+  </button>
+
+  <button id="buttonStringValue">
+    <span class="jsonStyle">Property Value: String</span>
+  </button>
+</div>
+
 
 <script src="main.compiled.js"></script>
 
 </body>
 </html>
-
-
-

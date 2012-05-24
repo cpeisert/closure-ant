@@ -16,22 +16,58 @@
 
 @import "json-styles.gss";
 
-@def CONTENT_WIDTH 350px;
-@def DEFAULT_FONT sans-serif;
-@def DEFAULT_FONT_SIZE 1em;
+@def BG_COLOR #f2f7f5;
+@def BG_COLOR_ALT white;
+@def BORDER_STYLE solid black 1px;
+@def FONT sans-serif;
+@def FONT_SIZE 1em;
 @def LEFT_MARGIN 15px;
 @def TEXT_COLOR rgb(34, 34, 34);
+@def WIDTH_MAIN 350px;
+@def WIDTH_MARGIN 20px;
+@def WIDTH_STYLE 300px;
+@def WIDTH_BODY add(WIDTH_MAIN, WIDTH_MARGIN, WIDTH_STYLE);
 
 
 html, button, input, select, textarea {
-  font-family: DEFAULT_FONT;
+  font-family: FONT;
   color: TEXT_COLOR;
 }
 
 body {
-  margin: LEFT_MARGIN;
-  font-size: DEFAULT_FONT_SIZE;
+  background-color: BG_COLOR;
+  font-size: FONT_SIZE;
   line-height: 1.4;
+  margin: 0px auto;
+  width: WIDTH_BODY;
+}
+
+button {
+  display: block;
+  font-size: mult(FONT_SIZE, 1.1);
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+h1, h2, h3, h4 {
+ text-align: center;
+}
+
+textarea {
+  margin-bottom: 25px;
+}
+
+.colorPopup {
+  position:absolute;
+  background-color: BG_COLOR_ALT;
+  color:TEXT_COLOR;
+  visibility:hidden;
+  width:100px;
+  height:100px;
+  font-size: 80%;
+  border: BORDER_STYLE;
+  -moz-outline:0;
+  outline:0;
 }
 
 .error {
@@ -39,6 +75,28 @@ body {
   font-weight: bold;
 }
 
+.standout {
+  background-color: BG_COLOR_ALT;
+  border: BORDER_STYLE;
+}
+
+.strong {
+  font-weight: bold;
+}
+
+.tip {
+  font-size: 0.75em;
+  font-style: italic;
+}
+
+#customizeStyles {
+  float: right;
+  width: WIDTH_STYLE;
+}
+
 #mainContent {
-  width: CONTENT_WIDTH;
+  align: left;
+  float: left;
+  margin-right: WIDTH_MARGIN;
+  width: WIDTH_MAIN;
 }
