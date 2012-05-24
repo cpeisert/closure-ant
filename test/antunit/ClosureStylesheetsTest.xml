@@ -63,7 +63,7 @@ limitations under the License.
     <!-- Compile json-in-style JavaScript. -->
     <builder-plus outputMode="COMPILED"
         outputfile="${json-in-style.output.js}">
-      <compiler compilationLevel="advanced" />
+      <compiler compilationLevel="advanced" warninglevel="verbose" />
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
       <root directory="${closure-library.dir}" />
     </builder-plus>
