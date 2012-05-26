@@ -59,6 +59,10 @@ limitations under the License.
     <mkdir dir="${json-in-style.output.dir}" />
     <copy file="${json-in-style.index.html}"
         todir="${json-in-style.output.dir}" />
+    <mkdir dir="${json-in-style.output.dir}/images" />
+    <copy todir="${json-in-style.output.dir}/images">
+      <fileset dir="${json-in-style.dir}/images" />
+    </copy>
 
     <!-- Compile json-in-style JavaScript. -->
     <builder-plus outputMode="COMPILED"
