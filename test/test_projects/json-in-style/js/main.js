@@ -17,6 +17,7 @@
 goog.provide('jsonstyle');
 
 goog.require('goog.dom');
+goog.require('goog.dom.DomHelper');
 goog.require('goog.events');
 goog.require('goog.events.Event');
 goog.require('goog.events.EventType');
@@ -24,6 +25,9 @@ goog.require('goog.format.JsonPrettyPrinter');
 goog.require('goog.positioning.ClientPosition');
 goog.require('goog.positioning.Corner');
 goog.require('goog.positioning.AnchoredViewportPosition');
+goog.require('goog.style');
+goog.require('goog.ui.Component');
+goog.require('goog.ui.HsvPalette');
 goog.require('goog.ui.Popup');
 
 
@@ -83,7 +87,8 @@ jsonstyle.inputTextareaListener = function(event) {
         jsonstyle.outputElement);
   } catch (error) {
     jsonstyle.outputElement.innerHTML =
-        '<span class="error">JSON syntax error.</span>';
+        '<span class="' + goog.getCssName('error')
+        + '">JSON syntax error.</span>';
   }
 };
 
@@ -124,10 +129,17 @@ jsonstyle.togglePopup = function(event) {
  * Initialize the popup used to display the HSV color selector.
  */
 jsonstyle.initializeColorPopup = function() {
-  jsonstyle.colorPopup.setAutoHide(false);
-  jsonstyle.colorPopup.setHideOnEscape(true);
-  jsonstyle.colorPopup.setPinnedCorner(goog.positioning.Corner.TOP_LEFT);
-  jsonstyle.colorPopup.setMargin(8, 0, 0, 5);
+  var popup = jsonstyle.colorPopup;
+  
+  popup.setAutoHide(false);
+  popup.setHideOnEscape(true);
+  popup.setPinnedCorner(goog.positioning.Corner.TOP_LEFT);
+  popup.setMargin(8, 0, 0, 5);
+
+  var domHelper = goog.dom.getDomHelper(jsonstyle.colorPopupElement);
+  var colorPalette = new goog.ui.HsvPalette(domHelper, null,
+      'goog-hsv-palette-sm');
+  colorPalette.render(jsonstyle.colorPopupElement);
 };
 
 /**
@@ -175,4 +187,6 @@ jsonstyle.initializeApp = function() {
 };
 
 // Application entry point.
-jsonstyle.initializeApp();
+window.onload = function() {
+  jsonstyle.initializeApp();
+};

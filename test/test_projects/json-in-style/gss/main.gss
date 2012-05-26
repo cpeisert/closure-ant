@@ -14,6 +14,7 @@
  * under the License.
  */
 
+@import "hsv-palette-styles.gss";
 @import "json-styles.gss";
 
 @def BG_COLOR #f2f7f5;
@@ -55,6 +56,7 @@ h1, h2, h3, h4 {
 
 textarea {
   margin-bottom: 15px;
+  width:100%;
 }
 
 .colorPopup {
@@ -62,8 +64,8 @@ textarea {
   background-color: BG_COLOR_ALT;
   color:TEXT_COLOR;
   visibility:hidden;
-  width:100px;
-  height:100px;
+  width:182px;
+  height:185px;
   font-size: 80%;
   border: BORDER_STYLE;
   -moz-outline:0;
@@ -99,4 +101,8 @@ textarea {
   float: left;
   margin-right: WIDTH_MARGIN;
   width: WIDTH_MAIN;
+}
+
+#outputPrettyPrint {
+  width: 100%;
 }
