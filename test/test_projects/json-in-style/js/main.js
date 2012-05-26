@@ -21,6 +21,9 @@ goog.require('goog.events');
 goog.require('goog.events.Event');
 goog.require('goog.events.EventType');
 goog.require('goog.format.JsonPrettyPrinter');
+goog.require('goog.positioning.ClientPosition');
+goog.require('goog.positioning.Corner');
+goog.require('goog.positioning.AnchoredViewportPosition');
 goog.require('goog.ui.Popup');
 
 
@@ -61,6 +64,13 @@ jsonstyle.prettyPrintJSON = function(json, element, indentation) {
   element.innerHTML = formatter.format(json);
 };
 
+/** @type {goog.ui.Popup} */
+jsonstyle.colorPopup = new goog.ui.Popup(jsonstyle.colorPopupElement);
+
+
+// Event handlers
+
+
 /**
  * Update the "outputPrettyPrint" &lt;pre&gt; element with pretty-printed JSON
  * based on changes to textarea "jsonInputTextarea".
@@ -77,70 +87,92 @@ jsonstyle.inputTextareaListener = function(event) {
   }
 };
 
-/*
- * Event handlers for the color popup.
+/**
+ * Event handler for window resize.
+ *
+ * @param {!goog.events.Event} event The resize event.
  */
-
-/** @type {goog.ui.Popup} */
-jsonstyle.colorPopup = new goog.ui.Popup(
-    jsonstyle.colorPopupElement);
+jsonstyle.onResize = function(event) {
+  if (jsonstyle.colorPopup && jsonstyle.colorPopup.isVisible()) {
+    jsonstyle.colorPopup.reposition();
+  }
+}
 
 /**
- * Make the color-selector popup window visible.
+ * Toggle the visibility of the color-selector popup window (that is, if it is
+ * visible then hide it, otherwise make visible). The popup is positioned at
+ * the bottom-left corner of the event target.
+ *
+ * @param {!goog.events.Event} event The click event.
  */
-jsonstyle.showPopup = function() {
-  /*var popup = jsonstyle.colorPopup;
+jsonstyle.togglePopup = function(event) {
+  var popup = jsonstyle.colorPopup;
 
-  var btn = document.getElementById('btn');
-  var buttonCorner = toCorner(
-      getCheckedValue(document.forms[0].elements['button_corner']));
-  var menuCorner = toCorner(
-      getCheckedValue(document.forms[0].elements['menu_corner']));
+  if (popup.isVisible()) {
+    popup.setVisible(false);
+  } else {
+    var targetEl = /** @type {!Element} */ (event.target);
 
-  var t = parseInt(document.getElementById('margin_top').value);
-  var r = parseInt(document.getElementById('margin_right').value);
-  var b = parseInt(document.getElementById('margin_bottom').value);
-  var l = parseInt(document.getElementById('margin_left').value);
-  var margin = new goog.math.Box(t, r, b, l);
-
-  popup.setVisible(false);
-  popup.setPinnedCorner(menuCorner);
-  popup.setMargin(margin);
-  popup.setPosition(new goog.positioning.AnchoredViewportPosition(btn,
-      buttonCorner));
-  popup.setVisible(true);*/
+    popup.setVisible(false);
+    popup.setPosition(new goog.positioning.AnchoredViewportPosition(
+        targetEl, goog.positioning.Corner.BOTTOM_LEFT));
+    popup.setVisible(true);
+  }
 };
 
 /**
  * Initialize the popup used to display the HSV color selector.
  */
 jsonstyle.initializeColorPopup = function() {
+  jsonstyle.colorPopup.setAutoHide(false);
   jsonstyle.colorPopup.setHideOnEscape(true);
-  jsonstyle.colorPopup.setAutoHide(true);
-
-  //goog.events.listen(window, goog.events.EventType.RESIZE, onResize);
+  jsonstyle.colorPopup.setPinnedCorner(goog.positioning.Corner.TOP_LEFT);
+  jsonstyle.colorPopup.setMargin(8, 0, 0, 5);
 };
 
 /**
  * Initialize JSON-In-Style application.
  */
 jsonstyle.initializeApp = function() {
-  document.getElementById('buttonPropertyName').className = 
-      goog.getCssName('.goog-jsonprettyprinter-propertyname');
-  document.getElementById('buttonBooleanValue').className =
-      goog.getCssName('.goog-jsonprettyprinter-propertyvalue-boolean');
-  document.getElementById('buttonNullValue').className =
-      goog.getCssName('.goog-jsonprettyprinter-propertyvalue-null');
-  document.getElementById('buttonNumberValue').className =
-      goog.getCssName('.goog-jsonprettyprinter-propertyvalue-number');
-  document.getElementById('buttonStringValue').className =
-      goog.getCssName('.goog-jsonprettyprinter-propertyvalue-string');
-
   jsonstyle.initializeColorPopup();
+
+  var buttonPropertyName = /** @type {!Element} */
+      document.getElementById('buttonPropertyName');
+  var buttonBooleanValue = /** @type {!Element} */
+      document.getElementById('buttonBooleanValue');
+  var buttonNullValue = /** @type {!Element} */
+      document.getElementById('buttonNullValue');
+  var buttonNumberValue = /** @type {!Element} */
+      document.getElementById('buttonNumberValue');
+  var buttonStringValue = /** @type {!Element} */
+      document.getElementById('buttonStringValue');
+
+  buttonPropertyName.className =
+      goog.getCssName('goog-jsonprettyprinter-propertyname');
+  buttonBooleanValue.className =
+      goog.getCssName('goog-jsonprettyprinter-propertyvalue-boolean');
+  buttonNullValue.className =
+      goog.getCssName('goog-jsonprettyprinter-propertyvalue-null');
+  buttonNumberValue.className =
+      goog.getCssName('goog-jsonprettyprinter-propertyvalue-number');
+  buttonStringValue.className =
+      goog.getCssName('goog-jsonprettyprinter-propertyvalue-string');
+
+  goog.events.listen(buttonPropertyName, goog.events.EventType.CLICK,
+      jsonstyle.togglePopup);
+  goog.events.listen(buttonBooleanValue, goog.events.EventType.CLICK,
+      jsonstyle.togglePopup);
+  goog.events.listen(buttonNullValue, goog.events.EventType.CLICK,
+      jsonstyle.togglePopup);
+  goog.events.listen(buttonNumberValue, goog.events.EventType.CLICK,
+      jsonstyle.togglePopup);
+  goog.events.listen(buttonStringValue, goog.events.EventType.CLICK,
+      jsonstyle.togglePopup);
+
   goog.events.listen(jsonstyle.inputTextarea, goog.events.EventType.CHANGE,
       jsonstyle.inputTextareaListener);
+  goog.events.listen(window, goog.events.EventType.RESIZE, jsonstyle.onResize);
 };
 
 // Application entry point.
 jsonstyle.initializeApp();
-

@@ -22,7 +22,7 @@
 @def FONT sans-serif;
 @def FONT_SIZE 1em;
 @def LEFT_MARGIN 15px;
-@def TEXT_COLOR rgb(34, 34, 34);
+@def TEXT_COLOR black;
 @def WIDTH_MAIN 350px;
 @def WIDTH_MARGIN 20px;
 @def WIDTH_STYLE 300px;
@@ -54,7 +54,7 @@ h1, h2, h3, h4 {
 }
 
 textarea {
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
 
 .colorPopup {
