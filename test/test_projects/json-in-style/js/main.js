@@ -30,6 +30,11 @@ goog.require('goog.ui.Component');
 goog.require('goog.ui.HsvPalette');
 goog.require('goog.ui.Popup');
 
+goog.require('jsonstyle.JsonStyleManager');
+
+
+/** @type {goog.ui.HsvPalette} */
+jsonstyle.colorPalette;
 
 /** @type {string} */
 jsonstyle.colorPopupID = "colorPopup";
@@ -52,6 +57,9 @@ jsonstyle.outputElement = /** @type {!Element} */
 jsonstyle.inputTextarea = /** @type {!Element} */
     (document.getElementById(jsonstyle.inputTextareaID));
 
+/** @type {jsonstyle.JsonStyleManager} */
+jsonstyle.jsonStyleManager;
+
 
 /**
  * Pretty-print a string of JSON and insert it into an HTML element.
@@ -63,7 +71,7 @@ jsonstyle.inputTextarea = /** @type {!Element} */
  */
 jsonstyle.prettyPrintJSON = function(json, element, indentation) {
   var delimiters = new goog.format.JsonPrettyPrinter.HtmlDelimiters();
-  delimiters.indent = indentation || 2;
+  delimiters.indent = goog.isDef(indentation) ? indentation : 2;
   var formatter = new goog.format.JsonPrettyPrinter(delimiters);
   element.innerHTML = formatter.format(json);
 };
@@ -76,12 +84,13 @@ jsonstyle.colorPopup = new goog.ui.Popup(jsonstyle.colorPopupElement);
 
 
 /**
- * Update the "outputPrettyPrint" &lt;pre&gt; element with pretty-printed JSON
- * based on changes to textarea "jsonInputTextarea".
+ * Update the {@code outputPrettyPrint} &lt;pre&gt; element with pretty-printed
+ * JSON based on changes to textarea "jsonInputTextarea". On error, update
+ * {@code outputPrettyPrint} with the message "JSON syntax error."
  *
  * @param {!goog.events.Event} event The change event.
  */
-jsonstyle.inputTextareaListener = function(event) {
+jsonstyle.onTextareaChange = function(event) {
   try {
     jsonstyle.prettyPrintJSON(jsonstyle.inputTextarea.value,
         jsonstyle.outputElement);
@@ -101,7 +110,39 @@ jsonstyle.onResize = function(event) {
   if (jsonstyle.colorPopup && jsonstyle.colorPopup.isVisible()) {
     jsonstyle.colorPopup.reposition();
   }
-}
+};
+
+/**
+ * Update the appropriate JSON style color based on which button is clicked and
+ * the selected color from the color palette.
+ *
+ * @param {!goog.events.Event} event The click event.
+ */
+jsonstyle.onColorPaletteAction = function(event) {
+  if (goog.isDef(jsonstyle.colorPalette.buttonClickedId)) {
+    var color = jsonstyle.colorPalette.getColor();
+
+    switch (jsonstyle.colorPalette.buttonClickedId) {
+      case "buttonPropertyName":
+        jsonstyle.jsonStyleManager.setPropertyNameColor(color);
+        break;
+      case "buttonBooleanValue":
+        jsonstyle.jsonStyleManager.setBooleanValueColor(color);
+        break;
+      case "buttonNumberValue":
+        jsonstyle.jsonStyleManager.setNumberValueColor(color);
+        break;
+      case "buttonNullValue":
+        jsonstyle.jsonStyleManager.setNullValueColor(color);
+        break;
+      case "buttonStringValue":
+        jsonstyle.jsonStyleManager.setStringValueColor(color);
+        break;
+      default: throw Error("unrecognized button ID: "
+          + jsonstyle.colorPalette.buttonClickedId);
+    }
+  }
+};
 
 /**
  * Toggle the visibility of the color-selector popup window (that is, if it is
@@ -112,18 +153,57 @@ jsonstyle.onResize = function(event) {
  */
 jsonstyle.togglePopup = function(event) {
   var popup = jsonstyle.colorPopup;
+  var buttonEl = /** @type {!Element} */ (event.target);
+  if (!goog.string.startsWith(buttonEl.getAttribute("id"), 'button')) {
+    buttonEl = /** @type {!Element} */ (event.target.parentNode);
+  }
 
   if (popup.isVisible()) {
     popup.setVisible(false);
+    jsonstyle.colorPalette.buttonClickedId = undefined;
   } else {
-    var targetEl = /** @type {!Element} */ (event.target);
-
     popup.setVisible(false);
     popup.setPosition(new goog.positioning.AnchoredViewportPosition(
-        targetEl, goog.positioning.Corner.BOTTOM_LEFT));
+        buttonEl, goog.positioning.Corner.BOTTOM_LEFT));
     popup.setVisible(true);
+
+    var buttonId = buttonEl.getAttribute("id");
+    var color = jsonstyle.getButtonColorByButtonID(buttonId);
+
+    jsonstyle.colorPalette.buttonClickedId = buttonId;
+    jsonstyle.colorPalette.setColor(color);
   }
 };
+
+/**
+ * Get the button font color for the button with the specified ID.
+ * @param buttonId The button ID.
+ * @return {string} The button's font color.
+ */
+jsonstyle.getButtonColorByButtonID = function(buttonId) {
+  switch (buttonId) {
+    case "buttonPropertyName":
+      return jsonstyle.jsonStyleManager.getPropertyNameColor();
+      break;
+    case "buttonBooleanValue":
+      return jsonstyle.jsonStyleManager.getBooleanValueColor();
+      break;
+    case "buttonNumberValue":
+      return jsonstyle.jsonStyleManager.getNumberValueColor();
+      break;
+    case "buttonNullValue":
+      return jsonstyle.jsonStyleManager.getNullValueColor();
+      break;
+    case "buttonStringValue":
+      return jsonstyle.jsonStyleManager.getStringValueColor();
+      break;
+    default: throw Error("unrecognized button ID: " + buttonId);
+  }
+};
+
+
+// Initialize the JSON in Style application.
+
 
 /**
  * Initialize the popup used to display the HSV color selector.
@@ -137,15 +217,27 @@ jsonstyle.initializeColorPopup = function() {
   popup.setMargin(8, 0, 0, 5);
 
   var domHelper = goog.dom.getDomHelper(jsonstyle.colorPopupElement);
-  var colorPalette = new goog.ui.HsvPalette(domHelper, null,
+  jsonstyle.colorPalette = new goog.ui.HsvPalette(domHelper, 'blue',
       'goog-hsv-palette-sm');
-  colorPalette.render(jsonstyle.colorPopupElement);
+  jsonstyle.colorPalette.render(jsonstyle.colorPopupElement);
+  /** @type {string|undefined} */
+  jsonstyle.colorPalette.buttonClickedId = undefined;
+  goog.events.listen(jsonstyle.colorPalette, goog.ui.Component.EventType.ACTION,
+      jsonstyle.onColorPaletteAction);
 };
 
 /**
- * Initialize JSON-In-Style application.
+ * Initialize application.
  */
 jsonstyle.initializeApp = function() {
+  var domHelper = goog.dom.getDomHelper(jsonstyle.outputElement);
+  jsonstyle.jsonStyleManager = new jsonstyle.JsonStyleManager(domHelper, {
+    'propertyName': 'blue',
+    'stringValue': 'darkgreen',
+    'numberValue': 'darkorange',
+    'booleanValue': 'darkviolet',
+    'nullValue': 'red'});
+
   jsonstyle.initializeColorPopup();
 
   var buttonPropertyName = /** @type {!Element} */
@@ -159,17 +251,6 @@ jsonstyle.initializeApp = function() {
   var buttonStringValue = /** @type {!Element} */
       document.getElementById('buttonStringValue');
 
-  buttonPropertyName.className =
-      goog.getCssName('goog-jsonprettyprinter-propertyname');
-  buttonBooleanValue.className =
-      goog.getCssName('goog-jsonprettyprinter-propertyvalue-boolean');
-  buttonNullValue.className =
-      goog.getCssName('goog-jsonprettyprinter-propertyvalue-null');
-  buttonNumberValue.className =
-      goog.getCssName('goog-jsonprettyprinter-propertyvalue-number');
-  buttonStringValue.className =
-      goog.getCssName('goog-jsonprettyprinter-propertyvalue-string');
-
   goog.events.listen(buttonPropertyName, goog.events.EventType.CLICK,
       jsonstyle.togglePopup);
   goog.events.listen(buttonBooleanValue, goog.events.EventType.CLICK,
@@ -182,7 +263,7 @@ jsonstyle.initializeApp = function() {
       jsonstyle.togglePopup);
 
   goog.events.listen(jsonstyle.inputTextarea, goog.events.EventType.CHANGE,
-      jsonstyle.inputTextareaListener);
+      jsonstyle.onTextareaChange);
   goog.events.listen(window, goog.events.EventType.RESIZE, jsonstyle.onResize);
 };
 

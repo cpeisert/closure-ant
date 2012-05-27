@@ -15,7 +15,6 @@
  */
 
 @import "hsv-palette-styles.gss";
-@import "json-styles.gss";
 
 @def BG_COLOR #f2f7f5;
 @def BG_COLOR_ALT white;
