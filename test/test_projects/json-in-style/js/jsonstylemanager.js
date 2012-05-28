@@ -150,7 +150,8 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
    * @private
    */
   this.propertyNameStyle_ = new jsonstyle.JsonStyle(
-      'goog-jsonprettyprinter-propertyname', propertyNameColor);
+      goog.getCssName('goog-jsonprettyprinter-propertyname'),
+      propertyNameColor);
 
   /**
    * Style information for JSON property values of type {@code string}.
@@ -158,7 +159,8 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
    * @private
    */
   this.stringValueStyle_ = new jsonstyle.JsonStyle(
-      'goog-jsonprettyprinter-propertyvalue-string', stringValueColor);
+      goog.getCssName('goog-jsonprettyprinter-propertyvalue-string'),
+      stringValueColor);
 
   /**
    * Style information for JSON property values of type {@code number}.
@@ -166,7 +168,8 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
    * @private
    */
   this.numberValueStyle_ = new jsonstyle.JsonStyle(
-      'goog-jsonprettyprinter-propertyvalue-number', numberValueColor);
+      goog.getCssName('goog-jsonprettyprinter-propertyvalue-number'),
+      numberValueColor);
 
   /**
    * Style information for JSON property values of type {@code boolean}.
@@ -174,7 +177,8 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
    * @private
    */
   this.booleanValueStyle_ = new jsonstyle.JsonStyle(
-      'goog-jsonprettyprinter-propertyvalue-boolean', booleanValueColor);
+      goog.getCssName('goog-jsonprettyprinter-propertyvalue-boolean'),
+      booleanValueColor);
 
   /**
    * Style information for JSON property values of type {@code null}.
@@ -182,7 +186,8 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
    * @private
    */
   this.nullValueStyle_ = new jsonstyle.JsonStyle(
-      'goog-jsonprettyprinter-propertyvalue-null', nullValueColor);
+      goog.getCssName('goog-jsonprettyprinter-propertyvalue-null'),
+      nullValueColor);
 
 
   // Install the styles.

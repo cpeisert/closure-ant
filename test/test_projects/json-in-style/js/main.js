@@ -218,7 +218,7 @@ jsonstyle.initializeColorPopup = function() {
 
   var domHelper = goog.dom.getDomHelper(jsonstyle.colorPopupElement);
   jsonstyle.colorPalette = new goog.ui.HsvPalette(domHelper, 'blue',
-      'goog-hsv-palette-sm');
+      goog.getCssName('goog-hsv-palette-sm'));
   jsonstyle.colorPalette.render(jsonstyle.colorPopupElement);
   /** @type {string|undefined} */
   jsonstyle.colorPalette.buttonClickedId = undefined;
