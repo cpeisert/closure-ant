@@ -64,9 +64,26 @@ limitations under the License.
       <fileset dir="${json-in-style.dir}/images" />
     </copy>
 
-    <!-- Compile json-in-style JavaScript. -->
+    <!-- json-in-style based on index.soy rather than index.html -->
+    <mkdir dir="${json-in-style.soy-output.dir}" />
+    <mkdir dir="${json-in-style.soy-output.dir}/images" />
+    <copy todir="${json-in-style.soy-output.dir}/images">
+      <fileset dir="${json-in-style.dir}/images" />
+    </copy>
+  </target>
+
+  <target name="json-in-style.jsCompile">
     <builder-plus outputMode="COMPILED"
-        outputfile="${json-in-style.output.js}">
+        outputFile="${json-in-style.output.js}">
+      <compiler compilationLevel="advanced" warninglevel="verbose" />
+      <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
+      <root directory="${closure-library.dir}" />
+    </builder-plus>
+  </target>
+
+  <target name="json-in-style.soy.jsCompile">
+    <builder-plus outputMode="COMPILED"
+        outputFile="${json-in-style.soy-output.js}">
       <compiler compilationLevel="advanced" warninglevel="verbose" />
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
       <root directory="${closure-library.dir}" />
@@ -81,11 +98,31 @@ limitations under the License.
   -->
 
 
-  <target name="testCompileGSS">
-    <stylesheets forceRecompile="true" prettyPrint="true"
-        outputFile="${json-in-style.output.css}">
-      <cssfileset dir="${json-in-style.dir}/gss" includes="**/*.gss" />
+  <target name="testCompileGSS" depends="json-in-style.jsCompile">
+    <stylesheets
+        copyrightNotice="${copyright}"
+        forceRecompile="true"
+        inputOrientation="ltr"
+        outputFile="${json-in-style.output.css}"
+        outputOrientation="ltr"
+        prettyPrint="true">
+      <allowednonstandardfunctions functionList="randomColor" />
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
     </stylesheets>
+
+    <assertFileExists file="${json-in-style.output.css}" />
+    <assertResourceContains resource="${json-in-style.output.css}"
+        value="Copyright (C) 2012 Christopher Peisert" />
+  </target>
+
+
+  <target name="testClassRenaming">
+
+  </target>
+
+
+  <target name="testCustomGssFunctionMapProvider">
+
   </target>
 
   

@@ -16,7 +16,6 @@
 
 @import "hsv-palette-styles.gss";
 
-@def BG_COLOR #f2f7f5;
 @def BG_COLOR_ALT white;
 @def BORDER_STYLE solid black 1px;
 @def FONT sans-serif;
@@ -27,6 +26,18 @@
 @def WIDTH_MARGIN 20px;
 @def WIDTH_STYLE 300px;
 @def WIDTH_BODY add(WIDTH_MAIN, WIDTH_MARGIN, WIDTH_STYLE);
+
+@defmixin borderRadius(RADIUS) {
+  -webkit-border-radius: RADIUS;
+  -moz-border-radius: RADIUS;
+  border-radius: RADIUS;
+}
+
+@if (USING_CUSTOM_FUNCTIONS) {
+  @def BG_COLOR randomColor('light');
+} @else {
+  @def BG_COLOR #faf9ff;
+}
 
 
 html, button, input, select, textarea {
@@ -47,6 +58,7 @@ button {
   font-size: mult(FONT_SIZE, 1.1);
   font-weight: bold;
   margin-bottom: 10px;
+  @mixin borderRadius(5px);
 }
 
 h1, h2, h3, h4 {
@@ -96,8 +108,8 @@ textarea {
 }
 
 #mainContent {
-  align: left;
   float: left;
+  margin-left:auto;
   margin-right: WIDTH_MARGIN;
   width: WIDTH_MAIN;
 }

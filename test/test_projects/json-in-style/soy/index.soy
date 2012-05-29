@@ -1,0 +1,70 @@
+{namespace jsonstyle autoescape="contextual"}
+
+/**
+ * Create index.html.
+ */
+{template .createIndexHtml}
+  {call html5.createDocument}
+    {param title: 'JSON in Style' /}
+    {param description: 'JSON in Style test app' /}
+    {param cssFiles: 'stylesheet.compiled.css' /}
+    {param scriptFiles: 'main.compiled.js' /}
+    {param contentHtml}
+      {call .createBodyContent /}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * Create the HTML content for the body of index.html.
+ */
+{template .createBodyContent}
+<h2>Beautify Your JSON</h2>
+
+<div id="mainContent">
+  <label for="jsonInputTextarea" class="{css strong}">Enter JSON
+    <span class="{css tip}"> (press Tab when done)</span>
+  </label>
+  <textarea id="jsonInputTextarea" class="{css standout}"
+      placeholder="Enter your plain JSON here." rows="5" cols="50"
+      autofocus="autofocus">
+  </textarea>
+
+  <p class="{css strong}">Your JSON in style!</p>
+  <pre id="outputPrettyPrint" class="{css standout}">
+  </pre>
+</div>
+
+<div id="customizeStyles">
+  <div class="{css strong}">Customize JSON colors</div>
+
+  // Technically, the JsonPrettyPrinter styles do not need to be wrapped with
+  // {css} since they are not defined within any CSS/GSS stylesheets, and hence
+  // will not get renamed by the Closure Stylesheets compiler. The
+  // implementation of goog.format.JsonPrettyPrinter (as of May 2012) will not
+  // work with CSS renaming, since the CSS class names are not wrapped with
+  // goog.getCssName().
+  <button id="buttonPropertyName" class="{css goog-jsonprettyprinter-propertyname}">
+    Property Name
+  </button>
+
+  <button id="buttonBooleanValue" class="{css goog-jsonprettyprinter-propertyvalue-boolean}">
+    Property Value: Boolean
+  </button>
+
+  <button id="buttonNullValue" class="{css goog-jsonprettyprinter-propertyvalue-null}">
+    Property Value: Null
+  </button>
+
+  <button id="buttonNumberValue" class="{css goog-jsonprettyprinter-propertyvalue-number}">
+    Property Value: Number
+  </button>
+
+  <button id="buttonStringValue" class="{css goog-jsonprettyprinter-propertyvalue-string}">
+    Property Value: String
+  </button>
+
+  <!-- Color-picker popup window. -->
+  <div id="colorPopup" class="{css colorPopup} {css standout}" tabindex="0"></div>
+</div>
+{/template}
