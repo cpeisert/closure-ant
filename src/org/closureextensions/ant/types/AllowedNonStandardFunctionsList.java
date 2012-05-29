@@ -37,13 +37,13 @@ public final class AllowedNonStandardFunctionsList {
   }
 
   /**
-   * @param functionsList list of allowed, non-standard CSS functions to pass
+   * @param functionList list of allowed, non-standard CSS functions to pass
    *     to the Closue Stylesheets compiler
    */
-  public void setFunctionsList(String functionsList) {
+  public void setFunctionList(String functionList) {
     CharMatcher matcher = CharMatcher.WHITESPACE.or(CharMatcher.anyOf(","));
     Iterable<String> splitFunctions = Splitter.on(matcher).omitEmptyStrings()
-        .trimResults().split(functionsList);
+        .trimResults().split(functionList);
 
     for (String allowedFunction : splitFunctions) {
       this.allowedNonStandardFunctions.add(allowedFunction);
