@@ -16,21 +16,24 @@
 
 package org.closureextensions.ant;
 
-import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.google.common.css.AbstractCommandLineCompiler;
 import com.google.common.css.ExitCodeHandler;
+import com.google.common.css.GssFunctionMapProvider;
 import com.google.common.css.JobDescription;
+import com.google.common.css.JobDescription.InputOrientation;
+import com.google.common.css.JobDescription.OutputOrientation;
 import com.google.common.css.JobDescriptionBuilder;
+import com.google.common.css.SourceCode;
 import com.google.common.css.compiler.ast.BasicErrorManager;
-import com.google.common.css.compiler.commandline.ClosureCommandLineCompiler;
-import com.google.common.css.compiler.commandline.DefaultCommandLineCompiler;
-import com.google.common.io.Files;
+import com.google.common.css.compiler.gssfunctions.DefaultGssFunctionMapProvider;
+
+import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -46,6 +49,10 @@ import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.ClosureBuildUtil;
 import org.closureextensions.common.util.FileUtil;
 import org.closureextensions.css.ClosureStylesheetsCompiler;
+import org.closureextensions.css.OutputRenamingMapFormat;
+import org.closureextensions.css.RenamingType;
+
+import javax.annotation.Nullable;
 
 /**
  * Closure Stylesheets Ant task. The default task name is {@code stylesheets}
@@ -65,19 +72,19 @@ import org.closureextensions.css.ClosureStylesheetsCompiler;
 public final class ClosureStylesheetsTask extends Task {
 
   // Attributes
-  private Boolean allowUnrecognizedFunctions;
+  private boolean allowUnrecognizedFunctions;
   private String copyrightNotice;
   private boolean forceRecompile;
   private String gssFunctionMapProviderClassName;
   private Path gssFunctionMapProviderClasspath;
   private String inputManifest;
-  private String inputOrientation;
+  private JobDescription.InputOrientation inputOrientation;
   private String outputFile;
-  private String outputOrientation;
+  private JobDescription.OutputOrientation outputOrientation;
   private String outputRenamingMap;
-  private String outputRenamingMapFormat;
-  private Boolean prettyPrint;
-  private String renamingType;
+  private OutputRenamingMapFormat outputRenamingMapFormat;
+  private boolean prettyPrint;
+  private RenamingType renamingType;
 
   // Nested elements
   private final List<String> allowedNonStandardFunctions;
@@ -103,19 +110,19 @@ public final class ClosureStylesheetsTask extends Task {
     }
 
     // Attributes
-    this.allowUnrecognizedFunctions = null;
+    this.allowUnrecognizedFunctions = false;
     this.copyrightNotice = null;
     this.forceRecompile = false;
     this.gssFunctionMapProviderClassName = null;
     this.gssFunctionMapProviderClasspath = null;
     this.inputManifest = null;
-    this.inputOrientation = null;
+    this.inputOrientation = InputOrientation.LTR;
     this.outputFile = null;
-    this.outputOrientation = null;
+    this.outputOrientation = OutputOrientation.LTR;
     this.outputRenamingMap = null;
-    this.outputRenamingMapFormat = null;
-    this.prettyPrint = null;
-    this.renamingType = null;
+    this.outputRenamingMapFormat = OutputRenamingMapFormat.JSON;
+    this.prettyPrint = false;
+    this.renamingType = RenamingType.NONE;
 
     // Nested elements
     this.allowedNonStandardFunctions = Lists.newArrayList();
@@ -234,7 +241,8 @@ public final class ClosureStylesheetsTask extends Task {
   public void setInputOrientation(String inputOrientation) {
     if ("LTR".equalsIgnoreCase(inputOrientation)
         || "RTL".equalsIgnoreCase(inputOrientation)) {
-      this.inputOrientation = inputOrientation.toUpperCase();
+      this.inputOrientation = InputOrientation.valueOf(
+          inputOrientation.toUpperCase());
     } else {
       throw new BuildException("Attribute \"inputOrientation\" expected to be "
           + "LTR or RTL but was \"" + inputOrientation + "\"");
@@ -271,7 +279,8 @@ public final class ClosureStylesheetsTask extends Task {
     if ("LTR".equalsIgnoreCase(outputOrientation)
         || "RTL".equalsIgnoreCase(outputOrientation)
         || "NOCHANGE".equalsIgnoreCase(outputOrientation)) {
-      this.outputOrientation = outputOrientation.toUpperCase();
+      this.outputOrientation = OutputOrientation.valueOf(
+          outputOrientation.toUpperCase());
     } else {
       throw new BuildException("Attribute \"outputOrientation\" expected to "
           + "be LTR, RTL, or NOCHANGE but was \"" + outputOrientation + "\"");
@@ -362,7 +371,8 @@ bar=b
         || "CLOSURE_UNCOMPILED".equalsIgnoreCase(outputRenamingMapFormat)
         || "JSON".equalsIgnoreCase(outputRenamingMapFormat)
         || "PROPERTIES".equalsIgnoreCase(outputRenamingMapFormat)) {
-      this.outputRenamingMapFormat = outputRenamingMapFormat.toUpperCase();
+      this.outputRenamingMapFormat = OutputRenamingMapFormat.valueOf(
+          outputRenamingMapFormat.toUpperCase());
     } else {
       throw new BuildException("Attribute \"outputRenamingMapFormat\" "
           + "expected to be one of CLOSURE_COMPILED, CLOSURE_UNCOMPILED, "
@@ -410,7 +420,7 @@ bar=b
     if ("CLOSURE".equalsIgnoreCase(renamingType)
         || "DEBUG".equalsIgnoreCase(renamingType)
         || "NONE".equalsIgnoreCase(renamingType)) {
-      this.renamingType = renamingType.toUpperCase();
+      this.renamingType = RenamingType.valueOf(renamingType.toUpperCase());
     } else {
       throw new BuildException("Attribute \"renamingType\" expected to be "
           + "one of CLOSURE, DEBUG, or NONE but was \"" + renamingType + "\"");
@@ -479,43 +489,27 @@ bar=b
    */
   public void execute() {
 
-    // TODO(cpeisert): remove Java Task and use methods
-    // createStylesheetCompilerJobDescription() and
-    // compileStylesheets(JobDescription job, String renamingMapFilePath)
-    Java runner = new Java(this);
-    runner.setFailonerror(true);
-    runner.setFork(true);
-    runner.setLogError(true);
-    runner.setTaskName(getTaskName());
-
-    if (this.gssFunctionMapProviderClasspath != null) {
-      runner.createClasspath().append(this.gssFunctionMapProviderClasspath);
-    }
-
-    CommandLineBuilder cmdlineFlags = getCommandLineOptionsExcludingSources();
     List<String> cssCurrentSources = getAllSources();
+    String taskSettings = getAntTaskSettingsExcludingSourcesAsString();
+    File cssOutputFile = null;
 
-    for (String arg : cmdlineFlags.toListOfString()) {
-      runner.createArg().setValue(arg);
-    }
-    for (String cssSource : cssCurrentSources) {
-      runner.createArg().setValue(cssSource);
+    if (!Strings.isNullOrEmpty(this.outputFile)) {
+      cssOutputFile = new File(this.outputFile);
     }
 
     boolean skipCompilation = false;
 
-    if (!this.forceRecompile) {
+    if (!this.forceRecompile && cssOutputFile != null) {
       // Check if the output file is up-to-date.
 
       BuildCache cache = new BuildCache(this);
       BuildSettings previousBuildSettings = cache.get();
       BuildSettings currentBuildSettings = new BuildSettings(
-          cmdlineFlags.toString(), cssCurrentSources);
-      // Save current build settings for the comparison with the next build.
+          taskSettings, cssCurrentSources);
+      // Save current build settings for comparison with the next build.
       cache.put(currentBuildSettings);
 
       if (previousBuildSettings != null) {
-        File cssOutputFile = new File(this.outputFile);
         if (ClosureBuildUtil.outputFileUpToDate(cssOutputFile,
             previousBuildSettings, currentBuildSettings)) {
           skipCompilation = true;
@@ -531,83 +525,17 @@ bar=b
       log("Compiling " + cssCurrentSources.size() + " " + sheetOrSheets
           + "...");
 
-      int exitCode = runner.executeJava();
-      if (exitCode != 0) {
-        throw new BuildException("Error: <" + getTaskName()
-            + "> finished with exit code " + exitCode);
+      JobDescription compileJob = createStylesheetCompilerJobDescription(
+          cssCurrentSources);
+      String compiledCSS = compileStylesheets(compileJob,
+          this.outputRenamingMap, this.outputRenamingMapFormat);
+
+      if (cssOutputFile == null) {
+        System.out.println(compiledCSS);
+      } else {
+        FileUtil.write(compiledCSS, cssOutputFile);
       }
     }
-  }
-
-  /**
-   * Gathers command line options based on the attributes and nested elements
-   * set for this task.
-   *
-   * @return command line options based on attribute and nested element settings
-   * @throws BuildException if obtaining the canonical path for the output file
-   *     or the outputRenamingMap throws an {@link IOException}
-   */
-  private CommandLineBuilder getCommandLineOptionsExcludingSources() {
-    CommandLineBuilder cmdline = new CommandLineBuilder();
-
-    if(this.allowUnrecognizedFunctions != null) {
-      cmdline.argument("--allow-unrecognized-functions");
-    }
-    if (this.copyrightNotice != null) {
-      cmdline.flagAndArgument("--copyright-notice", this.copyrightNotice);
-    }
-    if (this.gssFunctionMapProviderClassName != null) {
-      cmdline.flagAndArgument("--gss-function-map-provider",
-          this.gssFunctionMapProviderClassName);
-    }
-    if (this.inputOrientation != null) {
-      cmdline.flagAndArgument("--input-orientation", this.inputOrientation);
-    }
-    if (this.outputFile != null) {
-      try {
-        cmdline.flagAndArgument("--output-file",
-            new File(this.outputFile).getCanonicalPath());
-      } catch (IOException e) {
-        throw new BuildException(e);
-      }
-    }
-    if (this.outputOrientation != null) {
-      cmdline.flagAndArgument("--output-orientation", this.outputOrientation);
-    }
-    if (this.outputRenamingMap != null) {
-      try {
-        cmdline.flagAndArgument("--output-renaming-map",
-            new File(this.outputRenamingMap).getCanonicalPath());
-      } catch (IOException e) {
-        throw new BuildException(e);
-      }
-    }
-    if (this.outputRenamingMapFormat != null) {
-      cmdline.flagAndArgument("--output-renaming-map-format",
-          this.outputRenamingMapFormat);
-    }
-    if (this.prettyPrint != null) {
-      cmdline.argument("--pretty-print");
-    }
-    if (this.renamingType != null) {
-      cmdline.flagAndArgument("--rename", this.renamingType);
-    }
-
-    // Nested elements
-
-    for (String allowedFunction : this.allowedNonStandardFunctions) {
-      cmdline.flagAndArgument("--allowed-non-standard-function",
-          allowedFunction);
-    }
-    for (String excludedClass : this.classesExcludedFromRenaming) {
-      cmdline.flagAndArgument("--excluded-classes-from-renaming",
-          excludedClass);
-    }
-    for (String trueConditional : this.definedTrueConditionals) {
-      cmdline.flagAndArgument("--define", trueConditional);
-    }
-
-    return cmdline;
   }
 
   /**
@@ -637,22 +565,26 @@ bar=b
    * string. If a non-null renaming map file path is specified, then the
    * renaming file will be written as well.
    *
-   * @param job inputs and options
+   * @param job Closure Stylesheets compiler job description
+   * @param renamingMapFilePath optional file path to write the CSS renaming
+   *     map
+   * @param renamingMapFormat optional CSS renaming map format. Only used if
+   *     if a renaming map file path is specified.
    * @return the compiled CSS
    */
   private String compileStylesheets(JobDescription job,
-      String renamingMapFilePath) {
+      @Nullable String renamingMapFilePath,
+      @Nullable OutputRenamingMapFormat renamingMapFormat) {
 
     ClosureStylesheetsCompiler compiler = new ClosureStylesheetsCompiler(job,
         new ExitCodeHandler() {
           @Override public void processExitCode(int i) {
-            throw new BuildException("<" + getTaskName() + "> exited with "
-                + "code " + i);
+            throw new BuildException("<" + getTaskName() + "> finished with "
+                + "exit code " + i);
           }
         },
         new BasicErrorManager() {
-          @Override
-          public void print(String s) {
+          @Override public void print(String s) {
             log(s, Project.MSG_ERR);
           }
         }
@@ -660,6 +592,9 @@ bar=b
 
     File renamingMapFile = (renamingMapFilePath == null) ? null :
         new File(renamingMapFilePath);
+    if (renamingMapFormat != null) {
+      compiler.setOutputRenamingMapFormat(renamingMapFormat);
+    }
 
    return compiler.execute(renamingMapFile);
   }
@@ -667,13 +602,137 @@ bar=b
   /**
    * Create a {@link JobDescription} for the Closure Stylesheets compiler
    * initialized with data set for the {@link ClosureStylesheetsTask}.
-   * @return
+   *
+   * @param cssSources file paths for CSS sources to be compiled
+   * @return a job description for a run of the Closure Stylesheets compiler
    */
-  private JobDescription createStylesheetCompilerJobDescription() {
+  private JobDescription createStylesheetCompilerJobDescription(
+      List<String> cssSources) {
     JobDescriptionBuilder jobBuilder = new JobDescriptionBuilder();
 
-    // TODO(cpeisert): implement
+    jobBuilder.setInputOrientation(this.inputOrientation);
+    jobBuilder.setOutputOrientation(this.outputOrientation);
+    jobBuilder.setOutputFormat(this.prettyPrint
+        ? JobDescription.OutputFormat.PRETTY_PRINTED
+        : JobDescription.OutputFormat.COMPRESSED);
+    jobBuilder.setCopyrightNotice(this.copyrightNotice);
+    jobBuilder.setTrueConditionNames(this.definedTrueConditionals);
+    jobBuilder.setAllowUnrecognizedFunctions(this.allowUnrecognizedFunctions);
+    jobBuilder.setAllowedNonStandardFunctions(this.allowedNonStandardFunctions);
+    jobBuilder.setAllowWebkitKeyframes(true);
+    jobBuilder.setProcessDependencies(true);
+    jobBuilder.setExcludedClassesFromRenaming(this.classesExcludedFromRenaming);
+    jobBuilder.setSimplifyCss(true);
+    jobBuilder.setEliminateDeadStyles(true);
+    jobBuilder.setCssSubstitutionMapProvider(
+        this.renamingType.getCssSubstitutionMapProvider());
+
+    GssFunctionMapProvider gssFunctionMapProvider =
+        createGssFunctionMapProviderForName(
+            this.gssFunctionMapProviderClassName,
+            this.gssFunctionMapProviderClasspath);
+    jobBuilder.setGssFunctionMapProvider(gssFunctionMapProvider);
+
+    for (String filePath : cssSources) {
+      File file = new File(filePath);
+      if (!file.exists()) {
+        throw new BuildException(String.format(
+            "Input file %s does not exist", filePath));
+      }
+
+      String fileContents = FileUtil.toString(file);
+      jobBuilder.addInput(new SourceCode(filePath, fileContents));
+    }
 
     return jobBuilder.getJobDescription();
+  }
+
+  /**
+   * Create a new instance of the named class, which must implement {@link
+   * GssFunctionMapProvider}.An optional classpath may be specified,
+   * which will be searched for the class.
+   *
+   * @param className optional fully qualified Java class name such as
+   *     "com.google.common.css.compiler.gssfunctions.DefaultGssFunctionMapProvider"
+   * @param classpath optional {@link Path} containing classpaths to search
+   *     for {@code className}
+   * @return a new instance of the {@link GssFunctionMapProvider} that
+   *     corresponds to the specified class name, or a new instance of
+   *     {@link DefaultGssFunctionMapProvider} if the class name is
+   *     {@code null}.
+   * @throws RuntimeException if the classname cannot be found, accessed, or
+   *     instantiated
+   */
+  private GssFunctionMapProvider createGssFunctionMapProviderForName(
+      @Nullable String className, @Nullable Path classpath) {
+    if (Strings.isNullOrEmpty(className)) {
+      return new DefaultGssFunctionMapProvider();
+    }
+
+    ClassLoader classLoader = null;
+
+    if (classpath != null && !classpath.toString().isEmpty()) {
+      classLoader = new AntClassLoader(
+          this.getClass().getClassLoader(), getProject(), classpath, true);
+    }
+
+    try {
+      if (classLoader == null) {
+        return (GssFunctionMapProvider) Class.forName(className).newInstance();
+      } else {
+        return (GssFunctionMapProvider) Class.forName(className, true,
+            classLoader).newInstance();
+      }
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException("Cannot find class: " + className, e);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException("Cannot access class: " + className, e);
+    } catch (InstantiationException e) {
+      throw new RuntimeException("Cannot instantiate class: " + className, e);
+    }
+  }
+
+  /**
+   * Get the attribute and nested element settings for this Ant task. Each
+   * attribute-value pair is formatted as: {@literal <attribute>=<value>}. CSS
+   * input files are not included. See {@link #getAllSources()}.
+   *
+   * <p>This method serves to compare the settings between invocations of this
+   * Ant task so that execution may be skipped if nothing has changed.</p>
+   *
+   * @return a string containing the attribute and nested element settings for
+   *     this Ant task
+   */
+  private String getAntTaskSettingsExcludingSourcesAsString() {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("allowUnrecognizedFunctions=")
+        .append(this.allowUnrecognizedFunctions);
+    builder.append("copyrightNotice=").append(this.copyrightNotice);
+    builder.append("forceRecompile=").append(this.forceRecompile);
+    builder.append("functionMapProvider=")
+        .append(this.gssFunctionMapProviderClassName);
+    builder.append("classpath=").append(this.gssFunctionMapProviderClasspath);
+    builder.append("inputOrientation=").append(this.inputOrientation.toString());
+    builder.append("outputFile=").append(this.outputFile);
+    builder.append("outputOrientation=")
+        .append(this.outputOrientation.toString());
+    builder.append("outputRenamingMap=").append(this.outputRenamingMap);
+    builder.append("outputRenamingMapFormat=")
+        .append(this.outputRenamingMapFormat.toString());
+    builder.append("prettyPrint=").append(this.prettyPrint);
+    builder.append("renamingType").append(this.renamingType.toString());
+
+    for (String nonStndFunction : this.allowedNonStandardFunctions) {
+      builder.append("allowedNonStandardFunction=").append(nonStndFunction);
+    }
+    for (String excludedClass : this.classesExcludedFromRenaming) {
+      builder.append("classExcludedFromRenaming=").append(excludedClass);
+    }
+    for (String trueConditional : this.definedTrueConditionals) {
+      builder.append("definedTrueConditional=").append(trueConditional);
+    }
+
+    return builder.toString();
   }
 }

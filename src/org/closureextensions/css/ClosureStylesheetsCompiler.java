@@ -21,8 +21,10 @@ import com.google.common.css.JobDescription;
 import com.google.common.css.compiler.ast.ErrorManager;
 import com.google.common.css.compiler.commandline.DefaultCommandLineCompiler;
 
-import javax.annotation.Nullable;
 import java.io.File;
+import java.io.PrintWriter;
+import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * Wrapper for the Closure Stylesheets compiler to gain access to the protected
@@ -33,6 +35,8 @@ import java.io.File;
 public final class ClosureStylesheetsCompiler
     extends DefaultCommandLineCompiler {
 
+  private OutputRenamingMapFormat outputRenamingMapFormat;
+
   /**
    * Constructs a new Closure Stylesheets compiler wrapper to gain access to
    * {@link DefaultCommandLineCompiler#compile()}.
@@ -40,10 +44,30 @@ public final class ClosureStylesheetsCompiler
   public ClosureStylesheetsCompiler(JobDescription job,
       ExitCodeHandler exitCodeHandler, ErrorManager errorManager) {
     super(job, exitCodeHandler, errorManager);
+    this.outputRenamingMapFormat = OutputRenamingMapFormat.JSON;
   }
 
   /** @inheritDoc */
   @Override public String execute(@Nullable File renameFile) {
     return super.execute(renameFile);
+  }
+
+  /**
+   * Set the {@link OutputRenamingMapFormat} used to write the renaming map.
+   * This is only used if passing a renaming map file to {@link
+   * #execute(java.io.File)}.
+   *
+   * @param renamingMapFormat the CSS renaming map format
+   */
+  public void setOutputRenamingMapFormat(
+      OutputRenamingMapFormat renamingMapFormat) {
+    this.outputRenamingMapFormat = renamingMapFormat;
+  }
+
+  /** @inheritDoc */
+  @Override protected void writeRenamingMap(Map<String, String> renamingMap,
+      PrintWriter renamingMapWriter)  {
+    this.outputRenamingMapFormat.writeRenamingMap(renamingMap,
+        renamingMapWriter);
   }
 }
