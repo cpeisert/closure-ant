@@ -39,11 +39,6 @@ limitations under the License.
       location="${closure-ant-tasks.build.dir}/closure-tools-config.xml" />
   <import file="${closure-tools-config.xml}" />
 
-  <path id="test.classpath">
-    <fileset dir="${closure-ant-tasks.lib.dir}" includes="**/*.jar" />
-    <fileset dir="${test.lib.dir}" includes="**/*.jar" />
-  </path>
-
   <import file="${test-projects.dir}/json-in-style/jsonInStyle.xml" />
 
   
@@ -122,7 +117,26 @@ limitations under the License.
 
 
   <target name="testCustomGssFunctionMapProvider">
+    <!-- Make sure the test sources have been compiled. -->
+    <ant dir="${test.dir}" target="compile" />
 
+    <stylesheets
+        classpath="${test.build.dir}/classes"
+        functionMapProvider="org.closureextensions.css.CustomGssFunctionMapProvider"
+        forceRecompile="true" outputFile="${json-in-style.output.css}"
+        prettyPrint="true">
+      <allowednonstandardfunctions functionList="randomColor" />
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+      <definetrueconditionals trueConditionalsList="USING_CUSTOM_FUNCTIONS" />
+    </stylesheets>
+
+    <assertFileExists file="${json-in-style.output.css}" />
+
+    <!-- If the true-condition USING_CUSTOM_FUNCTIONS is successfully set,
+      then the background color should be set by a call to randomColor('light')
+      and therefore the background color will not equal the default #faf9ff. -->
+    <assertResourceDoesntContain resource="${json-in-style.output.css}"
+        value="background-color: #faf9ff" />
   </target>
 
   

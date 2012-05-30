@@ -16,13 +16,23 @@
 
 package org.closureextensions.ant;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.common.css.AbstractCommandLineCompiler;
+import com.google.common.css.ExitCodeHandler;
+import com.google.common.css.JobDescription;
+import com.google.common.css.JobDescriptionBuilder;
+import com.google.common.css.compiler.ast.BasicErrorManager;
+import com.google.common.css.compiler.commandline.ClosureCommandLineCompiler;
+import com.google.common.css.compiler.commandline.DefaultCommandLineCompiler;
+import com.google.common.io.Files;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.FileSet;
@@ -35,6 +45,7 @@ import org.closureextensions.ant.types.DefinedTrueConditionalsList;
 import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.ClosureBuildUtil;
 import org.closureextensions.common.util.FileUtil;
+import org.closureextensions.css.ClosureStylesheetsCompiler;
 
 /**
  * Closure Stylesheets Ant task. The default task name is {@code stylesheets}
@@ -67,7 +78,6 @@ public final class ClosureStylesheetsTask extends Task {
   private String outputRenamingMapFormat;
   private Boolean prettyPrint;
   private String renamingType;
-  private File stylesheetsJar;
 
   // Nested elements
   private final List<String> allowedNonStandardFunctions;
@@ -106,7 +116,6 @@ public final class ClosureStylesheetsTask extends Task {
     this.outputRenamingMapFormat = null;
     this.prettyPrint = null;
     this.renamingType = null;
-    this.stylesheetsJar = null;
 
     // Nested elements
     this.allowedNonStandardFunctions = Lists.newArrayList();
@@ -408,11 +417,6 @@ bar=b
     }
   }
 
-  /** @param file the Closure Stylesheets jar file */
-  public void setStylesheetsJar(File file) {
-    this.stylesheetsJar = file;
-  }
-
 
   // Nested element setters
 
@@ -475,20 +479,10 @@ bar=b
    */
   public void execute() {
 
-    if (this.stylesheetsJar == null) {
-      String stylesheetsJarPath =
-          SharedAntProperty.CLOSURE_STYLESHEETS_JAR.getValue(getProject());
-      if (stylesheetsJarPath != null) {
-        this.stylesheetsJar = new File(stylesheetsJarPath);
-      } else {
-        throw new BuildException("\"stylesheetsJar\" is not set. Verify "
-            + "that your build file imports \"closure-tools-config.xml\" and "
-            + "that the property locations are correct for your machine.");
-      }
-    }
-
+    // TODO(cpeisert): remove Java Task and use methods
+    // createStylesheetCompilerJobDescription() and
+    // compileStylesheets(JobDescription job, String renamingMapFilePath)
     Java runner = new Java(this);
-    runner.setJar(this.stylesheetsJar);
     runner.setFailonerror(true);
     runner.setFork(true);
     runner.setLogError(true);
@@ -636,5 +630,50 @@ bar=b
             this.cssFileSets));
 
     return currentBuildSources;
+  }
+
+  /**
+   * Run the Closure Stylesheets compiler and return the compiled CSS as a
+   * string. If a non-null renaming map file path is specified, then the
+   * renaming file will be written as well.
+   *
+   * @param job inputs and options
+   * @return the compiled CSS
+   */
+  private String compileStylesheets(JobDescription job,
+      String renamingMapFilePath) {
+
+    ClosureStylesheetsCompiler compiler = new ClosureStylesheetsCompiler(job,
+        new ExitCodeHandler() {
+          @Override public void processExitCode(int i) {
+            throw new BuildException("<" + getTaskName() + "> exited with "
+                + "code " + i);
+          }
+        },
+        new BasicErrorManager() {
+          @Override
+          public void print(String s) {
+            log(s, Project.MSG_ERR);
+          }
+        }
+    );
+
+    File renamingMapFile = (renamingMapFilePath == null) ? null :
+        new File(renamingMapFilePath);
+
+   return compiler.execute(renamingMapFile);
+  }
+
+  /**
+   * Create a {@link JobDescription} for the Closure Stylesheets compiler
+   * initialized with data set for the {@link ClosureStylesheetsTask}.
+   * @return
+   */
+  private JobDescription createStylesheetCompilerJobDescription() {
+    JobDescriptionBuilder jobBuilder = new JobDescriptionBuilder();
+
+    // TODO(cpeisert): implement
+
+    return jobBuilder.getJobDescription();
   }
 }
