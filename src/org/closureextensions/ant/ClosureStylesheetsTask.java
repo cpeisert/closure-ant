@@ -37,7 +37,6 @@ import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
@@ -590,8 +589,21 @@ bar=b
         }
     );
 
-    File renamingMapFile = (renamingMapFilePath == null) ? null :
-        new File(renamingMapFilePath);
+    File renamingMapFile = null;
+
+    if (renamingMapFilePath != null) {
+      renamingMapFile = new File(renamingMapFilePath);
+      try {
+        renamingMapFile.getParentFile().mkdirs();
+        renamingMapFile.createNewFile();
+      } catch (IOException e) {
+        throw new BuildException("unable to create CSS renaming map file: "
+            + renamingMapFilePath, e);
+      } catch (SecurityException se) {
+        throw new BuildException(se);
+      }
+    }
+
     if (renamingMapFormat != null) {
       compiler.setOutputRenamingMapFormat(renamingMapFormat);
     }
@@ -708,29 +720,30 @@ bar=b
 
     builder.append("allowUnrecognizedFunctions=")
         .append(this.allowUnrecognizedFunctions);
-    builder.append("copyrightNotice=").append(this.copyrightNotice);
-    builder.append("forceRecompile=").append(this.forceRecompile);
-    builder.append("functionMapProvider=")
+    builder.append(" copyrightNotice=").append(this.copyrightNotice);
+    builder.append(" forceRecompile=").append(this.forceRecompile);
+    builder.append(" functionMapProvider=")
         .append(this.gssFunctionMapProviderClassName);
-    builder.append("classpath=").append(this.gssFunctionMapProviderClasspath);
-    builder.append("inputOrientation=").append(this.inputOrientation.toString());
-    builder.append("outputFile=").append(this.outputFile);
-    builder.append("outputOrientation=")
+    builder.append(" classpath=").append(this.gssFunctionMapProviderClasspath);
+    builder.append(" inputOrientation=")
+        .append(this.inputOrientation.toString());
+    builder.append(" outputFile=").append(this.outputFile);
+    builder.append(" outputOrientation=")
         .append(this.outputOrientation.toString());
-    builder.append("outputRenamingMap=").append(this.outputRenamingMap);
-    builder.append("outputRenamingMapFormat=")
+    builder.append(" outputRenamingMap=").append(this.outputRenamingMap);
+    builder.append(" outputRenamingMapFormat=")
         .append(this.outputRenamingMapFormat.toString());
-    builder.append("prettyPrint=").append(this.prettyPrint);
-    builder.append("renamingType").append(this.renamingType.toString());
+    builder.append(" prettyPrint=").append(this.prettyPrint);
+    builder.append(" renamingType").append(this.renamingType.toString());
 
     for (String nonStndFunction : this.allowedNonStandardFunctions) {
-      builder.append("allowedNonStandardFunction=").append(nonStndFunction);
+      builder.append(" allowedNonStandardFunction=").append(nonStndFunction);
     }
     for (String excludedClass : this.classesExcludedFromRenaming) {
-      builder.append("classExcludedFromRenaming=").append(excludedClass);
+      builder.append(" classExcludedFromRenaming=").append(excludedClass);
     }
     for (String trueConditional : this.definedTrueConditionals) {
-      builder.append("definedTrueConditional=").append(trueConditional);
+      builder.append(" definedTrueConditional=").append(trueConditional);
     }
 
     return builder.toString();
