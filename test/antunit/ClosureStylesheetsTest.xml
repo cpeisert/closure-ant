@@ -77,31 +77,6 @@ limitations under the License.
   </target>
 
 
-  <!-- Setup targets for json-in-style using index.soy instead of index.html -->
-
-  <target name="json-in-style.soy.compileSoyTemplates">
-    <soy cssHandlingScheme="goog">
-      <soyfileset dir="${json-in-style.soy.dir}" includes="**/*.soy" />
-      <rendertemplate outputpathformat="${json-in-style.soy-output.html}"
-          templatename="jsonstyle.createIndexHtml" />
-    </soy>
-  </target>
-
-  <target name="json-in-style.soy.jsCompile">
-    <builder-plus outputMode="COMPILED"
-        outputFile="${json-in-style.soy-output.js}">
-      <compiler compilationLevel="advanced" warninglevel="verbose" />
-      <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
-    </builder-plus>
-  </target>
-
-  <target name="json-in-style.soy.build"
-      description="Builds the json-in-style test project by first compiling
-Soy templates and then compiling JavaScript sources."
-      depends="json-in-style.soy.compileSoyTemplates, json-in-style.soy.jsCompile"
-  />
-
   <!--
   =============================================================================
     Tests
@@ -149,11 +124,6 @@ Soy templates and then compiling JavaScript sources."
   </target>
 
 
-  <target name="testClassRenaming" depends="json-in-style.soy.build">
-
-  </target>
-
-
   <target name="testCustomGssFunctionMapProvider">
     <!-- Make sure the test sources have been compiled. -->
     <ant dir="${test.dir}" target="compile" />
@@ -175,6 +145,106 @@ Soy templates and then compiling JavaScript sources."
       and therefore the background color will not equal the default #faf9ff. -->
     <assertResourceDoesntContain resource="${json-in-style.output.css}"
         value="background-color: #faf9ff" />
+  </target>
+
+
+  <!--
+  ******************************************************************************
+    CSS class renaming tests.
+  ******************************************************************************
+  -->
+
+  <!--
+    Helper targets.
+  -->
+
+  <target name="createCssRenamingMap_CLOSURE_COMPILED">
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}"
+        outputRenamingMapFormat="CLOSURE_COMPILED"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+  </target>
+
+  <target name="createCssRenamingMap_CLOSURE_UNCOMPILED">
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}"
+        outputRenamingMapFormat="CLOSURE_COMPILED"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+  </target>
+
+  <target name="createCssRenamingMap_JSON">
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputRenamingMapFormat="JSON"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+  </target>
+
+  <target name="json-in-style.jscomp_ADVANCED"
+      depends="createCssRenamingMap_CLOSURE_COMPILED">
+    <builder-plus outputMode="COMPILED"
+        outputFile="${json-in-style.soy.compiled.js}">
+      <compiler compilationLevel="advanced" warninglevel="verbose" />
+      <mainsources file="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}" />
+      <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
+      <root directory="${closure-library.dir}" />
+    </builder-plus>
+  </target>
+
+  <target name="json-in-style.jscomp_RAW">
+    <builder-plus outputMode="RAW"
+        outputFile="${json-in-style.soy.raw.js}">
+      <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
+      <root directory="${closure-library.dir}" />
+    </builder-plus>
+  </target>
+
+
+  <!--
+    Tests.
+  -->
+
+  <target name="testClassRenaming_CLOSURE_COMPILED"
+      depends="createCssRenamingMap_JSON, json-in-style.jscomp_ADVANCED">
+
+    <soy
+        cssHandlingScheme="goog"
+        cssRenamingMap="${json-in-style.outputRenamingMap_JSON}">
+      <soyfileset dir="${json-in-style.soy.dir}" includes="**/*.soy" />
+      <rendertemplate
+          outputPathFormat="${json-in-style.soy-output.html}"
+          templateName="jsonstyle.createIndexHtml">
+        <data json="{'scriptFiles': ['${json-in-style.soy.compiled.js}']}" />
+      </rendertemplate>
+    </soy>
+
+
+  </target>
+
+
+  <target name="testClassRenaming_CLOSURE_UNCOMPILED"
+      depends="createCssRenamingMap_JSON, json-in-style.jscomp_RAW">
+
+   <!-- <soy
+        cssHandlingScheme="goog"
+        cssRenamingMap="${json-in-style.outputRenamingMap_JSON}">
+      <soyfileset dir="${json-in-style.soy.dir}" includes="**/*.soy" />
+      <rendertemplate
+          outputPathFormat="${json-in-style.soy-output.html}"
+          templateName="jsonstyle.createIndexHtml">
+        <data json="{'scriptFiles': ['${json-in-style.soy.raw.js}']}" />
+      </rendertemplate>
+    </soy>-->
+
+
   </target>
 
   
