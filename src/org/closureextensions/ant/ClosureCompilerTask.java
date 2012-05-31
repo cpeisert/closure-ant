@@ -230,7 +230,6 @@ public final class ClosureCompilerTask extends Task
   private CompilerOptionsComplete compilerOptions;
 
   // Attributes
-
   private File compilerJar;
   private boolean forceRecompile;
   // Files implemented as String instead of File to support special compiler
@@ -243,13 +242,6 @@ public final class ClosureCompilerTask extends Task
   private boolean printCommandLine;
 
   // Nested elements
-
-  // TODO(cpeisert): rename all Lists of FileSet to <name>FileSet, for example,
-  // mainSourceFileSets.
-
-  // TODO(cpeisert): rename Ant nested elements that are FileSets, to end in
-  // "FileSet", e.g., AddMainSourceFileSet(FileSet mainSourceFileSet)
-
   private final List<FileSet> mainSources;
   private final List<StringNestedElement> namespaceEntryPoints;
   private final List<FileList> sourceLists;
@@ -294,7 +286,7 @@ public final class ClosureCompilerTask extends Task
     this.sources = Lists.newArrayList();
   }
 
-  // Backdoor setter for tasks that wrap ClosureCompilerTask.
+  // Backdoor setter for tasks that wrap/compose the ClosureCompilerTask.
   public void protectedSetCompilerOptions(CompilerOptionsComplete options) {
     this.compilerOptions = options;
   }
