@@ -76,6 +76,17 @@ limitations under the License.
     </builder-plus>
   </target>
 
+
+  <!-- Setup targets for json-in-style using index.soy instead of index.html -->
+
+  <target name="json-in-style.soy.compileSoyTemplates">
+    <soy cssHandlingScheme="goog">
+      <soyfileset dir="${json-in-style.soy.dir}" includes="**/*.soy" />
+      <rendertemplate outputpathformat="${json-in-style.soy-output.html}"
+          templatename="jsonstyle.createIndexHtml" />
+    </soy>
+  </target>
+
   <target name="json-in-style.soy.jsCompile">
     <builder-plus outputMode="COMPILED"
         outputFile="${json-in-style.soy-output.js}">
@@ -85,6 +96,11 @@ limitations under the License.
     </builder-plus>
   </target>
 
+  <target name="json-in-style.soy.build"
+      description="Builds the json-in-style test project by first compiling
+Soy templates and then compiling JavaScript sources."
+      depends="json-in-style.soy.compileSoyTemplates, json-in-style.soy.jsCompile"
+  />
 
   <!--
   =============================================================================
@@ -111,7 +127,29 @@ limitations under the License.
   </target>
 
 
-  <target name="testClassRenaming">
+  <target name="testSkipCompilationIfOutputFileUpToDate"
+      depends="json-in-style.jsCompile">
+    <logcapturer />
+
+    <!-- First build. -->
+    <stylesheets
+        outputFile="${json-in-style.output.css}"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <!-- Second build should be skipped. -->
+    <stylesheets
+        outputFile="${json-in-style.output.css}"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <assertLogContains text="Stylesheet compilation skipped." />
+  </target>
+
+
+  <target name="testClassRenaming" depends="json-in-style.soy.build">
 
   </target>
 

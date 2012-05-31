@@ -43,8 +43,6 @@ limitations under the License.
   <!-- Properties for json-in-style using index.soy. -->
 
   <property name="json-in-style.soy.dir" location="${json-in-style.dir}/soy" />
-  <property name="json-in-style.index.soy"
-      location="${json-in-style.soy.dir}/index.soy" />
   <property name="json-in-style.soy-output.dir"
       location="${antunit.build.dir}/json-in-style-soy" />
   <property name="json-in-style.soy-output.js"
