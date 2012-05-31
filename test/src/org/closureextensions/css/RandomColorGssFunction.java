@@ -59,14 +59,15 @@ public final class RandomColorGssFunction implements GssFunction {
       ErrorManager errorManager) throws GssFunctionException {
     CssValueNode arg = args.get(0);
     String randomColor = null;
+    String argValue = stripQuotes(arg.getValue());
 
-    if ("light".equalsIgnoreCase(arg.getValue())) {
+    if ("light".equalsIgnoreCase(argValue)) {
       randomColor = generateLightRandomColor();
-    } else if ("dark".equalsIgnoreCase(arg.getValue())) {
+    } else if ("dark".equalsIgnoreCase(argValue)) {
       randomColor = generateDarkRandomColor();
     } else {
       String message = "The argument must be \"light\" or \"dark\" but was \""
-          + arg.getValue() + "\"";
+          + argValue + "\"";
       errorManager.report(new GssError(message, arg.getSourceCodeLocation()));
       throw new GssFunctionException(message);
     }
@@ -79,7 +80,7 @@ public final class RandomColorGssFunction implements GssFunction {
   @Override
   public String getCallResultString(List<String> args)
       throws GssFunctionException {
-    String arg = args.get(0);
+    String arg = stripQuotes(args.get(0));
     String randomColor = null;
 
     if ("light".equalsIgnoreCase(arg)) {
@@ -119,9 +120,13 @@ public final class RandomColorGssFunction implements GssFunction {
     return formatColor(Color.getHSBColor(hue, saturation, value));
   }
 
-
   private String formatColor(Color color) {
     return String.format("#%02X%02X%02X",
         color.getRed(), color.getGreen(), color.getBlue());
+  }
+
+  private String stripQuotes(String string) {
+    string = string.replaceAll("^\"|\"$", "");
+    return string.replaceAll("^'|'$", "");
   }
 }
