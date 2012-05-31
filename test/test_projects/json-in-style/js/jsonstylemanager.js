@@ -104,6 +104,10 @@ jsonstyle.JsonStyle.prototype.getCssString = function() {
  * specify the styles in a stylesheet or HTML document. All of the JSON style
  * colors default to black unless {@code opt_colors} is specified.
  *
+ * <p><b>Note:</b> since {@code goog.format.JsonPrettyPrinter} is does not use
+ * {@code goog.getCssName()} to wrap CSS classes, code that references these
+ * styles must likewise _not_ use {@code goog.getCssName()}.</p>
+ *
  * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @param {Object.<string>=} opt_colors Optional object specifying default
  *     colors. One or more of the following object keys may be specified:
@@ -150,7 +154,7 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
    * @private
    */
   this.propertyNameStyle_ = new jsonstyle.JsonStyle(
-      goog.getCssName('goog-jsonprettyprinter-propertyname'),
+      'goog-jsonprettyprinter-propertyname',
       propertyNameColor);
 
   /**
@@ -159,7 +163,7 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
    * @private
    */
   this.stringValueStyle_ = new jsonstyle.JsonStyle(
-      goog.getCssName('goog-jsonprettyprinter-propertyvalue-string'),
+      'goog-jsonprettyprinter-propertyvalue-string',
       stringValueColor);
 
   /**
@@ -168,7 +172,7 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
    * @private
    */
   this.numberValueStyle_ = new jsonstyle.JsonStyle(
-      goog.getCssName('goog-jsonprettyprinter-propertyvalue-number'),
+      'goog-jsonprettyprinter-propertyvalue-number',
       numberValueColor);
 
   /**
@@ -177,7 +181,7 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
    * @private
    */
   this.booleanValueStyle_ = new jsonstyle.JsonStyle(
-      goog.getCssName('goog-jsonprettyprinter-propertyvalue-boolean'),
+      'goog-jsonprettyprinter-propertyvalue-boolean',
       booleanValueColor);
 
   /**
@@ -186,7 +190,7 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
    * @private
    */
   this.nullValueStyle_ = new jsonstyle.JsonStyle(
-      goog.getCssName('goog-jsonprettyprinter-propertyvalue-null'),
+      'goog-jsonprettyprinter-propertyvalue-null',
       nullValueColor);
 
 
