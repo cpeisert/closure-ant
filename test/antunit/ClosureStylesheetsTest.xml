@@ -226,25 +226,39 @@ limitations under the License.
       </rendertemplate>
     </soy>
 
-
+    <assertFileExists file="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}" />
+    <assertFileExists file="${json-in-style.soy-output.html}" />
+    <assertResourceDoesntContain resource="${json-in-style.soy-output.html}"
+        value="renaming_CLOSURE_UNCOMPILED.js" />
   </target>
 
 
   <target name="testClassRenaming_CLOSURE_UNCOMPILED"
-      depends="createCssRenamingMap_JSON, json-in-style.jscomp_RAW">
+      depends="createCssRenamingMap_JSON,
+        createCssRenamingMap_CLOSURE_UNCOMPILED, json-in-style.jscomp_RAW">
 
-   <!-- <soy
+    <soy
         cssHandlingScheme="goog"
         cssRenamingMap="${json-in-style.outputRenamingMap_JSON}">
       <soyfileset dir="${json-in-style.soy.dir}" includes="**/*.soy" />
       <rendertemplate
           outputPathFormat="${json-in-style.soy-output.html}"
           templateName="jsonstyle.createIndexHtml">
-        <data json="{'scriptFiles': ['${json-in-style.soy.raw.js}']}" />
+        <data replaceProperties="true">
+          {
+            'scriptFiles': [
+              '${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}',
+              '${json-in-style.soy.raw.js}'
+            ]
+          }
+        </data>
       </rendertemplate>
-    </soy>-->
+    </soy>
 
-
+    <assertFileExists file="${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}" />
+    <assertFileExists file="${json-in-style.soy-output.html}" />
+    <assertResourceContains resource="${json-in-style.soy-output.html}"
+      value="renaming_CLOSURE_UNCOMPILED.js" />
   </target>
 
   
