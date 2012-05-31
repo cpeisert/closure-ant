@@ -2,13 +2,20 @@
 
 /**
  * Create index.html.
+ *
+ * @param? scriptFiles A list of script files, where each list element is
+ *     either a URL or a map with the following structure (only the src entry
+ *     is required):
+ *
+ *     [src: <script-file-url>, type: <MIME_type>, charset: <character_set>,
+ *     async: "async", defer: "defer"]
  */
 {template .createIndexHtml}
   {call html5.createDocument}
     {param title: 'JSON in Style' /}
     {param description: 'JSON in Style test app' /}
     {param cssFiles: ['stylesheet.compiled.css'] /}
-    {param scriptFiles: ['main.compiled.js'] /}
+    {param scriptFiles: ($scriptFiles ? $scriptFiles : ['main.compiled.js']) /}
     {param contentHtml}
       {call .createBodyContent /}
     {/param}

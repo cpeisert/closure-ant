@@ -45,14 +45,23 @@ limitations under the License.
   <property name="json-in-style.soy.dir" location="${json-in-style.dir}/soy" />
   <property name="json-in-style.soy-output.dir"
       location="${antunit.build.dir}/json-in-style-soy" />
-  <property name="json-in-style.soy-output.js"
+  <property name="json-in-style.soy.compiled.js"
       location="${json-in-style.soy-output.dir}/main.compiled.js" />
+  <property name="json-in-style.soy.raw.js"
+      location="${json-in-style.soy-output.dir}/main.raw.js" />
   <property name="json-in-style.soy-output.css"
       location="${json-in-style.soy-output.dir}/stylesheet.compiled.css" />
   <property name="json-in-style.soy.css-renaming-map.json"
       location="${json-in-style.soy-output.dir}/css-renaming-map.json" />
   <property name="json-in-style.soy-output.html"
       location="${json-in-style.soy-output.dir}/index.html" />
+
+  <property name="json-in-style.outputRenamingMap_CLOSURE_COMPILED"
+      location="${json-in-style.soy-output.dir}/renaming_CLOSURE_COMPILED.js" />
+  <property name="json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED"
+      location="${json-in-style.soy-output.dir}/renaming_CLOSURE_UNCOMPILED.js" />
+  <property name="json-in-style.outputRenamingMap_JSON"
+      location="${json-in-style.soy-output.dir}/renaming.json" />
 
   <property name="copyright">/*
  * Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
