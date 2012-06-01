@@ -40,6 +40,11 @@ public enum SharedAntProperty {
   DEPS_WRITER_PY("depswriter.py"),
   /** The name of Closure Linter executable. Defaults to "gjslint". */
   CLOSURE_LINTER_PY("closure-linter.py"),
+  /**
+   * The name of the Closure Linter tool for automatically fixing style issues
+   * in JavaScript code. Defaults to "fixjsstyle".
+   */
+  FIX_JS_STYLE_PY("fix-js-style.py"),
   /** The directory where the Closure Compiler is located. */
   CLOSURE_COMPILER_DIR("closure-compiler.dir"),
   /** The file path to the Closure Compiler jar file. */
