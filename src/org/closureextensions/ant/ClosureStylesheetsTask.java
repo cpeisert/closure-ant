@@ -309,10 +309,10 @@ public final class ClosureStylesheetsTask extends Task {
    * CLOSURE_COMPILED is specified, the output is a JSON map of renaming
    * information wrapped in a call to {@code goog.setCssNameMapping()}.
    * <p><pre>{@code
-goog.setCssNameMapping({
+goog.setCssNameMapping(&#123;
   "foo": "a",
   "bar": "b"
-});
+&#125;);
    * }</pre></p>
    * </li>
    *
@@ -321,10 +321,10 @@ goog.setCssNameMapping({
    * map of renaming information assigned to the global variable
    * CLOSURE_CSS_NAME_MAPPING.
    * <p><pre>{@code
-CLOSURE_CSS_NAME_MAPPING = {
+CLOSURE_CSS_NAME_MAPPING = &#123;
   "foo": "a",
   "bar": "b"
-};
+&#125;;
    * }</pre></p>
    * This file should be loaded via a {@literal <script>} tag before
    * {@code base.js} is loaded for the Closure Library. This is because
