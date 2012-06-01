@@ -38,6 +38,7 @@ import org.closureextensions.common.JsClosureSourceFile;
 import org.closureextensions.common.SourceFileFactory;
 import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.FileUtil;
+import org.closureextensions.soy.CssRenamingMap;
 
 /**
  * Builder Plus Ant task. Builder Plus is similar to Closure Builder,
@@ -171,6 +172,8 @@ public final class BuilderPlusTask extends Task {
 
   // Attributes
   private File compilerJar;
+  private CssRenamingMap cssRenamingMap;
+  private File cssRenamingMapFile;
   private boolean forceRecompile;
   private File inputManifest;
   private boolean keepAllSources;
@@ -194,6 +197,8 @@ public final class BuilderPlusTask extends Task {
   public BuilderPlusTask() {
     // Attributes
     this.compilerJar = null;
+    this.cssRenamingMap =null;
+    this.cssRenamingMapFile = null;
     this.forceRecompile = false;
     this.inputManifest = null;
     this.keepAllSources = false;
@@ -214,16 +219,70 @@ public final class BuilderPlusTask extends Task {
 
   // Attribute setters
 
-  /** @param file the Closure Compiler jar file */
+  /**
+   * Sets the Closure Compiler jar file.
+   *
+   * @param file the Closure Compiler jar file
+   */
   public void setCompilerJar(File file) {
     this.compilerJar = file;
   }
 
   /**
-   * @param forceRecompile determines if the Closure Compiler should always
-   *     recompile the {@code outputFile}, even if none of the input files
-   *     (externs or sources) have changed since the {@code outputFile} was
-   *     last modified. Defaults to {@code false}.
+   * Sets the CSS renaming map file, which may be a JSON file, Java properties
+   * file, or the result of generating the renaming map using Closure
+   * Stylesheets with one of the following formats:
+   *
+   * <p><ul>
+   * <li><b>CLOSURE_COMPILED</b>
+   * <p><pre>{@code
+goog.setCssNameMapping(&#123;
+  "foo": "a",
+  "bar": "b"
+&#125;);
+   * }</pre></p>
+   * </li>
+   *
+   * <li><b>CLOSURE_UNCOMPILED</b>
+   * <p><pre>{@code
+CLOSURE_CSS_NAME_MAPPING = &#123;
+  "foo": "a",
+  "bar": "b"
+&#125;;
+   * }</pre></p>
+   * </li>
+   * </ul></p>
+   *
+   * <p>Which of these four formats is used makes no difference, since in all
+   * cases the key-value pairs are parsed into a {@link java.util.Map}. When
+   * the Builder Plus output mode is COMPILED, two temporary files are
+   * created: 1) a file containing the renaming map formatted as shown above
+   * for CLOSURE_UNCOMPILED and 2) a file containing the renaming map formatted
+   * as shown above for CLOSURE_COMPILED. The renaming map file for
+   * CLOSURE_UNCOMPILED is passed to the Closure Compiler as the first source
+   * file, so that for compilation level WHITESPACE_ONLY, the global variable
+   * CLOSURE_CSS_NAME_MAPPING is set prior to loading Closure's base.js. The
+   * renaming map file for CLOSURE_COMPILED is passed to the Closure Compiler
+   * immediately after base.js, so that the renaming map is set for
+   * compilation levels SIMPLE_OPTIMIZATIONS and ADVANCED_OPTIMIZATIONS.</p>
+   *
+   * <p>For Builder Plus output mode RAW, the renaming map is prepending to
+   * the output using the format above for CLOSURE_UNCOMPILED.</p>
+   *
+   * @param file a CSS renaming map file
+   */
+  public void setCssRenamingMapFile(File file) {
+    this.cssRenamingMapFile = file;
+  }
+
+  /**
+   * Determines if the Closure Compiler should always recompile the {@code
+   * outputFile}, even if none of the input files (externs or sources) have
+   * changed since the {@code outputFile} was last modified.
+   *
+   * @param forceRecompile if {@code true}, always recompile the {@code
+   *     outputFile}, even if none of the input files (externs or sources)
+   *     have changed. Defaults to {@code false}.
    */
   public void setForceRecompile(boolean forceRecompile) {
     this.forceRecompile = forceRecompile;
@@ -284,7 +343,11 @@ public final class BuilderPlusTask extends Task {
     this.keepOriginalOrder = keepOriginalOrder;
   }
 
-  /** @param file the file to write output to instead of standard output */
+  /**
+   * Sets an output file to use instead of standard output.
+   *
+   * @param file the file to write output to instead of standard output
+   */
   public void setOutputFile(File file) {
     this.outputFile = file;
   }
@@ -366,7 +429,7 @@ public final class BuilderPlusTask extends Task {
   }
 
   /**
-   * Execute the Closure Builder task.
+   * Execute the Builder Plus task.
    *
    * @throws BuildException on error.
    */
