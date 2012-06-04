@@ -16,22 +16,24 @@
 
 package org.closureextensions.builderplus.cli;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 
-import org.closureextensions.builderplus.OutputMode;
-
 import org.closureextensions.ant.ClosureCompilerTask;
+import org.closureextensions.builderplus.OutputMode;
 import org.closureextensions.common.deps.ManifestBuilder;
 import org.closureextensions.common.JsClosureSourceFile;
 import org.closureextensions.common.SourceFileFactory;
@@ -85,7 +87,11 @@ public final class BuilderPlusRunner {
         new Function<File, JsClosureSourceFile>() {
           @Override
           public JsClosureSourceFile apply(File source) {
-            return SourceFileFactory.newJsClosureSourceFile(source);
+            try {
+              return SourceFileFactory.newJsClosureSourceFile(source);
+            } catch (IOException e) {
+              throw new RuntimeException(e);
+            }
           }
         };
 
@@ -106,22 +112,25 @@ public final class BuilderPlusRunner {
    *
    * @throws org.closureextensions.common.deps.CircularDependencyException if
    *     the goog.provided and goog.required namespaces form a cycle
+   * @throws IllegalStateException if the Closure Compiler jar file is null or
+   *     does not exist
+   * @throws IOException if the build manifest cannot be written or read
    * @throws org.closureextensions.common.deps.MissingProvideException if a
    *     goog.required namespace is not goog.provided by any of the inputs
    * @throws org.closureextensions.common.deps.MultipleProvideException if a
    *     namespace is provided by more than one source file
-   * @throws IllegalStateException if the Closure Compiler jar file is null or
-   *     does not exist
    * @throws NullPointerException if the manifest file returned by {@link
-   * #createManifest()} is {@code null}
+   *     #createManifest()} is {@code null}
    */
-  public void execute() {
+  public void execute() throws IOException {
     File manifest = createManifest();
-    List<String> currentSources = FileUtil.readlines(manifest);
-    Joiner manifestJoiner = Joiner.on(String.format("%n")).skipNulls();
+    List<String> currentSources;
+    Joiner joiner = Joiner.on(String.format("%n")).skipNulls();
+    currentSources = Files.readLines(manifest, Charsets.UTF_8);
 
     if (this.outputManifest != null) {
-      FileUtil.write(manifestJoiner.join(currentSources), this.outputManifest);
+      Files.write(joiner.join(currentSources), this.outputManifest,
+          Charsets.UTF_8);
     }
 
     if (OutputMode.COMPILED == this.outputMode) {
@@ -129,7 +138,7 @@ public final class BuilderPlusRunner {
     }
     if (OutputMode.MANIFEST == this.outputMode) {
       if (this.outputManifest == null) {
-        System.out.println(manifestJoiner.join(currentSources));
+        System.out.println(joiner.join(currentSources));
       }
     }
     if (OutputMode.RAW == this.outputMode) {
@@ -143,15 +152,17 @@ public final class BuilderPlusRunner {
    * standard output.
    *
    * @param sources the sources to concatenate
+   * @throws IOException if there is an error reading a source file
    */
-  private void writeRawConcatenationOfSources(List<String> sources) {
+  private void writeRawConcatenationOfSources(List<String> sources)
+      throws IOException {
     StringBuilder rawScript = new StringBuilder();
 
     for (String path : sources) {
-      rawScript.append(FileUtil.toString(new File(path)));
+      rawScript.append(Files.toString(new File(path), Charsets.UTF_8));
     }
     if (this.outputFile != null) {
-      FileUtil.write(rawScript.toString(), this.outputFile);
+      Files.write(rawScript.toString(), this.outputFile, Charsets.UTF_8);
     } else {
       System.out.println(rawScript.toString());
     }
@@ -227,12 +238,14 @@ public final class BuilderPlusRunner {
    *     dependency management
    * @throws org.closureextensions.common.deps.CircularDependencyException if
    *     the goog.provided and goog.required namespaces form a cycle
+   * @throws IOException if there is an error reading or writing the build
+   *     manifest
    * @throws org.closureextensions.common.deps.MissingProvideException if a
    *     goog.required namespace is not goog.provided by any of the inputs
    * @throws org.closureextensions.common.deps.MultipleProvideException if a
    *     namespace is provided by more than one source file
    */
-  private File createManifest() {
+  private File createManifest() throws IOException {
     List<JsClosureSourceFile> sourceEntryPoints = Lists.newArrayList(this.mainSources);
 
     System.out.println("Scanning paths...");
@@ -241,7 +254,7 @@ public final class BuilderPlusRunner {
 
     // Process --input_manifest flag
     if (this.inputManifest != null) {
-      paths = FileUtil.readlines(this.inputManifest);
+      paths = Files.readLines(this.inputManifest, Charsets.UTF_8);
       for (String path : paths) {
         JsClosureSourceFile sourceFile =
             SourceFileFactory.newJsClosureSourceFile(new File(path));
@@ -292,9 +305,9 @@ public final class BuilderPlusRunner {
     System.out.println(manifestFilePaths.size() + " dependencies in final "
         + "manifest.");
 
-    FileUtil.write(
+    Files.write(
         Joiner.on(String.format("%n")).skipNulls().join(manifestFilePaths),
-        tempManifest);
+        tempManifest, Charsets.UTF_8);
 
     return tempManifest;
   }

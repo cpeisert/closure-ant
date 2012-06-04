@@ -71,28 +71,6 @@ import java.util.Set;
  */
 public interface CompilerOptionsBasic {
 
-  /*
-  // Attributes
-
-  Boolean customExternsOnly;
-  Boolean debug;
-  String languageIn;
-  String outputWrapper;
-  Boolean prettyPrint;
-  Boolean printInputDelimiter;
-  String propertyMapInputFile;
-  String propertyMapOutputFile;
-  String variableMapInputFile;
-  String variableMapOutputFile;
-  String warningLevel;
-
-  // Nested elements
-
-  final List<NameValuePair> compilerChecks;
-  final CompileTimeDefines defines;
-  final List<FileSet> externs;
-  */
-
   // Attribute setters
 
   /**

@@ -16,6 +16,7 @@
 
 package org.closureextensions.ant;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -32,6 +33,7 @@ import com.google.common.css.JobDescriptionBuilder;
 import com.google.common.css.SourceCode;
 import com.google.common.css.compiler.ast.BasicErrorManager;
 import com.google.common.css.compiler.gssfunctions.DefaultGssFunctionMapProvider;
+import com.google.common.io.Files;
 
 import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
@@ -46,7 +48,6 @@ import org.closureextensions.ant.types.ClassNameList;
 import org.closureextensions.ant.types.DefinedTrueConditionalsList;
 import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.ClosureBuildUtil;
-import org.closureextensions.common.util.FileUtil;
 import org.closureextensions.css.ClosureStylesheetsCompiler;
 import org.closureextensions.css.OutputRenamingMapFormat;
 import org.closureextensions.css.RenamingType;
@@ -532,7 +533,11 @@ bar=b
       if (cssOutputFile == null) {
         System.out.println(compiledCSS);
       } else {
-        FileUtil.write(compiledCSS, cssOutputFile);
+        try {
+          Files.write(compiledCSS, cssOutputFile, Charsets.UTF_8);
+        } catch (IOException e) {
+          throw new BuildException(e);
+        }
       }
     }
   }
@@ -549,12 +554,15 @@ bar=b
     List<String> currentBuildSources = Lists.newArrayList();
 
     if (this.inputManifest != null) {
-      currentBuildSources.addAll(FileUtil.readlines(
-          new File(this.inputManifest)));
+      try {
+        currentBuildSources.addAll(Files.readLines(
+            new File(this.inputManifest), Charsets.UTF_8));
+      } catch (IOException e) {
+        throw new BuildException(e);
+      }
     }
-    currentBuildSources.addAll(
-        AntUtil.getFilePathsFromCollectionOfFileSet(getProject(),
-            this.cssFileSets));
+    currentBuildSources.addAll(AntUtil
+        .getFilePathsFromCollectionOfFileSet(getProject(), this.cssFileSets));
 
     return currentBuildSources;
   }
@@ -617,6 +625,8 @@ bar=b
    *
    * @param cssSources file paths for CSS sources to be compiled
    * @return a job description for a run of the Closure Stylesheets compiler
+   * @throws BuildException if there is an {@link IOException} reading one of
+   *     the CSS source files
    */
   private JobDescription createStylesheetCompilerJobDescription(
       List<String> cssSources) {
@@ -652,7 +662,13 @@ bar=b
             "Input file %s does not exist", filePath));
       }
 
-      String fileContents = FileUtil.toString(file);
+      String fileContents;
+
+      try {
+        fileContents = Files.toString(file, Charsets.UTF_8);
+      } catch (IOException e) {
+        throw new BuildException(e);
+      }
       jobBuilder.addInput(new SourceCode(filePath, fileContents));
     }
 

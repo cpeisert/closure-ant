@@ -16,11 +16,14 @@
 
 package org.closureextensions.ant;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +124,11 @@ public final class DepsWriterTask extends Task {
         + String.format("%n") + "// Please do not edit." + String.format("%n");
 
     if (this.outputFile != null) {
-      FileUtil.write(header + googAddDepsCalls, this.outputFile);
+      try {
+        Files.write(header + googAddDepsCalls, this.outputFile, Charsets.UTF_8);
+      } catch (IOException e) {
+        throw new BuildException(e);
+      }
     } else {
       log(header + googAddDepsCalls);
     }
@@ -141,8 +148,15 @@ public final class DepsWriterTask extends Task {
       if (pair.getFilePath() == null) {
         throw new BuildException("null file path");
       }
-      JsClosureSourceFile input = SourceFileFactory.newJsClosureSourceFile(
-          new File(pair.getFilePath()));
+      JsClosureSourceFile input;
+
+      try {
+        input = SourceFileFactory.newJsClosureSourceFile(
+            new File(pair.getFilePath()));
+      } catch (IOException e) {
+        throw new BuildException(e);
+      }
+
       if (pair.getDepsPath() != null) {
         map.put(normalizePath(pair.getDepsPath()), input);
       } else {
@@ -162,10 +176,14 @@ public final class DepsWriterTask extends Task {
           /* includes */ ImmutableList.of("**/*.js"),
           /* excludes */ ImmutableList.of(".*"));
 
-      for (String relativePath : relativePaths) {
-        map.put(normalizePath(new File(prefix, relativePath).getPath()),
-            SourceFileFactory.newJsClosureSourceFile(
-                new File(dirPrefixPair.getDirPath(), relativePath)));
+      try {
+        for (String relativePath : relativePaths) {
+          JsClosureSourceFile file = SourceFileFactory.newJsClosureSourceFile(
+              new File(dirPrefixPair.getDirPath(), relativePath));
+          map.put(normalizePath(new File(prefix, relativePath).getPath()),file);
+        }
+      } catch (IOException e) {
+        throw new BuildException(e);
       }
     }
     return map;

@@ -16,8 +16,10 @@
 
 package org.closureextensions.ant;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +37,6 @@ import org.closureextensions.ant.types.CompilerOptionsFactory;
 import org.closureextensions.ant.types.Directory;
 import org.closureextensions.ant.types.StringNestedElement;
 import org.closureextensions.common.util.AntUtil;
-import org.closureextensions.common.util.FileUtil;
 
 /**
  * Ant task wrapping the Python script closurebuilder.py. The default task
@@ -359,17 +360,24 @@ public final class ClosureBuilderPythonTask extends Task {
     }
 
     File manifest = createManifest();
-    List<String> currentSources = FileUtil.readlines(manifest);
+    List<String> currentSources;
 
-    if (this.outputManifest != null) {
-      Joiner joiner = Joiner.on(String.format("%n")).skipNulls();
-      FileUtil.write(joiner.join(currentSources), this.outputManifest);
-    }
-    if (OutputMode.RAW == this.outputMode) {
-      writeRawConcatenationOfSources(currentSources);
-    }
-    if (OutputMode.COMPILED == this.outputMode) {
-      runClosureCompiler(manifest);
+    try {
+      currentSources = Files.readLines(manifest, Charsets.UTF_8);
+
+      if (this.outputManifest != null) {
+        Joiner joiner = Joiner.on(String.format("%n")).skipNulls();
+        Files.write(joiner.join(currentSources), this.outputManifest,
+            Charsets.UTF_8);
+      }
+
+      if (OutputMode.RAW == this.outputMode) {
+        writeRawConcatenationOfSources(currentSources);
+      } else if (OutputMode.COMPILED == this.outputMode) {
+        runClosureCompiler(manifest);
+      }
+    } catch (IOException e) {
+      throw new BuildException(e);
     }
   }
 
@@ -380,14 +388,15 @@ public final class ClosureBuilderPythonTask extends Task {
    *
    * @param sources the sources to concatenate
    */
-  private void writeRawConcatenationOfSources(List<String> sources) {
+  private void writeRawConcatenationOfSources(List<String> sources)
+      throws IOException {
     StringBuilder rawScript = new StringBuilder();
 
     for (String path : sources) {
-      rawScript.append(FileUtil.toString(new File(path)));
+      rawScript.append(Files.toString(new File(path), Charsets.UTF_8));
     }
     if (this.outputFile != null) {
-      FileUtil.write(rawScript.toString(), this.outputFile);
+      Files.write(rawScript.toString(), this.outputFile, Charsets.UTF_8);
     } else {
       System.out.println(rawScript.toString());
     }
@@ -457,7 +466,11 @@ public final class ClosureBuilderPythonTask extends Task {
     }
     // Add all source files to the command line.
     if (this.inputManifest != null) {
-      cmdline.arguments(FileUtil.readlines(this.inputManifest));
+      try {
+        cmdline.arguments(Files.readLines(this.inputManifest, Charsets.UTF_8));
+      } catch (IOException e) {
+        throw new BuildException(e);
+      }
     }
     cmdline.arguments(
         AntUtil.getFilePathsFromCollectionOfFileSet(getProject(), this.inputs));

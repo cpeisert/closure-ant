@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +34,7 @@ import java.util.regex.Pattern;
  */
 public final class Main {
 
-  public static void main(String[] args) throws CmdLineException {
+  public static void main(String[] args) throws CmdLineException, IOException {
     List<String> processedArgs = processArgs(args);
 
     CommandLineOptions options = new CommandLineOptions();

@@ -272,41 +272,6 @@ import java.io.File;
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public interface CompilerOptionsComplete extends CompilerOptionsBasic {
-  /*
-  // Attributes
-
-  Boolean acceptConstKeyword;
-  String charset;
-  String commonJsModulePathPrefix;
-  String commonJsEntryModule;
-  CompilationLevel compilationLevel;
-  Boolean createNameMapFiles;
-  File flagFile;
-  Boolean generateExports;
-  Level loggingLevel;
-  String moduleOutputPathPrefix;
-  File outputFile;
-  Boolean printAST;
-  Boolean printPassGraph;
-  Boolean printTree;
-  Boolean processClosurePrimitives;
-  Boolean processCommonJsModules;
-  Boolean processjQueryPrimitives;
-  String sourceMapFormat;
-  String sourceMapOutputFile;
-  Integer summaryDetailLevel;
-  Boolean thirdParty;
-  Boolean transformAMDModules;
-  File translationsFile;
-  String translationsProject;
-
-  // Nested elements
-
-  final CommandLineBuilder flags;
-  final List<StringNestedElement> modules;
-  final List<StringNestedElement> moduleWrappers;
-
-  */
 
   // Attribute setters
 

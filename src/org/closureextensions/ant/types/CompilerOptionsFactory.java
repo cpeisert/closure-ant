@@ -16,30 +16,31 @@
 
 package org.closureextensions.ant.types;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 import com.google.gson.JsonPrimitive;
 
-import org.closureextensions.ant.CommandLineBuilder;
-import org.closureextensions.ant.PlovrConfig;
-import org.closureextensions.common.util.AntUtil;
-import org.closureextensions.common.util.FileUtil;
-import org.closureextensions.common.util.OperatingSystemUtil;
-import org.closureextensions.common.util.StringUtil;
-
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.types.FileSet;
-import org.apache.tools.ant.types.Parameter;
-
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.closureextensions.ant.CommandLineBuilder;
+import org.closureextensions.ant.PlovrConfig;
+import org.closureextensions.common.util.AntUtil;
+import org.closureextensions.common.util.StringUtil;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.types.Parameter;
 
 /**
  * Static factory class to create new instances of {@link CompilerOptionsBasic},
@@ -776,7 +777,12 @@ public final class CompilerOptionsFactory {
         // character limit on Windows. An error will result if a flag file
         // includes a reference to another flag file. Hence, we need to read
         // the flag file arguments and add them to our command line builder.
-        String flagData = FileUtil.toString(this.flagFile);
+        String flagData;
+        try {
+          flagData = Files.toString(this.flagFile, Charsets.UTF_8);
+        } catch (IOException e) {
+          throw new BuildException(e);
+        }
         if (flagData != null) {
           List<String> args = StringUtil.tokenizeKeepingQuotedStrings(flagData);
           List<String> processedFileArgs =

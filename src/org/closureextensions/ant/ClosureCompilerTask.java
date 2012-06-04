@@ -16,7 +16,14 @@
 
 package org.closureextensions.ant;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -32,12 +39,7 @@ import org.closureextensions.ant.types.NameValuePair;
 import org.closureextensions.ant.types.StringNestedElement;
 import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.ClosureBuildUtil;
-import org.closureextensions.common.util.FileUtil;
 import org.closureextensions.common.util.StringUtil;
-
-import java.io.File;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Closure Compiler Ant task. The default task name is {@code closure-compiler}
@@ -653,7 +655,11 @@ public final class ClosureCompilerTask extends Task
       }
     }
     File tempFlagFile = cache.createTempFile("temp_flag_file.txt");
-    FileUtil.write(compilerFlags.toString(), tempFlagFile);
+    try {
+      Files.write(compilerFlags.toString(), tempFlagFile, Charsets.UTF_8);
+    } catch (IOException e) {
+      throw new BuildException(e);
+    }
     runner.createArg().setValue("--flagfile");
     runner.createArg().setValue(tempFlagFile.getAbsolutePath());
 
@@ -727,17 +733,21 @@ public final class ClosureCompilerTask extends Task
       cmdline.flagAndArgument("--closure_entry_point", namespace.getValue());
     }
 
-    // Add namespaces that are goog.provided in the <mainsources>.
-    for (FileSet sources : this.mainSources) {
-      for (File source :
-          AntUtil.getListOfFilesFromAntFileSet(getProject(), sources)) {
-        List<String> namespaces =
-            ClosureBuildUtil.extractGoogProvidedNamespaces(source);
+    // Add namespaces that are goog.provided in the main sources.
+    try {
+      for (FileSet sources : this.mainSources) {
+        for (File source :
+            AntUtil.getListOfFilesFromAntFileSet(getProject(), sources)) {
+          List<String> namespaces =
+              ClosureBuildUtil.extractGoogProvidedNamespaces(source);
 
-        for (String namespace : namespaces) {
-          cmdline.flagAndArgument("--closure_entry_point", namespace);
+          for (String namespace : namespaces) {
+            cmdline.flagAndArgument("--closure_entry_point", namespace);
+          }
         }
       }
+    } catch (IOException e) {
+      throw new BuildException(e);
     }
     return cmdline;
   }
@@ -755,10 +765,15 @@ public final class ClosureCompilerTask extends Task
   private List<String> getAllSources() {
     List<String> currentBuildSources = Lists.newArrayList();
 
-    if (this.inputManifest != null) {
-      currentBuildSources.addAll(FileUtil.readlines(
-          new File(this.inputManifest)));
+    try {
+      if (this.inputManifest != null) {
+        currentBuildSources.addAll(Files.readLines(
+            new File(this.inputManifest), Charsets.UTF_8));
+      }
+    } catch (IOException e) {
+      throw new BuildException(e);
     }
+
     currentBuildSources.addAll(
         AntUtil.getFilePathsFromCollectionOfFileSet(getProject(), mainSources));
     for (FileList fileList : this.sourceLists) {

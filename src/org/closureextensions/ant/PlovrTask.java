@@ -16,13 +16,16 @@
 
 package org.closureextensions.ant;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
@@ -788,7 +791,12 @@ public final class PlovrTask extends Task {
     // Exclude unset nested elements from appearing in the config file.
     plovrConfig.nullifyEmptyCollections();
     String currentPlovrConfig = gson.toJson(plovrConfig);
-    FileUtil.write(currentPlovrConfig, this.configFile);
+
+    try {
+      Files.write(currentPlovrConfig, this.configFile, Charsets.UTF_8);
+    } catch (IOException e) {
+      throw new BuildException(e);
+    }
     String confirmation = "plovr config file successfully created: "
         + this.configFile.getAbsolutePath();
     log(confirmation, (PlovrMode.CONFIG == this.plovrMode) ? Project.MSG_INFO
@@ -808,7 +816,13 @@ public final class PlovrTask extends Task {
       if (PlovrMode.SERVE == this.plovrMode) {
         startPlovrServer(runner);
       } else if (PlovrMode.BUILD == this.plovrMode && !this.forceRecompile) {
-        List<String> currentSources = getCurrentSources(plovrConfig);
+        List<String> currentSources;
+        try {
+          currentSources = getCurrentSources(plovrConfig);
+        } catch (IOException e) {
+          throw new BuildException(e);
+        }
+
         BuildCache cache = new BuildCache(this);
         BuildSettings previousBuildSettings = cache.get();
         BuildSettings currentBuildSettings = new BuildSettings(
@@ -847,7 +861,8 @@ public final class PlovrTask extends Task {
    * @return JavaScript, soy, and coffee script source files based on the
    *     plovr config inputs and paths
    */
-  private List<String> getCurrentSources(PlovrConfig plovrConfig) {
+  private List<String> getCurrentSources(PlovrConfig plovrConfig)
+      throws IOException {
     List<String> currentSources = Lists.newArrayList();
 
     if (plovrConfig.inputs != null) {
@@ -945,25 +960,31 @@ public final class PlovrTask extends Task {
     // Add task attributes.
 
     if (this.closureLibrary != null) {
-      List<String> baseJsCandidates = FileUtil.scanDirectory(
-          new File(this.closureLibrary), ImmutableList.of("**/base.js"), null);
+      try {
+        List<String> baseJsCandidates = FileUtil.scanDirectory(
+            new File(this.closureLibrary), ImmutableList.of("**/base.js"),
+            null);
 
-      File baseJs = null;
-      for (String candidate : baseJsCandidates) {
-        File file = new File(candidate);
-        if (ClosureBuildUtil.isClosureBaseJs(file)) {
-          baseJs = file;
-          break;
+        File baseJs = null;
+        for (String candidate : baseJsCandidates) {
+          File file = new File(candidate);
+          if (ClosureBuildUtil.isClosureBaseJs(file)) {
+            baseJs = file;
+            break;
+          }
         }
+        if (baseJs == null) {
+          throw new BuildException("Error: could not find \"base.js\" in "
+              + "closure library directory [" + closureLibrary + "] or any of "
+              + "its subdirectories. Note: \"base.js\" must contain the line:"
+              + String.format("%n")
+              + "\"var goog = goog || {}; // Identifies this file as the "
+              + "Closure base.\"");
+        }
+        plovrConfig.closureLibrary = baseJs.getParent();
+      } catch (IOException e) {
+        throw new BuildException(e);
       }
-      if (baseJs == null) {
-        throw new BuildException("Error: could not find \"base.js\" in "
-            + "closure library directory [" + closureLibrary + "] or any of "
-            + "its subdirectories. Note: \"base.js\" must contain the line "
-            + "\"var goog = goog || {}; // Identifies this file as the "
-            + "Closure base.\"");
-      }
-      plovrConfig.closureLibrary = baseJs.getParent();
     }
 
     plovrConfig.id = this.configID;
