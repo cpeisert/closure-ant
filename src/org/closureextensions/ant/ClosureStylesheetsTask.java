@@ -309,24 +309,24 @@ public final class ClosureStylesheetsTask extends Task {
    * with the Closure Compiler in either SIMPLE or ADVANCED mode. When
    * CLOSURE_COMPILED is specified, the output is a JSON map of renaming
    * information wrapped in a call to {@code goog.setCssNameMapping()}.
-   * <p><pre>{@code
-goog.setCssNameMapping(&#123;
+   * <p><pre><code>
+goog.setCssNameMapping({
   "foo": "a",
   "bar": "b"
-&#125;);
-   * }</pre></p>
+});
+   * </code></pre></p>
    * </li>
    *
    * <li><b>CLOSURE_UNCOMPILED</b> - should be used with uncompiled Closure
    * Library code. When CLOSURE_UNCOMPILED is specified, the output is a JSON
    * map of renaming information assigned to the global variable
    * CLOSURE_CSS_NAME_MAPPING.
-   * <p><pre>{@code
-CLOSURE_CSS_NAME_MAPPING = &#123;
+   * <p><pre><code>
+CLOSURE_CSS_NAME_MAPPING = {
   "foo": "a",
   "bar": "b"
-&#125;;
-   * }</pre></p>
+};
+   * </code></pre></p>
    * This file should be loaded via a {@literal <script>} tag before
    * {@code base.js} is loaded for the Closure Library. This is because
    * {@code base.js} checks to see whether the global CLOSURE_CSS_NAME_MAPPING
@@ -337,12 +337,12 @@ CLOSURE_CSS_NAME_MAPPING = &#123;
    *
    * <li><b>JSON</b> - should be used when building a tool that consumes the
    * renaming-map data. When JSON is specified, the output is a pure JSON map.
-   * <p><pre>{@code
+   * <p><pre><code>
 {
   "foo": "a",
   "bar": "b"
 }
-   * }</pre></p>
+   * </code></pre></p>
    * </li>
    *
    * <li><b>PROPERTIES</b> - should be used as an alternative to JSON if, for
