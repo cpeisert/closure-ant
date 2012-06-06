@@ -31,6 +31,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
+import org.closureextensions.ant.types.CompilationLevel;
 import org.closureextensions.ant.types.CompilerOptionsComplete;
 import org.closureextensions.ant.types.CompilerOptionsFactory;
 import org.closureextensions.ant.types.Directory;
@@ -268,13 +269,18 @@ public final class BuilderPlusTask extends Task {
    * @param renamingMap CSS renaming map file path
    * @throws ClassCastException if JSON object contains non-string values such
    *     as number or boolean
+   * @throws BuildException if the CSS renaming map has already been set
    * @throws java.io.IOException if there is an error reading the file
    * @throws com.google.gson.JsonParseException if the file does not contain
    *     valid JSON
    */
   public void setCssRenamingMap(String renamingMap) throws IOException {
-    this.cssRenamingMap =
-        CssRenamingMap.createFromJsonFile(new File(renamingMap));
+    if (this.cssRenamingMap == null) {
+      this.cssRenamingMap =
+          CssRenamingMap.createFromJsonFile(new File(renamingMap));
+    } else {
+      throw new BuildException("cssRenamingMap already set");
+    }
   }
 
   /**
@@ -284,12 +290,17 @@ public final class BuilderPlusTask extends Task {
    *
    * @param propertiesFile Java {@link Properties} file from which to create
    *     CSS renaming map
+   * @throws BuildException if the CSS renaming map has already been set
    * @throws java.io.IOException if there is an error reading the file
    */
   public void setCssRenamingMapPropertiesFile(File propertiesFile)
       throws IOException {
-    this.cssRenamingMap =
-        CssRenamingMap.createFromJavaPropertiesFile(propertiesFile);
+    if (this.cssRenamingMap == null) {
+      this.cssRenamingMap =
+          CssRenamingMap.createFromJavaPropertiesFile(propertiesFile);
+    } else {
+      throw new BuildException("cssRenamingMap already set");
+    }
   }
 
   /**
@@ -568,11 +579,11 @@ public final class BuilderPlusTask extends Task {
    *     manifest file
    */
   private List<String> createManifest() throws IOException {
-    // TODO(cpeisert): add CSS renaming map to manifest if specified
     // Source-file entry points.
     List<JsClosureSourceFile> sourceEntryPoints = Lists.newArrayList();
 
-    // Additional sources
+    // Additional sources (may be pruned if not transitively required by the
+    // entry points).
     List<JsClosureSourceFile> sources = Lists.newArrayList();
 
     log("Scanning paths...");
@@ -646,6 +657,13 @@ public final class BuilderPlusTask extends Task {
       throw new BuildException(e);
     }
 
+    if (this.cssRenamingMap != null && !this.cssRenamingMap.isEmpty()) {
+      JsClosureSourceFile tempRenamingMap = createTempCssRenamingMapFile();
+      addCssRenamingMapToManifest(tempRenamingMap, manifestList);
+      log("Adding temporary CSS renaming map to manifest... ["
+          + tempRenamingMap.getAbsolutePath() + "]");
+    }
+
     List<String> manifestFilePaths = Lists.newArrayList();
 
     for (JsClosureSourceFile jsClosureSourceFile : manifestList) {
@@ -659,5 +677,41 @@ public final class BuilderPlusTask extends Task {
     log(manifestFilePaths.size() + " dependencies in final manifest.");
 
     return manifestFilePaths;
+  }
+
+  /**
+   * Use {@link BuildCache} to create a temporary CSS renaming map file
+   * using either the Closure Stylesheets renaming map format
+   * CLOSURE_COMPILED or CLOSURE_UNCOMPILED. See {@link
+   * #setCssRenamingMap(String)}.
+   *
+   * @param renamingMap CSS renaming map to write to temp file
+   * @param builderPlusMode the BuilderPlus output mode
+   * @param compilationLevel Closure Compiler compilation level
+   * @return the temporary CSS renaming map file
+   */
+  private JsClosureSourceFile createTempCssRenamingMapFile(
+      CssRenamingMap renamingMap, OutputMode builderPlusMode,
+      CompilationLevel compilationLevel) {
+    JsClosureSourceFile tempRenamingMap;
+
+
+    return tempRenamingMap;
+  }
+
+  /**
+   * Inserts a CSS renaming map into a manifest list either immediately before
+   * or after Closure's base.js. If base.js is not in the manifest list, the
+   * renaming map is inserted at the head of the list.
+   *
+   * @param cssRenamingMapFile CSS renaming map file to add
+   * @param manifestList the manifest list
+   * @param isBeforeBaseJs if {@code true}, insert the CSS renaming map
+   *     immediately prior to Closure's base.js. Defaults to {@code false}.
+   */
+  private void addCssRenamingMapToManifest(
+      JsClosureSourceFile cssRenamingMapFile,
+      List<JsClosureSourceFile> manifestList, boolean isBeforeBaseJs) {
+
   }
 }
