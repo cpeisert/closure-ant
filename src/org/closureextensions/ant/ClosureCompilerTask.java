@@ -33,6 +33,7 @@ import org.apache.tools.ant.types.FileList;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Parameter;
 
+import org.closureextensions.ant.types.CompilationLevel;
 import org.closureextensions.ant.types.CompilerOptionsComplete;
 import org.closureextensions.ant.types.CompilerOptionsFactory;
 import org.closureextensions.ant.types.NameValuePair;
@@ -234,8 +235,6 @@ public final class ClosureCompilerTask extends Task
   // Attributes
   private File compilerJar;
   private boolean forceRecompile;
-  // Files implemented as String instead of File to support special compiler
-  // features such as the output manifest %outname% placeholder.
   private String inputManifest;
   private Boolean manageClosureDependencies;
   private Boolean onlyClosureDependencies;
@@ -527,6 +526,9 @@ public final class ClosureCompilerTask extends Task
   }
   public void setCompilationLevel(String compilationLevel) {
     this.compilerOptions.setCompilationLevel(compilationLevel);
+  }
+  public CompilationLevel getCompilationLevel() {
+    return this.compilerOptions.getCompilationLevel();
   }
   public void setCreateNameMapFiles(boolean createNameMapFiles) {
     this.compilerOptions.setCreateNameMapFiles(createNameMapFiles);

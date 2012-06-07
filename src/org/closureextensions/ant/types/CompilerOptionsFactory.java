@@ -535,6 +535,15 @@ public final class CompilerOptionsFactory {
     }
 
     /**
+     * Get the compilation level. See {@link CompilationLevel}.
+     *
+     * @return the compilation level
+     */
+    public CompilationLevel getCompilationLevel() {
+      return this.compilationLevel;
+    }
+
+    /**
      * @param createNameMapFiles if {@code true}, variable renaming and property
      *     renaming map files will be produced as
      *     {@literal {binary name}_vars_map.out} and

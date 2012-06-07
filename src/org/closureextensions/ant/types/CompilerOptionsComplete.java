@@ -309,6 +309,13 @@ public interface CompilerOptionsComplete extends CompilerOptionsBasic {
   void setCompilationLevel(String compilationLevel);
 
   /**
+   * Get the compilation level. See {@link CompilationLevel}.
+   *
+   * @return the compilation level
+   */
+  CompilationLevel getCompilationLevel();
+
+  /**
    * @param createNameMapFiles if {@code true}, variable renaming and property
    *     renaming map files will be produced as
    *     {@literal {binary name}_vars_map.out} and

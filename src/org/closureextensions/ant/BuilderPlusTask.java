@@ -261,6 +261,9 @@ public final class BuilderPlusTask extends Task {
    *     CLOSURE_UNCOMPILED. This file immediately precedes base.js in the
    *     manifest.</li>
    *   </ul></li>
+   * <li><b>Builder Plus output mode: MANIFEST</b> - works the same as output
+   *     mode COMPILED. If a nested {@literal <compile>} element is not
+   *     specified, the compilation level defaults to SIMPLE.</li>
    * <li><b>Builder Plus output mode: RAW</b> - creates a renaming map using
    *     the Closure Stylesheets output renaming map format CLOSURE_UNCOMPILED
    *     and prepends it to the concatenated output.</li>
@@ -658,8 +661,12 @@ public final class BuilderPlusTask extends Task {
     }
 
     if (this.cssRenamingMap != null && !this.cssRenamingMap.isEmpty()) {
-      JsClosureSourceFile tempRenamingMap = createTempCssRenamingMapFile();
-      addCssRenamingMapToManifest(tempRenamingMap, manifestList);
+      CompilationLevel level = (this.compilerOptions == null) ?
+          CompilationLevel.SIMPLE_OPTIMIZATIONS :
+          this.compilerOptions.getCompilationLevel();
+      JsClosureSourceFile tempRenamingMap =
+          createRenamingMapFileAndAddToManifest(this.cssRenamingMap,
+              this.outputMode, level, manifestList);
       log("Adding temporary CSS renaming map to manifest... ["
           + tempRenamingMap.getAbsolutePath() + "]");
     }
@@ -685,33 +692,25 @@ public final class BuilderPlusTask extends Task {
    * CLOSURE_COMPILED or CLOSURE_UNCOMPILED. See {@link
    * #setCssRenamingMap(String)}.
    *
+   * <p>The temporary renaming map file is then added to the manifest list
+   * either immediately before or after Closure's base.js (CLOSURE_COMPILED
+   * after base.js and CLOSURE_UNCOMPILED before). If base.js is not present,
+   * the renaming map is inserted at the head of the list.</p>
+   *
    * @param renamingMap CSS renaming map to write to temp file
    * @param builderPlusMode the BuilderPlus output mode
    * @param compilationLevel Closure Compiler compilation level
+   * @param manifestList the manifest list
    * @return the temporary CSS renaming map file
    */
-  private JsClosureSourceFile createTempCssRenamingMapFile(
+  private JsClosureSourceFile createRenamingMapFileAndAddToManifest(
       CssRenamingMap renamingMap, OutputMode builderPlusMode,
-      CompilationLevel compilationLevel) {
-    JsClosureSourceFile tempRenamingMap;
+      CompilationLevel compilationLevel,
+      List<JsClosureSourceFile> manifestList) {
+
+    JsClosureSourceFile tempRenamingMap = null;
 
 
     return tempRenamingMap;
-  }
-
-  /**
-   * Inserts a CSS renaming map into a manifest list either immediately before
-   * or after Closure's base.js. If base.js is not in the manifest list, the
-   * renaming map is inserted at the head of the list.
-   *
-   * @param cssRenamingMapFile CSS renaming map file to add
-   * @param manifestList the manifest list
-   * @param isBeforeBaseJs if {@code true}, insert the CSS renaming map
-   *     immediately prior to Closure's base.js. Defaults to {@code false}.
-   */
-  private void addCssRenamingMapToManifest(
-      JsClosureSourceFile cssRenamingMapFile,
-      List<JsClosureSourceFile> manifestList, boolean isBeforeBaseJs) {
-
   }
 }
