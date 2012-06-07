@@ -57,6 +57,12 @@ limitations under the License.
   <target name="suiteSetUp">
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${project101.output.dir}" />
+
+    <mkdir dir="${json-in-style.soy-output.dir}" />
+    <mkdir dir="${json-in-style.soy-output.dir}/images" />
+    <copy todir="${json-in-style.soy-output.dir}/images">
+      <fileset dir="${json-in-style.dir}/images" />
+    </copy>
   </target>
 
 
@@ -213,6 +219,164 @@ limitations under the License.
 
     <assertLogContains text="Output file up-to-date. Compilation skipped." />
   </target>
+
+
+  <!--
+  =============================================================================
+    Tests for CSS renaming map attributes
+  =============================================================================
+  -->
+
+  <import file="${test-projects.dir}/json-in-style/jsonInStyle.xml" />
+  <property name="manifest.CLOSURE_COMPILED.txt"
+      location="${json-in-style.soy-output.dir}/manifest_closure_compiled.txt" />
+  <property name="manifest.CLOSURE_UNCOMPILED.txt"
+      location="${json-in-style.soy-output.dir}/manifest_closure_uncompiled.txt" />
+
+
+  <target name="testInputCssRenamingMap_CLOSURE_COMPILED">
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}"
+        outputRenamingMapFormat="CLOSURE_COMPILED"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <builder-plus
+        cssRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}"
+        outputManifest="${manifest.CLOSURE_COMPILED.txt}"
+        outputMode="MANIFEST"
+        outputFile="${json-in-style.soy.compiled.js}">
+      <compiler compilationLevel="advanced" warningLevel="verbose" />
+      <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
+      <root directory="${closure-library.dir}" />
+    </builder-plus>
+
+    <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
+    <assertResourceContains resource="${manifest.CLOSURE_COMPILED.txt}"
+        value="css_renaming_map_CLOSURE_COMPILED.js" />
+  </target>
+
+
+  <target name="testInputCssRenamingMap_CLOSURE_UNCOMPILED">
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}"
+        outputRenamingMapFormat="CLOSURE_UNCOMPILED"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <builder-plus
+        cssRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}"
+        outputManifest="${manifest.CLOSURE_COMPILED.txt}"
+        outputMode="MANIFEST">
+      <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
+      <root directory="${closure-library.dir}" />
+    </builder-plus>
+
+    <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
+    <assertResourceContains resource="${manifest.CLOSURE_COMPILED.txt}"
+        value="css_renaming_map_CLOSURE_COMPILED.js" />
+  </target>
+
+
+  <target name="testInputCssRenamingMap_JSON">
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputRenamingMapFormat="JSON"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <builder-plus
+        cssRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputManifest="${manifest.CLOSURE_COMPILED.txt}"
+        outputMode="COMPILED"
+        outputFile="${json-in-style.soy.compiled.js}">
+      <compiler compilationLevel="advanced" warningLevel="verbose" />
+      <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
+      <root directory="${closure-library.dir}" />
+    </builder-plus>
+
+    <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
+    <assertResourceContains resource="${manifest.CLOSURE_COMPILED.txt}"
+        value="css_renaming_map_CLOSURE_COMPILED.js" />
+  </target>
+
+
+  <target name="testInputCssRenamingMap_PROPERTIES">
+    <stylesheets
+        outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_PROPERTIES}"
+        outputRenamingMapFormat="PROPERTIES"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <builder-plus
+        cssRenamingMapPropertiesFile="${json-in-style.outputRenamingMap_PROPERTIES}"
+        outputManifest="${manifest.CLOSURE_COMPILED.txt}"
+        outputMode="MANIFEST">
+      <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
+      <root directory="${closure-library.dir}" />
+    </builder-plus>
+
+    <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
+    <assertResourceContains resource="${manifest.CLOSURE_COMPILED.txt}"
+        value="css_renaming_map_CLOSURE_COMPILED.js" />
+  </target>
+
+
+  <target name="testOutputCssRenamingMap_CLOSURE_UNCOMPILED">
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputRenamingMapFormat="JSON"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <!--
+      Compilation level WHITESPACE should cause Builder Plus to produce a
+      CSS renaming map using format CLOSURE_UNCOMPILED.
+    -->
+    <builder-plus
+        cssRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputManifest="${manifest.CLOSURE_UNCOMPILED.txt}"
+        outputMode="COMPILED"
+        outputFile="${json-in-style.soy.raw.js}">
+      <compiler compilationLevel="WHITESPACE" warningLevel="verbose" />
+      <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
+      <root directory="${closure-library.dir}" />
+    </builder-plus>
+
+    <assertFileExists file="${manifest.CLOSURE_UNCOMPILED.txt}" />
+    <assertResourceContains resource="${manifest.CLOSURE_UNCOMPILED.txt}"
+        value="css_renaming_map_CLOSURE_UNCOMPILED.js" />
+
+    <!-- Generate index.html for testing in browser. -->
+    <soy
+        cssHandlingScheme="goog"
+        cssRenamingMap="${json-in-style.outputRenamingMap_JSON}">
+      <soyfileset dir="${json-in-style.soy.dir}" includes="**/*.soy" />
+      <rendertemplate
+          outputPathFormat="${json-in-style.soy-output.html}"
+          templateName="jsonstyle.createIndexHtml">
+        <data replaceProperties="true">
+          {
+            'scriptFiles': [
+              '${json-in-style.soy.raw.js}'
+            ]
+          }
+        </data>
+      </rendertemplate>
+    </soy>
+  </target>
+
   
   <!-- Run this test suite. -->
   <target name="test">

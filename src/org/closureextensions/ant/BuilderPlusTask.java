@@ -18,15 +18,21 @@ package org.closureextensions.ant;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.Properties;
 
 import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
@@ -477,8 +483,8 @@ public final class BuilderPlusTask extends Task {
       } else {
         // Save a copy of the manifest in directory '.closure-ant-tasks'.
         BuildCache cache = new BuildCache(this);
-        manifestFile = cache.createTempFile("temp_manifest[" + getTaskName()
-            + "].txt");
+        manifestFile = cache.createTempFile("temp_manifest_for_target["
+            + getOwningTarget().getName() + "].txt");
         Files.write(manifestString, manifestFile, Charsets.UTF_8);
       }
 
@@ -702,15 +708,71 @@ public final class BuilderPlusTask extends Task {
    * @param compilationLevel Closure Compiler compilation level
    * @param manifestList the manifest list
    * @return the temporary CSS renaming map file
+   * @throws IOException if unable to create temp CSS renaming map file
+   * @throws NullPointerException if any of the arguments are {@code null}
    */
   private JsClosureSourceFile createRenamingMapFileAndAddToManifest(
       CssRenamingMap renamingMap, OutputMode builderPlusMode,
       CompilationLevel compilationLevel,
-      List<JsClosureSourceFile> manifestList) {
+      List<JsClosureSourceFile> manifestList) throws IOException {
 
-    JsClosureSourceFile tempRenamingMap = null;
+    Preconditions.checkNotNull(renamingMap, "renamingMap is null");
+    Preconditions.checkNotNull(builderPlusMode, "builderPlusMode is null");
+    Preconditions.checkNotNull(compilationLevel, "compilationLevel is null");
+    Preconditions.checkNotNull(manifestList, "manifestList is null");
 
+    BuildCache cache = new BuildCache(this);
+    JsClosureSourceFile tempRenamingMapFile;
+    File file;
+    boolean beforeBaseJs = false;
 
-    return tempRenamingMap;
+    if (builderPlusMode.equals(OutputMode.RAW)
+        || compilationLevel.equals(CompilationLevel.WHITESPACE_ONLY)) {
+      beforeBaseJs = true;
+      file = cache.createTempFile("css_renaming_map_CLOSURE_UNCOMPILED.js");
+      writeRenamingMap(cssRenamingMap, "CLOSURE_CSS_NAME_MAPPING = %s;\n",file);
+    } else {
+      file = cache.createTempFile("css_renaming_map_CLOSURE_COMPILED.js");
+      writeRenamingMap(cssRenamingMap, "goog.setCssNameMapping(%s);\n", file);
+    }
+
+    tempRenamingMapFile = SourceFileFactory.newJsClosureSourceFile(file);
+    boolean added = false;
+
+    for (ListIterator<JsClosureSourceFile> i = manifestList.listIterator();
+         i.hasNext();) {
+      JsClosureSourceFile sourceFile = i.next();
+      if (sourceFile.isBaseJs()) {
+        if (beforeBaseJs) {
+          i.previous();
+        }
+        i.add(tempRenamingMapFile);
+        added = true;
+        break;
+      }
+    }
+    if (!added) {
+      manifestList.add(0, tempRenamingMapFile);
+    }
+
+    return tempRenamingMapFile;
+  }
+
+  /**
+   * Borrowed from {@link
+   * com.google.common.css.compiler.commandline.OutputRenamingMapFormat}
+   */
+  private void writeRenamingMap(CssRenamingMap renamingMap,
+      String formatString, File outputFile) throws IOException {
+    // Build up the renaming map as a JsonObject.
+    JsonObject properties = new JsonObject();
+    for (Map.Entry<String, String> entry : renamingMap.entrySet()) {
+      properties.addProperty(entry.getKey(), entry.getValue());
+    }
+
+    // Write the JSON wrapped in this output format's formatString.
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    Files.write(String.format(formatString, gson.toJson(properties)),
+        outputFile, Charsets.UTF_8);
   }
 }
