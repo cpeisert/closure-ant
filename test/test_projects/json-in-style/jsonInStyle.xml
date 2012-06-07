@@ -62,6 +62,8 @@ limitations under the License.
       location="${json-in-style.soy-output.dir}/renaming_CLOSURE_UNCOMPILED.js" />
   <property name="json-in-style.outputRenamingMap_JSON"
       location="${json-in-style.soy-output.dir}/renaming.json" />
+  <property name="json-in-style.outputRenamingMap_PROPERTIES"
+      location="${json-in-style.soy-output.dir}/renaming.properties" />
 
   <property name="copyright">/*
  * Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
