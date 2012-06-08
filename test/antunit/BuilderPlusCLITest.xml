@@ -22,7 +22,7 @@ limitations under the License.
 -->
 <project name="builder-plus-cli-test" default="test">
 
-  <dirname property="antunit.dir" 
+  <dirname property="antunit.dir"
       file="${ant.file.builder-plus-cli-test}" />
 
   <property name="test.dir" location="${antunit.dir}/.." />
