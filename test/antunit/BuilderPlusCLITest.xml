@@ -243,6 +243,26 @@ limitations under the License.
 
     <assertLogContains text="Output file up-to-date. Compilation skipped." />
   </target>
+
+
+  <!--
+  =============================================================================
+    Tests for CSS renaming map flags.
+  =============================================================================
+  -->
+
+  <import file="${test-projects.dir}/json-in-style/jsonInStyle.xml" />
+  <property name="manifest.CLOSURE_COMPILED.txt"
+      location="${json-in-style.soy-output.dir}/manifest_closure_compiled.txt" />
+  <property name="manifest.CLOSURE_UNCOMPILED.txt"
+      location="${json-in-style.soy-output.dir}/manifest_closure_uncompiled.txt" />
+
+  <!-- TODO(cpeisert): write test to throw error when both css renaming map
+        flags are specified. (verify exception output to ensure it would make
+        sense to end users. -->
+
+
+
   
   <!-- Run this test suite. -->
   <target name="test">

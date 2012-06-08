@@ -37,11 +37,13 @@ public final class Main {
   public static void main(String[] args) throws CmdLineException, IOException {
     List<String> processedArgs = processArgs(args);
 
-    CommandLineOptions options = new CommandLineOptions();
-    CmdLineParser parser = new CmdLineParser(options);
+    CommandLineOptions options = null;
+    CmdLineParser parser = null;
     boolean optionsValid = true;
 
     try {
+      options = new CommandLineOptions();
+      parser = new CmdLineParser(options);
       parser.parseArgument(processedArgs.toArray(new String[] {}));
     } catch (CmdLineException e) {
       System.err.println(e.getMessage());
@@ -88,4 +90,3 @@ public final class Main {
     return processedArgs;
   }
 }
-

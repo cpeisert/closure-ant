@@ -19,7 +19,6 @@ package org.closureextensions.builderplus.cli;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
@@ -33,11 +32,16 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 
 import org.closureextensions.ant.ClosureCompilerTask;
+import org.closureextensions.ant.types.CompilationLevel;
+import org.closureextensions.builderplus.BuilderPlusUtil;
 import org.closureextensions.builderplus.OutputMode;
+import org.closureextensions.common.CssRenamingMap;
 import org.closureextensions.common.deps.ManifestBuilder;
 import org.closureextensions.common.JsClosureSourceFile;
 import org.closureextensions.common.SourceFileFactory;
 import org.closureextensions.common.util.FileUtil;
+
+import org.kohsuke.args4j.CmdLineException;
 
 /**
  * Builder Plus program runner. Builder Plus is similar to Closure Builder,
@@ -45,12 +49,13 @@ import org.closureextensions.common.util.FileUtil;
  * "outputManifest" and the "script" mode has been renamed "raw" to match
  * plovr. There are also flags to control the dependency management process:
  * {@code --keep_all_sources}, {@code --keep_moochers}, and {@code
- * --keep_original_order}.
+ * --keep_original_order} as well as options to specify a CSS renaming map.
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class BuilderPlusRunner {
 
+  private CssRenamingMap cssRenamingMap;
   private File compilerJar;
   private boolean forceRecompile;
   private File inputManifest;
@@ -71,8 +76,9 @@ public final class BuilderPlusRunner {
   /**
    * Constructs a new Ant task for Closure Builder.
    */
-  public BuilderPlusRunner(CommandLineOptions options) {
+  public BuilderPlusRunner(CommandLineOptions options) throws CmdLineException {
 
+    this.cssRenamingMap = options.getCssRenamingMap();
     this.compilerJar = options.getCompilerJar();
     this.forceRecompile = options.isForceRecompile();
     this.inputManifest = options.getInputManifest();
@@ -120,29 +126,46 @@ public final class BuilderPlusRunner {
    * @throws org.closureextensions.common.deps.MultipleProvideException if a
    *     namespace is provided by more than one source file
    * @throws NullPointerException if the manifest file returned by {@link
-   *     #createManifest()} is {@code null}
+   *     #createManifest(CompilationLevel, File)} is {@code null}
    */
   public void execute() throws IOException {
-    File manifest = createManifest();
-    List<String> currentSources;
-    Joiner joiner = Joiner.on(String.format("%n")).skipNulls();
-    currentSources = Files.readLines(manifest, Charsets.UTF_8);
-
-    if (this.outputManifest != null) {
-      Files.write(joiner.join(currentSources), this.outputManifest,
-          Charsets.UTF_8);
-    }
+    ClosureCompilerTask compilerTask = null;
+    CompilationLevel compilationLevel;
 
     if (OutputMode.COMPILED == this.outputMode) {
-      runClosureCompiler(manifest);
+      compilerTask = newClosureCompilerTask();
+      compilationLevel = compilerTask.getCompilationLevel();
+    } else {
+      compilationLevel = CompilationLevel.SIMPLE_OPTIMIZATIONS;
+    }
+
+    File builderPlusCache = new File(".builder-plus");
+    builderPlusCache.mkdir();
+    List<String> manifestList = createManifest(compilationLevel,
+        builderPlusCache);
+    String manifestString = Joiner.on(String.format("%n")).skipNulls()
+        .join(manifestList);
+
+    File manifestFile;
+    if (this.outputManifest != null) {
+      Files.write(manifestString, this.outputManifest, Charsets.UTF_8);
+      manifestFile = this.outputManifest;
+    } else {
+      // Save a copy of the manifest in directory '.builder-plus'.
+      manifestFile = new File(builderPlusCache, "temp_manifest.txt");
+      Files.write(manifestString, manifestFile, Charsets.UTF_8);
+    }
+
+    if (compilerTask != null) {
+      compilerTask.setInputManifest(manifestFile.getAbsolutePath());
+      compilerTask.execute();
     }
     if (OutputMode.MANIFEST == this.outputMode) {
       if (this.outputManifest == null) {
-        System.out.println(joiner.join(currentSources));
+        System.out.println(manifestString);
       }
-    }
-    if (OutputMode.RAW == this.outputMode) {
-      writeRawConcatenationOfSources(currentSources);
+    } else if (OutputMode.RAW == this.outputMode) {
+      writeRawConcatenationOfSources(manifestList);
     }
   }
 
@@ -169,16 +192,15 @@ public final class BuilderPlusRunner {
   }
 
   /**
-   * Run the Closure Compiler using the Closure Compiler Ant task bundled
-   * with the Ant Closure Tools.
+   * Creates a new {@link ClosureCompilerTask} for internal execution.
    *
-   * @param manifest a manifest file listing all of the sources for the build
+   * <p><b>Note:</b> the input manifest is not set by this method and must
+   * be set on the returned {@link ClosureCompilerTask}.</p>
+   *
    * @throws IllegalStateException if the Closure Compiler jar file is null or
    *     does not exist
-   * @throws NullPointerException if the manifest file is {@code null}
    */
-  private void runClosureCompiler(File manifest) {
-    Preconditions.checkNotNull(manifest, "manifest is null");
+  private ClosureCompilerTask newClosureCompilerTask() {
     if (this.compilerJar == null) {
       throw new IllegalStateException("\"compilerJar\" is not set. The Closure "
           + "Compiler is required for output mode COMPILED. Verify "
@@ -202,7 +224,6 @@ public final class BuilderPlusRunner {
     compilerTask.setProject(project);
     compilerTask.setOwningTarget(builderPlusTarget);
 
-    compilerTask.setInputManifest(manifest.getAbsolutePath());
     if (this.flagFile != null) {
       compilerTask.setFlagFile(this.flagFile);
     }
@@ -216,11 +237,8 @@ public final class BuilderPlusRunner {
       throw new IllegalStateException("The Closure Compiler jar file "
           + "\"" + this.compilerJar.getAbsolutePath() + "\" does not exist.");
     }
-    compilerTask.setInputManifest(manifest.getAbsolutePath());
 
-    builderPlusTarget.addTask(compilerTask);
-    project.addTarget(builderPlusTarget);
-    builderPlusTarget.execute();
+    return compilerTask;
   }
 
   /**
@@ -234,6 +252,13 @@ public final class BuilderPlusRunner {
    * after its dependencies, unless the flag {@link #keepOriginalOrder} is set
    * to {@code true}, in which case the sources are not sorted.
    *
+   * <p>If a CSS renaming map is specified, it will be written to a temporary
+   * file and added to the manifest. See {@link
+   * org.closureextensions.ant.BuilderPlusTask#setCssRenamingMap(String)}.</p>
+   *
+   * @param compilationLevel the Closure Compiler compilation level
+   * @param outputDirectory directory to write temporary files, such as CSS
+   *     renaming maps
    * @return a manifest file containing a list of the sources after
    *     dependency management
    * @throws org.closureextensions.common.deps.CircularDependencyException if
@@ -245,8 +270,10 @@ public final class BuilderPlusRunner {
    * @throws org.closureextensions.common.deps.MultipleProvideException if a
    *     namespace is provided by more than one source file
    */
-  private File createManifest() throws IOException {
-    List<JsClosureSourceFile> sourceEntryPoints = Lists.newArrayList(this.mainSources);
+  private List<String> createManifest(CompilationLevel compilationLevel,
+      File outputDirectory) throws IOException {
+    List<JsClosureSourceFile> sourceEntryPoints =
+        Lists.newArrayList(this.mainSources);
 
     System.out.println("Scanning paths...");
 
@@ -288,10 +315,17 @@ public final class BuilderPlusRunner {
 
     System.out.println("Building dependency tree...");
 
-    new File(".builder-plus").mkdir();
-    File tempManifest = new File(".builder-plus/temp_manifest.txt");
-
     List<JsClosureSourceFile> manifestList = builder.toManifestList();
+
+    if (this.cssRenamingMap != null && !this.cssRenamingMap.isEmpty()) {
+      JsClosureSourceFile tempRenamingMap =
+          BuilderPlusUtil.createRenamingMapFileAndAddToManifest(
+              this.cssRenamingMap, this.outputMode, compilationLevel,
+              manifestList, outputDirectory);
+      System.out.println("Adding temporary CSS renaming map to manifest... ["
+          + tempRenamingMap.getAbsolutePath() + "]");
+    }
+
     List<String> manifestFilePaths = Lists.newArrayList();
 
     for (JsClosureSourceFile jsClosureSourceFile : manifestList) {
@@ -305,10 +339,6 @@ public final class BuilderPlusRunner {
     System.out.println(manifestFilePaths.size() + " dependencies in final "
         + "manifest.");
 
-    Files.write(
-        Joiner.on(String.format("%n")).skipNulls().join(manifestFilePaths),
-        tempManifest, Charsets.UTF_8);
-
-    return tempManifest;
+    return manifestFilePaths;
   }
 }

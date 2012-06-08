@@ -20,7 +20,14 @@ package org.closureextensions.builderplus.cli;
 import com.google.common.collect.Lists;
 
 import com.google.common.collect.Sets;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 import org.closureextensions.builderplus.OutputMode;
+import org.closureextensions.common.CssRenamingMap;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -31,16 +38,30 @@ import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
 
-import java.io.File;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Command line options for the Builder Plus command line interface.
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class CommandLineOptions {
+
+  @Option(name = "--css_renaming_map", usage = ""
+      + "A file containing a JSON object\n"
+      + "representing a CSS renaming map. Any\n"
+      + "characters outside the outermost matching\n"
+      + "set of curly braces are ignored. This\n"
+      + "means that all of the CSS renaming map\n"
+      + "output formats supported by Closure\n"
+      + "Stylesheets (except PROPERTIES) may be\n"
+      + "used. For Java Properties files, use\n"
+      + "--css_renaming_map_properties_file\n")
+  private File cssRenamingMapFile;
+
+  @Option(name = "--css_renaming_map_properties_file", usage = ""
+      + "A Java properties file containing\n"
+      + "key-value pairs for a CSS renaming map.\n"
+      + "See --css_renaming_map\n")
+  private File cssRenamingMapPropertiesFile;
 
   @Option(name = "--compiler_jar", usage = ""
       + "The location of the Closure compiler .jar\n"
@@ -147,6 +168,32 @@ public final class CommandLineOptions {
       + "--source option.")
   private List<File> arguments = Lists.newArrayList();
 
+
+  public CssRenamingMap getCssRenamingMap() throws CmdLineException {
+    if (this.cssRenamingMapFile != null
+        && this.cssRenamingMapPropertiesFile != null) {
+      throw new CmdLineException("Only one of --css_renaming_map and "
+          + "--css_renaming_map_properties_file may be specified.");
+    }
+    if (this.cssRenamingMapFile == null
+        && this.cssRenamingMapPropertiesFile == null) {
+      return null;
+    }
+
+    CssRenamingMap renamingMap;
+    try {
+      if (this.cssRenamingMapFile != null) {
+        renamingMap = CssRenamingMap.createFromJsonFile(this.cssRenamingMapFile);
+      } else {
+        renamingMap = CssRenamingMap.createFromJavaPropertiesFile(
+            this.cssRenamingMapPropertiesFile);
+      }
+    } catch (IOException e) {
+      throw new CmdLineException(e);
+    }
+
+    return renamingMap;
+  }
 
   public File getCompilerJar() {
     return compilerJar;
