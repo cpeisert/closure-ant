@@ -257,11 +257,145 @@ limitations under the License.
   <property name="manifest.CLOSURE_UNCOMPILED.txt"
       location="${json-in-style.soy-output.dir}/manifest_closure_uncompiled.txt" />
 
-  <!-- TODO(cpeisert): write test to throw error when both css renaming map
-        flags are specified. (verify exception output to ensure it would make
-        sense to end users. -->
+
+  <target name="testInputCssRenamingMap_CLOSURE_COMPILED">
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}"
+        outputRenamingMapFormat="CLOSURE_COMPILED"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--css_renaming_map=${json-in-style.outputRenamingMap_CLOSURE_COMPILED}" />
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
+      <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
+      <arg line="--output_mode MANIFEST" />
+      <arg line="--main_source '${json-in-style.js.dir}/jsonstylemanager.js'" />
+      <arg line="--main_source '${json-in-style.js.dir}/main.js'" />
+      <arg line='--root "${closure-library.dir}"' />
+    </java>
+
+    <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
+    <assertResourceContains resource="${manifest.CLOSURE_COMPILED.txt}"
+        value="css_renaming_map_CLOSURE_COMPILED.js" />
+  </target>
 
 
+  <target name="testInputCssRenamingMap_CLOSURE_UNCOMPILED">
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}"
+        outputRenamingMapFormat="CLOSURE_UNCOMPILED"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--css_renaming_map=${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}" />
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
+      <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
+      <arg line="--output_mode MANIFEST" />
+      <arg line="--main_source '${json-in-style.js.dir}/jsonstylemanager.js'" />
+      <arg line="--main_source '${json-in-style.js.dir}/main.js'" />
+      <arg line='--root "${closure-library.dir}"' />
+    </java>
+
+    <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
+    <assertResourceContains resource="${manifest.CLOSURE_COMPILED.txt}"
+        value="css_renaming_map_CLOSURE_COMPILED.js" />
+  </target>
+
+
+  <target name="testInputCssRenamingMap_JSON">
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputRenamingMapFormat="JSON"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--css_renaming_map=${json-in-style.outputRenamingMap_JSON}" />
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
+      <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
+      <arg line="--output_mode COMPILED" />
+      <arg line="--main_source '${json-in-style.js.dir}/jsonstylemanager.js'" />
+      <arg line="--main_source '${json-in-style.js.dir}/main.js'" />
+      <arg line='--root "${closure-library.dir}"' />
+    </java>
+
+    <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
+    <assertResourceContains resource="${manifest.CLOSURE_COMPILED.txt}"
+        value="css_renaming_map_CLOSURE_COMPILED.js" />
+  </target>
+
+
+  <target name="testInputCssRenamingMap_PROPERTIES">
+    <stylesheets
+        outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_PROPERTIES}"
+        outputRenamingMapFormat="PROPERTIES"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--css_renaming_map_properties_file=${json-in-style.outputRenamingMap_PROPERTIES}" />
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
+      <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
+      <arg line="--output_mode MANIFEST" />
+      <arg line="--main_source '${json-in-style.js.dir}/jsonstylemanager.js'" />
+      <arg line="--main_source '${json-in-style.js.dir}/main.js'" />
+      <arg line='--root "${closure-library.dir}"' />
+    </java>
+
+    <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
+    <assertResourceContains resource="${manifest.CLOSURE_COMPILED.txt}"
+        value="css_renaming_map_CLOSURE_COMPILED.js" />
+  </target>
+
+
+  <target name="testError_CssRenamingMapSpecifiedAsPropertiesAndJSON">
+    <stylesheets
+        outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_PROPERTIES}"
+        outputRenamingMapFormat="PROPERTIES"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <stylesheets outputFile="${json-in-style.soy-output.css}"
+        outputRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputRenamingMapFormat="JSON"
+        renamingType="CLOSURE"
+        prettyPrint="true">
+      <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
+    </stylesheets>
+
+    <expectfailure>
+      <!-- May not specify both JSON and Properties file renaming maps. -->
+      <java jar="${builderplus.jar}" fork="true" failonerror="true">
+        <arg value="--css_renaming_map=${json-in-style.outputRenamingMap_JSON}" />
+        <arg value="--css_renaming_map_properties_file=${json-in-style.outputRenamingMap_PROPERTIES}" />
+        <arg value="--compiler_jar=${closure-compiler.jar}" />
+        <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
+        <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
+        <arg line="--output_mode MANIFEST" />
+        <arg line="--main_source '${json-in-style.js.dir}/jsonstylemanager.js'" />
+        <arg line="--main_source '${json-in-style.js.dir}/main.js'" />
+        <arg line='--root "${closure-library.dir}"' />
+      </java>
+    </expectfailure>
+  </target>
 
   
   <!-- Run this test suite. -->
