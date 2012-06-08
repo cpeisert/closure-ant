@@ -44,8 +44,8 @@ public final class BuilderPlusUtil {
   private BuilderPlusUtil() {}
 
   /**
-   * Use {@link org.closureextensions.ant.BuildCache} to create a temporary CSS
-   * renaming map file using either the Closure Stylesheets renaming map format
+   * Creates a temporary CSS renaming map file in the specified output
+   * directory using either the Closure Stylesheets renaming map format
    * CLOSURE_COMPILED or CLOSURE_UNCOMPILED. See {@link
    * org.closureextensions.ant.BuilderPlusTask#setCssRenamingMap(String)}.
    *
