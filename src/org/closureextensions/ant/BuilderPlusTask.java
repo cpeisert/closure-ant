@@ -35,6 +35,7 @@ import org.closureextensions.ant.types.CompilationLevel;
 import org.closureextensions.ant.types.CompilerOptionsComplete;
 import org.closureextensions.ant.types.CompilerOptionsFactory;
 import org.closureextensions.ant.types.Directory;
+import org.closureextensions.ant.types.NamespaceList;
 import org.closureextensions.ant.types.StringNestedElement;
 import org.closureextensions.builderplus.BuilderPlusUtil;
 import org.closureextensions.builderplus.OutputMode;
@@ -190,7 +191,7 @@ public final class BuilderPlusTask extends Task {
   // Nested elements
   private CompilerOptionsComplete compilerOptions;
   private final List<FileSet> mainSources; // Program entry points
-  private final List<StringNestedElement> namespaces;
+  private final List<String> namespaces;
   private final List<Directory> roots;
   private final List<FileSet> sources;
 
@@ -441,9 +442,14 @@ public final class BuilderPlusTask extends Task {
     this.mainSources.add(mainSources);
   }
 
-  /** @param namespace a Closure namespace */
-  public void addNamespace(StringNestedElement namespace) {
-    this.namespaces.add(namespace);
+  /**
+   * A list of namespaces separated by whitespace and/or commas that represent
+   * program entry points for which dependencies will be calculated.
+   *
+   * @param namespaces a list of Closure namespaces
+   */
+  public void addConfiguredNamespaceList(NamespaceList namespaces) {
+    this.namespaces.addAll(namespaces.getNamespaces());
   }
 
   /** @param root path to be traversed to build the dependencies */
@@ -613,12 +619,6 @@ public final class BuilderPlusTask extends Task {
       sourceEntryPoints.add(sourceFile);
     }
 
-    // Process <namespace> nested elements.
-    List<String> namespaceEntryPoints = Lists.newArrayList();
-    for (StringNestedElement namespace : this.namespaces) {
-      namespaceEntryPoints.add(namespace.getValue());
-    }
-
     // Process <sources> nested elements.
     paths =
         AntUtil.getFilePathsFromCollectionOfFileSet(getProject(), this.sources);
@@ -644,7 +644,7 @@ public final class BuilderPlusTask extends Task {
         new ManifestBuilder<JsClosureSourceFile>();
     builder.mainSources(sourceEntryPoints);
     builder.sources(sources);
-    builder.namespaces(namespaceEntryPoints)
+    builder.namespaces(this.namespaces)
         .keepAllSources(this.keepAllSources)
         .keepMoochers(this.keepMoochers)
         .keepOriginalOrder(this.keepOriginalOrder);
