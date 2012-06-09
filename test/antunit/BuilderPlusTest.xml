@@ -75,7 +75,7 @@ limitations under the License.
   <target name="test_outputMode=RAW">
     <builder-plus outputMode="raw"
         outputfile="${project101.raw.output.js}">
-      <namespace value="${project101.namespace}" />
+      <namespaces namespaces="${project101.namespace}" />
       <root directory="${project101.js.dir}" />
       <root directory="${closure-library.dir}" />
     </builder-plus>
@@ -90,7 +90,7 @@ limitations under the License.
     <builder-plus outputMode="raw"
         keepMoochers="true"
         outputfile="${project101.raw.output.js}">
-      <namespace value="${project101.namespace}" />
+      <namespaces namespaces="${project101.namespace}" />
       <root directory="${project101.js.dir}" />
       <root directory="${closure-library.dir}" />
     </builder-plus>
@@ -104,7 +104,7 @@ limitations under the License.
   <target name="test_whitespace-compiled">
     <builder-plus outputMode="compiled" forceRecompile="true"
         outputFile="${project101.whitespace-compiled.output.js}">
-      <namespace value="${project101.namespace}" />
+      <namespaces namespaces="${project101.namespace}" />
       <root directory="${project101.js.dir}" />
       <root directory="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true">
@@ -121,7 +121,7 @@ limitations under the License.
   <target name="test_simple-compiled">
     <builder-plus outputMode="compiled" forceRecompile="true"
         outputFile="${project101.simple-compiled.output.js}">
-      <namespace value="${project101.namespace}" />
+      <namespaces namespaces="${project101.namespace}" />
       <root directory="${project101.js.dir}" />
       <root directory="${closure-library.dir}" />
       <compiler compilationLevel="SIMPLE" prettyPrint="true">
@@ -149,7 +149,7 @@ limitations under the License.
   <target name="test_advanced-compiled">
     <builder-plus outputMode="compiled" forceRecompile="true"
         outputFile="${project101.advanced-compiled.output.js}">
-      <namespace value="${project101.namespace}" />
+      <namespaces namespaces="${project101.namespace}" />
       <root directory="${project101.js.dir}" />
       <root directory="${closure-library.dir}" />
       <compiler compilationLevel="advanced" />
@@ -162,7 +162,7 @@ limitations under the License.
   <target name="test_outputMode=MANIFEST">
     <builder-plus outputMode="MANIFEST"
         outputManifest="${project101.outputManifest}">
-      <namespace value="${project101.namespace}" />
+      <namespaces namespaces="${project101.namespace}" />
       <root directory="${project101.js.dir}" />
       <root directory="${closure-library.dir}" />
     </builder-plus>
@@ -202,7 +202,7 @@ limitations under the License.
     <logcapturer />
     <builder-plus outputMode="compiled"
         outputFile="${project101.whitespace-compiled.output.js}">
-      <namespace value="${project101.namespace}" />
+      <namespaces namespaces="${project101.namespace}" />
       <root directory="${project101.js.dir}" />
       <root directory="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
@@ -211,7 +211,7 @@ limitations under the License.
     <!-- Compilation should be skipped. -->
     <builder-plus outputMode="compiled"
         outputFile="${project101.whitespace-compiled.output.js}">
-      <namespace value="${project101.namespace}" />
+      <namespaces namespaces="${project101.namespace}" />
       <root directory="${project101.js.dir}" />
       <root directory="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
