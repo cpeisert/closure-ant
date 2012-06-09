@@ -22,25 +22,25 @@ limitations under the License.
   <taskdef name="closure-builder-python"
       classname="org.closureextensions.ant.ClosureBuilderPythonTask" />
 
-  <!-- Closure Compiler task synonyms: closure-compiler or jscomp -->
+  <!-- Closure Compiler task aliases: closure-compiler or jscomp -->
   <taskdef name="closure-compiler"
       classname="org.closureextensions.ant.ClosureCompilerTask" />
   <taskdef name="jscomp"
       classname="org.closureextensions.ant.ClosureCompilerTask" />
 
-  <!-- Closure Linter task synonyms: closure-linter or gjslint -->
+  <!-- Closure Linter task aliases: closure-linter or gjslint -->
   <taskdef name="closure-linter"
       classname="org.closureextensions.ant.ClosureLinterTask" />
   <taskdef name="gjslint"
       classname="org.closureextensions.ant.ClosureLinterTask" />
 
-  <!-- Closure Stylesheets task synonyms: closure-stylesheets or stylesheets -->
+  <!-- Closure Stylesheets task aliases: closure-stylesheets or stylesheets -->
   <taskdef name="closure-stylesheets"
       classname="org.closureextensions.ant.ClosureStylesheetsTask" />
   <taskdef name="stylesheets"
       classname="org.closureextensions.ant.ClosureStylesheetsTask" />
 
-  <!-- Closure Templates task synonyms: closure-templates or soy  -->
+  <!-- Closure Templates task aliases: closure-templates or soy  -->
   <taskdef name="closure-templates"
       classname="org.closureextensions.ant.SoyTask" />
   <taskdef name="soy" classname="org.closureextensions.ant.SoyTask" />
