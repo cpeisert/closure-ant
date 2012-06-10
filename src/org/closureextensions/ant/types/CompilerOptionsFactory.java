@@ -32,9 +32,9 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.closureextensions.ant.AntUtil;
 import org.closureextensions.ant.CommandLineBuilder;
 import org.closureextensions.ant.PlovrConfig;
-import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.StringUtil;
 
 import org.apache.tools.ant.BuildException;

@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.tools.ant.types.DataType;
 import org.apache.tools.ant.types.FileSet;
 
-import org.closureextensions.common.util.AntUtil;
+import org.closureextensions.ant.AntUtil;
 
 /**
  * Data type for {@literal <module>} nested element of the

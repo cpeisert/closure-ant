@@ -43,7 +43,6 @@ import org.closureextensions.ant.types.ExperimentalCompilerOptions;
 import org.closureextensions.ant.types.PlovrOutputModule;
 import org.closureextensions.ant.types.PlovrOutputModuleCollection;
 import org.closureextensions.ant.types.StringNestedElement;
-import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.ClosureBuildUtil;
 import org.closureextensions.common.util.FileUtil;
 

@@ -46,7 +46,6 @@ import org.apache.tools.ant.types.Reference;
 import org.closureextensions.ant.types.AllowedNonStandardFunctionsList;
 import org.closureextensions.ant.types.ClassNameList;
 import org.closureextensions.ant.types.DefinedTrueConditionalsList;
-import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.ClosureBuildUtil;
 import org.closureextensions.css.ClosureStylesheetsCompiler;
 import org.closureextensions.css.OutputRenamingMapFormat;

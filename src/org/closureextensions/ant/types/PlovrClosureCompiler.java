@@ -28,8 +28,8 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Parameter;
 
+import org.closureextensions.ant.AntUtil;
 import org.closureextensions.ant.PlovrConfig;
-import org.closureextensions.common.util.AntUtil;
 
 /**
  * // TODO(cpeisert): Delete this file once documentation has been migrated.

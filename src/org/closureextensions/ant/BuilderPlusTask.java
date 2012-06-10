@@ -29,21 +29,19 @@ import java.util.Properties;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.DirSet;
 import org.apache.tools.ant.types.FileSet;
 
 import org.closureextensions.ant.types.CompilationLevel;
 import org.closureextensions.ant.types.CompilerOptionsComplete;
 import org.closureextensions.ant.types.CompilerOptionsFactory;
-import org.closureextensions.ant.types.Directory;
 import org.closureextensions.ant.types.NamespaceList;
-import org.closureextensions.ant.types.StringNestedElement;
 import org.closureextensions.builderplus.BuilderPlusUtil;
 import org.closureextensions.builderplus.OutputMode;
 import org.closureextensions.common.CssRenamingMap;
 import org.closureextensions.common.deps.ManifestBuilder;
 import org.closureextensions.common.JsClosureSourceFile;
 import org.closureextensions.common.SourceFileFactory;
-import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.FileUtil;
 
 /**
@@ -192,7 +190,7 @@ public final class BuilderPlusTask extends Task {
   private CompilerOptionsComplete compilerOptions;
   private final List<FileSet> mainSources; // Program entry points
   private final List<String> namespaces;
-  private final List<Directory> roots;
+  private final List<DirSet> roots;
   private final List<FileSet> sources;
 
 
@@ -452,9 +450,14 @@ public final class BuilderPlusTask extends Task {
     this.namespaces.addAll(namespaces.getNamespaces());
   }
 
-  /** @param root path to be traversed to build the dependencies */
-  public void addRoot(Directory root) {
-    this.roots.add(root);
+  /**
+   * Adds an Ant {@link DirSet} of directory paths to be traversed to build the
+   * dependencies.
+   *
+   * @param roots an Ant {@link DirSet} of directory paths
+   */
+  public void addRoots(DirSet roots) {
+    this.roots.add(roots);
   }
 
   /**
@@ -628,9 +631,12 @@ public final class BuilderPlusTask extends Task {
       sources.add(sourceFile);
     }
 
-    // Process <root> nested elements.
-    for (Directory dir : this.roots) {
-      paths = FileUtil.scanDirectory(dir.getDirectory(),
+    // Process <roots> nested elements.
+    List<String> rootDirectoryPaths =
+        AntUtil.getFilePathsFromCollectionOfFileSet(getProject(), this.roots);
+
+    for (String dirPath : rootDirectoryPaths) {
+      paths = FileUtil.scanDirectory(new File(dirPath),
           /* includes */ ImmutableList.of("**/*.js"),
           /* excludes */ ImmutableList.of(".*"));
       for (String path : paths) {

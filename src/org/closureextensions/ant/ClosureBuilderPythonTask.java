@@ -36,7 +36,6 @@ import org.closureextensions.ant.types.CompilerOptionsComplete;
 import org.closureextensions.ant.types.CompilerOptionsFactory;
 import org.closureextensions.ant.types.Directory;
 import org.closureextensions.ant.types.StringNestedElement;
-import org.closureextensions.common.util.AntUtil;
 
 /**
  * Ant task wrapping the Python script closurebuilder.py. The default task

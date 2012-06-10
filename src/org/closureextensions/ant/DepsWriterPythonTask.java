@@ -31,7 +31,6 @@ import org.apache.tools.ant.types.FileSet;
 
 import org.closureextensions.common.deps.DirectoryPathPrefixPair;
 import org.closureextensions.common.deps.FilePathDepsPathPair;
-import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.StringUtil;
 
 /**

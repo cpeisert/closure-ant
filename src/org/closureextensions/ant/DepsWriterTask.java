@@ -36,7 +36,6 @@ import org.closureextensions.common.deps.DirectoryPathPrefixPair;
 import org.closureextensions.common.deps.FilePathDepsPathPair;
 import org.closureextensions.common.JsClosureSourceFile;
 import org.closureextensions.common.SourceFileFactory;
-import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.FileUtil;
 
 /**

@@ -39,7 +39,6 @@ import org.closureextensions.ant.types.CompilerOptionsFactory;
 import org.closureextensions.ant.types.NameValuePair;
 import org.closureextensions.ant.types.NamespaceList;
 import org.closureextensions.ant.types.StringNestedElement;
-import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.ClosureBuildUtil;
 import org.closureextensions.common.util.StringUtil;
 
