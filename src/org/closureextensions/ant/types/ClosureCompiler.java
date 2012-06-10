@@ -368,10 +368,10 @@ public class ClosureCompiler extends AbstractClosureCompiler {
     if (!outputWrapper.isEmpty()) {
       cmdline.flagAndArgument("--output_wrapper", outputWrapper);
     }
-    if (prettyPrint != null && prettyPrint) {
+    if (Boolean.TRUE.equals(prettyPrint)) {
       cmdline.flagAndArgument("--formatting", "PRETTY_PRINT");
     }
-    if (printInputDelimiter != null && printInputDelimiter) {
+    if (Boolean.TRUE.equals(printInputDelimiter)) {
       cmdline.flagAndArgument("--formatting", "PRINT_INPUT_DELIMITER");
     }
     if (!propertyMapInputFile.isEmpty()) {
