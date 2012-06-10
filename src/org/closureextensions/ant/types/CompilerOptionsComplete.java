@@ -19,6 +19,8 @@ package org.closureextensions.ant.types;
 import java.io.File;
 
 /**
+ * // TODO(cpeisert): rewrite docs to better explain why some of the compiler
+ * // TODO            flags are intentionally excluded from this interface
  * Object providing the Closure Compiler options in a format adhering to the
  * Apache Ant design pattern for XML attributes and nested elements. With the
  * exception of the flags listed below, all Compiler options are supported as
@@ -57,18 +59,18 @@ import java.io.File;
  * CommandLineRunner.java</a> (see example below)</li>
  * </ul></p>
  *
- * <p><b>Flag Example for {@code --jscomp_dev_mode}</b></p>
+ * <p><b>{@literal <flag>} example</b></p>
  *
-<p><pre>{@literal
+<pre>{@literal
 <closure-compiler
     compilationLevel="SIMPLE_OPTIMIZATIONS"
     outputFile="app.js"
     onlyClosureDependencies="true">
   <flag name="--jscomp_dev_mode" value="START" />
-  <namespaceentrypoint value="my.namespace" />
+  <namespacelist value="my.namespace" />
   <sources dir="${myapp.dir}" includes="*.js" />
 </closure-compiler>
-}</pre></p>
+}</pre>
  *
  *
  * <p>The additional compiler options relative to {@link CompilerOptionsBasic}
