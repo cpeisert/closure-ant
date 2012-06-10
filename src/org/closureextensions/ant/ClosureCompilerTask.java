@@ -37,6 +37,7 @@ import org.closureextensions.ant.types.CompilationLevel;
 import org.closureextensions.ant.types.CompilerOptionsComplete;
 import org.closureextensions.ant.types.CompilerOptionsFactory;
 import org.closureextensions.ant.types.NameValuePair;
+import org.closureextensions.ant.types.NamespaceList;
 import org.closureextensions.ant.types.StringNestedElement;
 import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.ClosureBuildUtil;
@@ -60,7 +61,7 @@ import org.closureextensions.common.util.StringUtil;
  * "Inputs" additionally provides the convenience of automatically extracting
  * the {@code goog.provided} namespaces and passing them to the compiler using
  * {@code --closure_entry_point}. See {@link #addInputs(FileSet)} and
- * {@link #addNamespaceEntryPoint(StringNestedElement)}.</p>
+ * {@link #addConfiguredNamespaceList(NamespaceList)}.</p>
  *
  *
  * TODO(cpeisert): Move the Ant-style documentation below into separate doc
@@ -244,7 +245,7 @@ public final class ClosureCompilerTask extends Task
 
   // Nested elements
   private final List<FileSet> mainSources;
-  private final List<StringNestedElement> namespaceEntryPoints;
+  private final List<String> namespaces;
   private final List<FileList> sourceLists;
   private final List<FileSet> sources;
 
@@ -282,7 +283,7 @@ public final class ClosureCompilerTask extends Task
 
     // Nested elements
     this.mainSources = Lists.newArrayList();
-    this.namespaceEntryPoints = Lists.newArrayList();
+    this.namespaces = Lists.newArrayList();
     this.sourceLists = Lists.newArrayList();
     this.sources = Lists.newArrayList();
   }
@@ -391,7 +392,7 @@ public final class ClosureCompilerTask extends Task
    * Source files for which transitive dependencies will be calculated. Inputs
    * are similar to {@literal <sources>}, except that {@code goog.provided}
    * namespaces are passed to the Compiler as namespace entry points. See
-   * {@link #addNamespaceEntryPoint(StringNestedElement)}.
+   * {@link #addConfiguredNamespaceList(NamespaceList)}.
    *
    * <p><b>Note: </b>The {@literal <mainsources>} element is an Ant
    * <a href="http://ant.apache.org/manual/Types/fileset.html">FileSet</a>
@@ -405,18 +406,19 @@ public final class ClosureCompilerTask extends Task
   }
 
   /**
-   * Entry point to the program that must be a Closure namespace. A Closure
+   * A list of namespaces separated by whitespace and/or commas that represent
+   * program entry points for which dependencies will be calculated. A Closure
    * namespace is a dot-delimited path expression declared with a call to
    * {@code goog.provide()} (for example, "goog.array" or "foo.bar"). Any
    * namespace symbols that are not transitive dependencies of the entry points
    * will be removed. Files without {@code goog.provide()}, and their
-   * dependencies, will always be left in.
+   * dependencies, will always be left in unless using {@code
+   * onlyClosureDependencies} is {@code true}.
    *
-   * @param namespaceEntryPoint a program entry point; must be a Closure
-   *     namespace
+   * @param namespaceList a list of Closure namespaces
    */
-  public void addNamespaceEntryPoint(StringNestedElement namespaceEntryPoint) {
-    this.namespaceEntryPoints.add(namespaceEntryPoint);
+  public void addConfiguredNamespaceList(NamespaceList namespaceList) {
+    this.namespaces.addAll(namespaceList.getNamespaces());
   }
 
   /**
@@ -731,8 +733,8 @@ public final class ClosureCompilerTask extends Task
       cmdline.flagAndArgument("--output_manifest",
           new File(this.outputManifest).getAbsolutePath());
     }
-    for (StringNestedElement namespace : this.namespaceEntryPoints) {
-      cmdline.flagAndArgument("--closure_entry_point", namespace.getValue());
+    for (String namespace : this.namespaces) {
+      cmdline.flagAndArgument("--closure_entry_point", namespace);
     }
 
     // Add namespaces that are goog.provided in the main sources.

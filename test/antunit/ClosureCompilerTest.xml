@@ -97,7 +97,7 @@ limitations under the License.
       * manageClosureDependencies
       * outputFile
       * prettyPrint
-      * <namespaceEntryPoint>
+      * <namespacelist>
       * <sources>
       * <define>
       * <compilerCheck>
@@ -108,7 +108,7 @@ limitations under the License.
         manageClosureDependencies="true"
         outputFile="${project101.simple-compiled.output.js}"
         prettyPrint="true">
-      <namespaceentrypoint value="${project101.namespace}" />
+      <namespacelist namespaces="${project101.namespace}" />
       <sources dir="${project101.js.dir}" includes="**/*.js" />
       <sources dir="${closure-library.dir}" includes="**/*.js" />
       <define name="goog.DEBUG" value="false" type="boolean" />
@@ -136,14 +136,14 @@ limitations under the License.
       Also test the following:
       * onlyClosureDependencies
       * outputFile
-      * <namespaceEntryPoint>
+      * <namespacelist>
       * <sources>
     -->
     <closure-compiler forceRecompile="true"
         compilationLevel="ADVANCED_OPTIMIZATIONS"
         outputFile="${project101.advanced-compiled.output.js}"
         onlyClosureDependencies="true">
-      <namespaceentrypoint value="${project101.namespace}" />
+      <namespacelist namespaces="${project101.namespace}" />
       <sources dir="${project101.js.dir}" includes="**/*.js" />
       <sources dir="${closure-library.dir}" includes="**/*.js" />
     </closure-compiler>
@@ -235,7 +235,7 @@ limitations under the License.
         compilationLevel="simple"
         outputfile="${exclude-closure-library.simple-compiled.js}"
         prettyPrint="true">
-      <namespaceentrypoint value="test" />
+      <namespacelist namespaces="test" />
       <sourcelist dir="${exclude-closure-library.input.dir}"
         files="mylib.js, test.js" />
     </closure-compiler>
