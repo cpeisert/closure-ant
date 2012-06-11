@@ -29,10 +29,10 @@ import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.FileSet;
 
+import org.closureextensions.ant.types.ClosureLinterErrors;
 import org.closureextensions.ant.types.Directory;
 import org.closureextensions.common.deps.DirectoryPathPrefixPair;
 import org.closureextensions.common.deps.FilePathDepsPathPair;
-import org.closureextensions.common.util.AntUtil;
 import org.closureextensions.common.util.StringUtil;
 
 /**
@@ -51,20 +51,91 @@ import org.closureextensions.common.util.StringUtil;
  */
 public final class ClosureLinterTask extends Task {
 
+  /** Execution modes supported by the Closure Linter task. Defaults to LINT. */
+  public static enum ClosureLinterMode {
+    /** Automatically fix simple style guide violations. */
+    FIX,
+
+    /** Checks JavaScript files for common style guide violations. */
+    LINT,
+    ;
+  }
+
   // Note: the Closure Linter command line flags are defined in the following
   // source files: checker.py, checkerbase.py, ecmalintrules.py,
   // error_fixer.py, error_check.py, errorrules.py, fixjsstyle.py, gjslint.py,
   // indentation.py, common/simplefileflags.py.
 
   // Attributes
+
+  // Corresponds to flag --beep defined in gjslint.py.
+  private Boolean beep;
+
+  // Corresponds to flag --check_html defined in gjslint.py.
+  private Boolean checkJavaScriptInHtmlFiles;
+
+  // Corresponds to flag --debug_indentation defined in indentation.py.
+  private Boolean debugIndentation;
+
+  // Corresponds to flag --debug_tokens defined in checkerbase.py.
+  private Boolean debugTokens;
+
+  // Corresponds to flag --disable_indentation_fixing defined in error_fixer.py.
+  private Boolean disableIndentationFixing;
+
+  // Corresponds to flag --error_trace defined in checkerbase.py.
+  private Boolean errorTrace;
+
   private File fixjsstylePythonScript;
   private File gjslintPythonScript;
+  private ClosureLinterMode linterMode;
   private File logFile;
+
+  // Corresponds to flag --multiprocess defined in gjslint.py.
+  private Boolean multiProcess;
+
   private String pythonExecutable;
 
+  // Corresponds to flag --summary defined in gjslint.py.
+  private Boolean showSummary;
+
+  // Corresponds to flag --time defined in gjslint.py.
+  private Boolean timingStats;
+
+  // Corresponds to flag --unix_mode defined in gjslint.py.
+  private Boolean unixMode;
+
+
   // Nested elements
+
+  // Corresponds to flag --additional_extensions defined in gjslint.py.
+  private final List<String> additionalJavaScriptExtensions;
+
+  private ClosureLinterErrors closureLinterErrors;
+
+  // Corresponds to flag --custom_jsdoc_tags defined in ecmalintrules.py.
+  private final List<String> customJsDocTags;
+
+  //
+
+  // Corresponds to flag --ignored_extra_namespaces defined in checker.py.
+  private final List<String> extraNamespacesToIgnore;
+
+  // Serves same purpose as flag --closurized_namespaces defined in checker.py.
+  private final List<FileSet> mainSources; // Program entry points
+
+  // Corresponds to flag --closurized_namespaces defined in checker.py.
+  private final List<String> namespaces;
+
+  // Serves sames purpose as flag --recurse defined in simplefileflags.py.
   private final List<Directory> roots;
+
+  // Serves same purpose as passing JavaScript source files as extra arguments
+  // to gjslint or fixjsstyle
   private final List<FileSet> sources;
+
+  // Corresponds to flag --limited_doc_files defined in checker.py.
+  private final List<FileSet> sourcesWithRelaxedDocumentationChecks;
 
 
   /**
@@ -72,14 +143,32 @@ public final class ClosureLinterTask extends Task {
    */
   public ClosureLinterTask() {
     // Attributes
+    this.beep = null;
+    this.checkJavaScriptInHtmlFiles = null;
+    this.debugIndentation = null;
+    this.debugTokens = null;
+    this.disableIndentationFixing = null;
+    this.errorTrace = null;
     this.fixjsstylePythonScript = null;
     this.gjslintPythonScript = null;
+    this.linterMode = ClosureLinterMode.LINT;
     this.logFile = null;
+    this.multiProcess = null;
     this.pythonExecutable = "python";
+    this.showSummary = null;
+    this.timingStats = null;
+    this.unixMode = null;
 
     // Nested elements
+    this.additionalJavaScriptExtensions = Lists.newArrayList();
+    this.closureLinterErrors = null;
+    this.customJsDocTags = Lists.newArrayList();
+    this.extraNamespacesToIgnore = Lists.newArrayList();
+    this.mainSources = Lists.newArrayList();
+    this.namespaces = Lists.newArrayList();
     this.roots = Lists.newArrayList();
     this.sources = Lists.newArrayList();
+    this.sourcesWithRelaxedDocumentationChecks = Lists.newArrayList();
   }
 
 
@@ -103,6 +192,25 @@ public final class ClosureLinterTask extends Task {
    */
   public void setGjslintPythonScript(File file) {
     this.gjslintPythonScript = file;
+  }
+
+  /**
+   * Sets a log file to store output from {@code gjslint} and {@code
+   * fixjsstyle}.
+   *
+   * @param logFile the log file
+   */
+  public void setLogFile(File logFile) {
+    this.logFile = logFile;
+  }
+
+  /**
+   * Sets the Python interpreter executable.
+   *
+   * @param python the Python executable. Defaults to "python".
+   */
+  public void setPythonExecutable(String python) {
+    this.pythonExecutable = python;
   }
 
 
@@ -136,7 +244,7 @@ public final class ClosureLinterTask extends Task {
     cmdline.argument(this.pythonExecutable);
     cmdline.argument(this.gjslintPythonScript);
 
-    for (FilePathDepsPathPair pair : this.paths) {
+    /*for (FilePathDepsPathPair pair : this.paths) {
       if (pair.getFilePath() == null) {
         throw new BuildException("null file path");
       }
@@ -172,7 +280,7 @@ public final class ClosureLinterTask extends Task {
     runner.setVMLauncher(false);
     runner.setAntRun(getProject());
     runner.setCommandline(cmdline.toStringArray());
-    executeDepsWriter(runner);
+    executeDepsWriter(runner);*/
   }
 
   /**
@@ -183,8 +291,8 @@ public final class ClosureLinterTask extends Task {
    * @throws org.apache.tools.ant.BuildException if there is an {@link java.io.IOException}
    */
   private int executeDepsWriter(Execute runner) {
-    int exitCode;
-    try {
+    int exitCode = 0;
+    /*try {
       exitCode = runner.execute();
       if (exitCode != 0) {
         log("Error: " + this.pythonExecutable + " "
@@ -193,7 +301,7 @@ public final class ClosureLinterTask extends Task {
       }
     } catch (IOException e) {
       throw new BuildException(e);
-    }
+    }*/
     return exitCode;
   }
 }
