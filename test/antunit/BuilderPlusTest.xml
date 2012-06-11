@@ -105,8 +105,8 @@ limitations under the License.
     <builder-plus outputMode="compiled" forceRecompile="true"
         outputFile="${project101.whitespace-compiled.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true">
       </compiler>
     </builder-plus>
@@ -122,8 +122,8 @@ limitations under the License.
     <builder-plus outputMode="compiled" forceRecompile="true"
         outputFile="${project101.simple-compiled.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="SIMPLE" prettyPrint="true">
         <define name="goog.DEBUG" value="false" type="boolean" />
         <define name="goog.LOCALE" value="de" type="string" />
@@ -150,8 +150,8 @@ limitations under the License.
     <builder-plus outputMode="compiled" forceRecompile="true"
         outputFile="${project101.advanced-compiled.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="advanced" />
     </builder-plus>
 
@@ -163,8 +163,8 @@ limitations under the License.
     <builder-plus outputMode="MANIFEST"
         outputManifest="${project101.outputManifest}">
       <namespacelist namespaces="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
 
     <assertFileExists file="${project101.outputManifest}" />
@@ -183,7 +183,7 @@ limitations under the License.
         outputManifest="${project101.outputManifest}"
         outputFile="${project101.raw.output.js}">
       <mainsources dir="${project101.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
 
     <assertFileExists file="${project101.outputManifest}" />
@@ -203,8 +203,8 @@ limitations under the License.
     <builder-plus outputMode="compiled"
         outputFile="${project101.whitespace-compiled.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
     </builder-plus>
 
@@ -212,8 +212,8 @@ limitations under the License.
     <builder-plus outputMode="compiled"
         outputFile="${project101.whitespace-compiled.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
     </builder-plus>
 
@@ -250,7 +250,7 @@ limitations under the License.
         outputFile="${json-in-style.soy.compiled.js}">
       <compiler compilationLevel="advanced" warningLevel="verbose" />
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
 
     <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
@@ -273,7 +273,7 @@ limitations under the License.
         outputManifest="${manifest.CLOSURE_COMPILED.txt}"
         outputMode="MANIFEST">
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
 
     <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
@@ -298,7 +298,7 @@ limitations under the License.
         outputFile="${json-in-style.soy.compiled.js}">
       <compiler compilationLevel="advanced" warningLevel="verbose" />
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
 
     <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
@@ -322,7 +322,7 @@ limitations under the License.
         outputManifest="${manifest.CLOSURE_COMPILED.txt}"
         outputMode="MANIFEST">
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
 
     <assertFileExists file="${manifest.CLOSURE_COMPILED.txt}" />
@@ -351,7 +351,7 @@ limitations under the License.
         outputFile="${json-in-style.soy.raw.js}">
       <compiler compilationLevel="WHITESPACE" warningLevel="verbose" />
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
 
     <assertFileExists file="${manifest.CLOSURE_UNCOMPILED.txt}" />
