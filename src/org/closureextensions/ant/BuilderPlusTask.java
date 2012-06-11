@@ -29,13 +29,13 @@ import java.util.Properties;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.types.DirSet;
 import org.apache.tools.ant.types.FileSet;
 
 import org.closureextensions.ant.types.CompilationLevel;
 import org.closureextensions.ant.types.CompilerOptionsComplete;
 import org.closureextensions.ant.types.CompilerOptionsFactory;
 import org.closureextensions.ant.types.NamespaceList;
+import org.closureextensions.ant.types.RootDirSet;
 import org.closureextensions.builderplus.BuilderPlusUtil;
 import org.closureextensions.builderplus.OutputMode;
 import org.closureextensions.common.CssRenamingMap;
@@ -190,7 +190,7 @@ public final class BuilderPlusTask extends Task {
   private CompilerOptionsComplete compilerOptions;
   private final List<FileSet> mainSources; // Program entry points
   private final List<String> namespaces;
-  private final List<DirSet> roots;
+  private final List<RootDirSet> roots;
   private final List<FileSet> sources;
 
 
@@ -451,12 +451,17 @@ public final class BuilderPlusTask extends Task {
   }
 
   /**
-   * Adds an Ant {@link DirSet} of directory paths to be traversed to build the
-   * dependencies.
+   * Adds a {@link RootDirSet} containing one or more directory paths to be
+   * traversed to build the dependencies. A {@link RootDirSet} is an Ant
+   * {@link org.apache.tools.ant.types.DirSet}, except that by default it only
+   * matches the specified root directory (set using the {@code dir}
+   * attribute). To make a {@link RootDirSet} behave like identically to a
+   * {@link org.apache.tools.ant.types.DirSet}, set the attribute {@code
+   * enableDirSet} to {@code true}.
    *
-   * @param roots an Ant {@link DirSet} of directory paths
+   * @param roots an Ant {@link RootDirSet} of directory paths
    */
-  public void addRoots(DirSet roots) {
+  public void addRoots(RootDirSet roots) {
     this.roots.add(roots);
   }
 

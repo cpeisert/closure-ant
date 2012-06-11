@@ -76,8 +76,8 @@ limitations under the License.
     <builder-plus outputMode="raw"
         outputfile="${project101.raw.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" enableDirSet="true" />
+      <roots dir="${closure-library.dir}" enableDirSet="true" />
     </builder-plus>
 
     <assertFileExists file="${project101.raw.output.js}" />
@@ -91,8 +91,8 @@ limitations under the License.
         keepMoochers="true"
         outputfile="${project101.raw.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
 
     <assertFileExists file="${project101.raw.output.js}" />
