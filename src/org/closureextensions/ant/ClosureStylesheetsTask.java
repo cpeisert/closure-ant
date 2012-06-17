@@ -19,11 +19,6 @@ package org.closureextensions.ant;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import com.google.common.css.ExitCodeHandler;
 import com.google.common.css.GssFunctionMapProvider;
 import com.google.common.css.JobDescription;
@@ -34,6 +29,10 @@ import com.google.common.css.SourceCode;
 import com.google.common.css.compiler.ast.BasicErrorManager;
 import com.google.common.css.compiler.gssfunctions.DefaultGssFunctionMapProvider;
 import com.google.common.io.Files;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
@@ -499,7 +498,7 @@ bar=b
     boolean skipCompilation = false;
 
     if (!this.forceRecompile && cssOutputFile != null) {
-      // Check if the output file is up-to-date.
+      // Check if the output file and output renaming map are up-to-date.
 
       BuildCache cache = new BuildCache(this);
       BuildSettings previousBuildSettings = cache.get();
@@ -508,13 +507,11 @@ bar=b
       // Save current build settings for comparison with the next build.
       cache.put(currentBuildSettings);
 
-      if (previousBuildSettings != null) {
-        if (ClosureBuildUtil.outputFileUpToDate(cssOutputFile,
-            previousBuildSettings, currentBuildSettings)) {
-          skipCompilation = true;
-          log("Output file \"" + cssOutputFile.getName() + "\" up-to-date. "
-              + "Stylesheet compilation skipped.");
-        }
+      if (outputFileAndOutputRenamingMapUpToDate(previousBuildSettings,
+          currentBuildSettings)) {
+        skipCompilation = true;
+        log("Output file \"" + cssOutputFile.getName() + "\" up-to-date. "
+            + "Stylesheet compilation skipped.");
       }
     }
 
@@ -539,6 +536,34 @@ bar=b
         }
       }
     }
+  }
+
+  /**
+   * Determine if the CSS output file and renaming map are up to date. See
+   * {@link ClosureBuildUtil#outputFileUpToDate(java.io.File, BuildSettings, BuildSettings)}
+   *
+   * @param previousSettings the settings from the previous build
+   * @param currentSettings the settings for the current build
+   * @return {@code true} if the CSS output file and renaming map are up-to-date
+   */
+  private boolean outputFileAndOutputRenamingMapUpToDate(
+      @Nullable BuildSettings previousSettings, BuildSettings currentSettings) {
+
+    if (this.outputFile != null && previousSettings != null) {
+      if (ClosureBuildUtil.outputFileUpToDate(new File(this.outputFile),
+          previousSettings, currentSettings)) {
+        if (this.outputRenamingMap != null) {
+          if (ClosureBuildUtil.outputFileUpToDate(
+              new File(this.outputRenamingMap), previousSettings,
+              currentSettings)) {
+            return true;
+          }
+        } else {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
