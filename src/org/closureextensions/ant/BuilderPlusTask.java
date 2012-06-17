@@ -35,7 +35,7 @@ import org.closureextensions.ant.types.CompilationLevel;
 import org.closureextensions.ant.types.CompilerOptionsComplete;
 import org.closureextensions.ant.types.CompilerOptionsFactory;
 import org.closureextensions.ant.types.NamespaceList;
-import org.closureextensions.ant.types.RootDirSet;
+import org.closureextensions.ant.types.RestrictedDirSet;
 import org.closureextensions.builderplus.BuilderPlusUtil;
 import org.closureextensions.builderplus.OutputMode;
 import org.closureextensions.common.CssRenamingMap;
@@ -190,7 +190,7 @@ public final class BuilderPlusTask extends Task {
   private CompilerOptionsComplete compilerOptions;
   private final List<FileSet> mainSources; // Program entry points
   private final List<String> namespaces;
-  private final List<RootDirSet> roots;
+  private final List<RestrictedDirSet> roots;
   private final List<FileSet> sources;
 
 
@@ -451,17 +451,15 @@ public final class BuilderPlusTask extends Task {
   }
 
   /**
-   * Adds a {@link RootDirSet} containing one or more directory paths to be
-   * traversed to build the dependencies. A {@link RootDirSet} is an Ant
-   * {@link org.apache.tools.ant.types.DirSet}, except that by default it only
-   * matches the specified root directory (set using the {@code dir}
-   * attribute). To make a {@link RootDirSet} behave like identically to a
-   * {@link org.apache.tools.ant.types.DirSet}, set the attribute {@code
-   * enableDirSet} to {@code true}.
+   * Adds root directories to be recursively scanned for JavaScript source
+   * files. By default, only the directory specified with the {@code dir}
+   * attribute is scanned. If includes and/or excludes patterns are specified,
+   * directories are recursively scanned for matching subdirectories. See
+   * {@link RestrictedDirSet}.
    *
-   * @param roots an Ant {@link RootDirSet} of directory paths
+   * @param roots directories to be recursively scanned for JavaScript sources
    */
-  public void addRoots(RootDirSet roots) {
+  public void addRoots(RestrictedDirSet roots) {
     this.roots.add(roots);
   }
 
@@ -637,11 +635,13 @@ public final class BuilderPlusTask extends Task {
     }
 
     // Process <roots> nested elements.
-    List<String> rootDirectoryPaths =
-        AntUtil.getFilePathsFromCollectionOfFileSet(getProject(), this.roots);
+    List<File> rootDirectories = Lists.newArrayList();
+    for (RestrictedDirSet dirSet : this.roots) {
+      rootDirectories.addAll(dirSet.getMatchedDirectories());
+    }
 
-    for (String dirPath : rootDirectoryPaths) {
-      paths = FileUtil.scanDirectory(new File(dirPath),
+    for (File dir : rootDirectories) {
+      paths = FileUtil.scanDirectory(dir,
           /* includes */ ImmutableList.of("**/*.js"),
           /* excludes */ ImmutableList.of(".*"));
       for (String path : paths) {
