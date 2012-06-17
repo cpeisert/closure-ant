@@ -16,41 +16,38 @@
 
 package org.closureextensions.ant.types;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-
 import java.util.List;
 
 /**
  * Ant data type for a list of allowed, non-standard CSS functions to pass to
- * the Closure Stylesheets compiler.
+ * the Closure Stylesheets compiler, where each CSS function name may be
+ * separated by whitespace and/or commas.
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class AllowedNonStandardFunctionsList {
-
-  private List<String> allowedNonStandardFunctions;
+public final class AllowedNonStandardFunctionsList extends StringList {
 
   public AllowedNonStandardFunctionsList() {
-    this.allowedNonStandardFunctions = Lists.newArrayList();
+    super();
   }
 
   /**
-   * @param functionList list of allowed, non-standard CSS functions to pass
-   *     to the Closue Stylesheets compiler
+   * Sets the list of allowed non-standard CSS functions.
+   *
+   * @param functionList list of allowed non-standard CSS functions to pass
+   *     to the Closure Stylesheets compiler separated by whitespace and/or
+   *     commas
    */
   public void setFunctionList(String functionList) {
-    CharMatcher matcher = CharMatcher.WHITESPACE.or(CharMatcher.anyOf(","));
-    Iterable<String> splitFunctions = Splitter.on(matcher).omitEmptyStrings()
-        .trimResults().split(functionList);
-
-    for (String allowedFunction : splitFunctions) {
-      this.allowedNonStandardFunctions.add(allowedFunction);
-    }
+    setListOfStrings(functionList);
   }
 
+  /**
+   * Gets the list of allowed non-standard CSS functions.
+   *
+   * @return a {@link List} of allowed non-standard CSS functions
+   */
   public List<String> getAllowedNonStandardFunctions() {
-    return this.allowedNonStandardFunctions;
+    return getListOfStrings();
   }
 }
