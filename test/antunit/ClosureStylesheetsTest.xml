@@ -72,7 +72,7 @@ limitations under the License.
         outputFile="${json-in-style.output.js}">
       <compiler compilationLevel="advanced" warninglevel="verbose" />
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
   </target>
 
@@ -150,16 +150,16 @@ limitations under the License.
 
   <target name="testCssRenamingMap_PROPERTIES_FILE">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_PROPERTIES}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_PROPERTIES}"
         outputRenamingMapFormat="PROPERTIES"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
     </stylesheets>
 
-    <assertFileExists file="${json-in-style.outputRenamingMap_PROPERTIES}" />
+    <assertFileExists file="${json-in-style.soy.outputRenamingMap_PROPERTIES}" />
     <assertResourceContains
-        resource="${json-in-style.outputRenamingMap_PROPERTIES}"
+        resource="${json-in-style.soy.outputRenamingMap_PROPERTIES}"
         value="goog=a" />
   </target>
 
@@ -176,7 +176,7 @@ limitations under the License.
 
   <target name="createCssRenamingMap_CLOSURE_COMPILED">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}"
         outputRenamingMapFormat="CLOSURE_COMPILED"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -186,7 +186,7 @@ limitations under the License.
 
   <target name="createCssRenamingMap_CLOSURE_UNCOMPILED">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}"
         outputRenamingMapFormat="CLOSURE_UNCOMPILED"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -196,7 +196,7 @@ limitations under the License.
 
   <target name="createCssRenamingMap_JSON">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputRenamingMapFormat="JSON"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -209,9 +209,9 @@ limitations under the License.
     <builder-plus outputMode="COMPILED"
         outputFile="${json-in-style.soy.compiled.js}">
       <compiler compilationLevel="advanced" warninglevel="verbose" />
-      <mainsources file="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}" />
+      <mainsources file="${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}" />
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
   </target>
 
@@ -219,7 +219,7 @@ limitations under the License.
     <builder-plus outputMode="RAW"
         outputFile="${json-in-style.soy.raw.js}">
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${closure-library.dir}" />
     </builder-plus>
   </target>
 
@@ -229,11 +229,11 @@ limitations under the License.
   -->
 
   <target name="testClassRenaming_CLOSURE_COMPILED"
-      depends="createCssRenamingMap_JSON, json-in-style.jscomp_ADVANCED">
+      depends="json-in-style.jscomp_ADVANCED">
 
     <soy
         cssHandlingScheme="goog"
-        cssRenamingMap="${json-in-style.outputRenamingMap_JSON}">
+        cssRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}">
       <soyfileset dir="${json-in-style.soy.dir}" includes="**/*.soy" />
       <rendertemplate
           outputPathFormat="${json-in-style.soy-output.html}"
@@ -242,7 +242,7 @@ limitations under the License.
       </rendertemplate>
     </soy>
 
-    <assertFileExists file="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}" />
+    <assertFileExists file="${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}" />
     <assertFileExists file="${json-in-style.soy-output.html}" />
     <assertResourceDoesntContain resource="${json-in-style.soy-output.html}"
         value="renaming_CLOSURE_UNCOMPILED.js" />
@@ -255,7 +255,7 @@ limitations under the License.
 
     <soy
         cssHandlingScheme="goog"
-        cssRenamingMap="${json-in-style.outputRenamingMap_JSON}">
+        cssRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}">
       <soyfileset dir="${json-in-style.soy.dir}" includes="**/*.soy" />
       <rendertemplate
           outputPathFormat="${json-in-style.soy-output.html}"
@@ -271,7 +271,7 @@ limitations under the License.
       </rendertemplate>
     </soy>
 
-    <assertFileExists file="${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}" />
+    <assertFileExists file="${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}" />
     <assertFileExists file="${json-in-style.soy-output.html}" />
     <assertResourceContains resource="${json-in-style.soy-output.html}"
       value="renaming_CLOSURE_UNCOMPILED.js" />

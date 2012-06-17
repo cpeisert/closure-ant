@@ -71,8 +71,8 @@ limitations under the License.
         outputManifest="${project101.outputManifest}"
         outputFile="${project101.whitespace-compiled.output.js}">
       <namespace value="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
     </closure-builder-python>
 
@@ -159,8 +159,8 @@ limitations under the License.
         outputManifest="${project101.outputManifest}"
         outputFile="${project101.whitespace-compiled.output.js}">
       <namespace value="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
     </closure-builder-python>
 
@@ -195,8 +195,8 @@ limitations under the License.
         outputManifest="${closure-builder.manifest.txt}"
         outputFile="${project101.whitespace-compiled.output.js}">
       <namespace value="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
     </closure-builder-python>
 
