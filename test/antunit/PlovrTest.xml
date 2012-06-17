@@ -77,6 +77,17 @@ limitations under the License.
   </target>
 
 
+  <target name="test_plovrMode=config_autoGenerateTempConfig">
+    <logcapturer />
+
+    <plovr configID="project101" plovrMode="config">
+      <inputs dir="${project101.js.dir}" includes="**/*.js" />
+    </plovr>
+
+    <assertLogContains text="plovr_config_for_target" />
+  </target>
+
+
   <target name="test_plovrMode=build_simple">
 
     <plovr plovrMode="build" forceRecompile="true"

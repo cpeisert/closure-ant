@@ -38,10 +38,10 @@ import org.closureextensions.ant.types.ClassNameList;
 import org.closureextensions.ant.types.CompilerOptionsFactory;
 import org.closureextensions.ant.types.CompilerOptionsForPlovr;
 import org.closureextensions.ant.types.CompileTimeDefines;
-import org.closureextensions.ant.types.Directory;
 import org.closureextensions.ant.types.ExperimentalCompilerOptions;
 import org.closureextensions.ant.types.PlovrOutputModule;
 import org.closureextensions.ant.types.PlovrOutputModuleCollection;
+import org.closureextensions.ant.types.RestrictedDirSet;
 import org.closureextensions.ant.types.StringNestedElement;
 import org.closureextensions.common.util.ClosureBuildUtil;
 import org.closureextensions.common.util.FileUtil;
@@ -338,7 +338,7 @@ public final class PlovrTask extends Task {
   private CompilerOptionsForPlovr compilerOptions;
   private final List<FileSet> inputs;
   private final PlovrOutputModuleCollection modules;
-  private final List<Directory> paths;
+  private final List<RestrictedDirSet> paths;
   private final List<FileSet> sources;
   private final List<String> soyFunctionPlugins;
   private final List<StringNestedElement> testExcludes;
@@ -407,10 +407,10 @@ public final class PlovrTask extends Task {
 
   /**
    * The plovr config file. In plovr modes {@code BUILD} and {@code CONFIG}
-   * the config file is rewritten based on the task attributes and nested
-   * element settings.
+   * the config file is rewritten based on the plovr task settings (attributes
+   * and nested elements).
    *
-   * @param configFile
+   * @param configFile the plovr config file to write
    */
   public void setConfigFile(File configFile) {
     this.configFile = configFile;
@@ -685,9 +685,17 @@ public final class PlovrTask extends Task {
     this.modules.add(module);
   }
 
-  /** @param path a path to be traversed to build the dependencies */
-  public void addPath(Directory path) {
-    this.paths.add(path);
+  /**
+   * Adds paths to be recursively scanned for JavaScript source files. By
+   * default, only the directory specified with the {@code dir} attribute is
+   * scanned. If includes and/or excludes patterns are specified, directories
+   * are recursively scanned for matching subdirectories. See {@link
+   * RestrictedDirSet}.
+   *
+   * @param paths paths to be recursively scanned for JavaScript sources
+   */
+  public void addPaths(RestrictedDirSet paths) {
+    this.paths.add(paths);
   }
 
   /**
@@ -756,8 +764,8 @@ public final class PlovrTask extends Task {
           throw new BuildException("Required attribute \"plovrJar\" is not "
               + "set. The plovr jar file is required for plovr modes "
               + "\"build\", \"jsdoc\", and \"serve\". Verify that your build "
-              + "file imports \"closure-tools-config.xml\" and that the property "
-              + "locations are correct for your machine.");
+              + "file imports \"closure-tools-config.xml\" and that the "
+              + "property locations are correct for your machine.");
         }
       }
     }
@@ -765,16 +773,17 @@ public final class PlovrTask extends Task {
       throw new BuildException("required attribute \"configID\" is not set");
     }
 
-    // TODO(cpeisert): if configFile not set, create one automatically in the
-    // TODO            .closure-ant-tasks directory using BuildCache
+    BuildCache cache = new BuildCache(this);
     if (this.configFile == null) {
-      throw new BuildException("required attribute \"configFile\" is not set");
+      this.configFile = cache.createTempFile(String.format(
+          "plovr_config_for_target[%s].json",
+          this.getOwningTarget().getName()));
     }
 
     // Update plovr config file.
 
-    log("Creating plovr config file \"" + this.configFile.getAbsolutePath()
-        + "\"", Project.MSG_INFO);
+    log("Creating plovr config file: " + this.configFile.getAbsolutePath(),
+        Project.MSG_INFO);
     PlovrConfig plovrConfig = getPlovrConfigOptions();
 
     Gson gson = new GsonBuilder()
@@ -796,10 +805,6 @@ public final class PlovrTask extends Task {
     } catch (IOException e) {
       throw new BuildException(e);
     }
-    String confirmation = "plovr config file successfully created: "
-        + this.configFile.getAbsolutePath();
-    log(confirmation, (PlovrMode.CONFIG == this.plovrMode) ? Project.MSG_INFO
-        : Project.MSG_VERBOSE);
 
     // Run the plovr jar file.
 
@@ -822,7 +827,6 @@ public final class PlovrTask extends Task {
           throw new BuildException(e);
         }
 
-        BuildCache cache = new BuildCache(this);
         BuildSettings previousBuildSettings = cache.get();
         BuildSettings currentBuildSettings = new BuildSettings(
             currentPlovrConfig, currentSources);
@@ -1026,8 +1030,14 @@ public final class PlovrTask extends Task {
       plovrConfig.modules.add(module);
     }
 
-    for (Directory path : paths) {
-      plovrConfig.paths.add(path.getDirectory().getAbsolutePath());
+    // Process <paths> nested elements.
+    List<File> rootDirectories = Lists.newArrayList();
+    for (RestrictedDirSet dirSet : this.paths) {
+      rootDirectories.addAll(dirSet.getMatchedDirectories());
+    }
+
+    for (File dir : rootDirectories) {
+      plovrConfig.paths.add(dir.getAbsolutePath());
     }
 
     for (FileSet source : sources) {
