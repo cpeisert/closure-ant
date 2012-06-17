@@ -70,8 +70,8 @@ limitations under the License.
     <closure-builder-python outputMode="raw"
         outputfile="${project101.raw.output.js}">
       <namespace value="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
     </closure-builder-python>
 
     <assertFileExists file="${project101.raw.output.js}" />
@@ -84,8 +84,8 @@ limitations under the License.
     <closure-builder-python outputMode="compiled" forceRecompile="true"
         outputFile="${project101.whitespace-compiled.output.js}">
       <namespace value="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true">
       </compiler>
     </closure-builder-python>
@@ -101,8 +101,8 @@ limitations under the License.
     <closure-builder-python outputMode="compiled" forceRecompile="true"
         outputFile="${project101.simple-compiled.output.js}">
       <namespace value="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="SIMPLE" prettyPrint="true">
         <define name="goog.DEBUG" value="false" type="boolean" />
         <define name="goog.LOCALE" value="de" type="string" />
@@ -129,8 +129,8 @@ limitations under the License.
     <closure-builder-python outputMode="compiled" forceRecompile="true"
         outputFile="${project101.advanced-compiled.output.js}">
       <namespace value="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="advanced" />
     </closure-builder-python>
 
@@ -146,7 +146,7 @@ limitations under the License.
         outputManifest="${project101.outputManifest}"
         outputFile="${project101.raw.output.js}">
       <inputs dir="${project101.js.dir}" includes="**/*.js" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${closure-library.dir}" />
     </closure-builder-python>
 
     <assertFileExists file="${project101.outputManifest}" />
@@ -166,8 +166,8 @@ limitations under the License.
     <closure-builder-python outputMode="compiled"
         outputFile="${project101.whitespace-compiled.output.js}">
       <namespace value="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
     </closure-builder-python>
 
@@ -175,8 +175,8 @@ limitations under the License.
     <closure-builder-python outputMode="compiled"
         outputFile="${project101.whitespace-compiled.output.js}">
       <namespace value="${project101.namespace}" />
-      <root directory="${project101.js.dir}" />
-      <root directory="${closure-library.dir}" />
+      <roots dir="${project101.js.dir}" />
+      <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
     </closure-builder-python>
 

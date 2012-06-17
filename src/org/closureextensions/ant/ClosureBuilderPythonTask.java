@@ -34,7 +34,7 @@ import org.apache.tools.ant.types.FileSet;
 
 import org.closureextensions.ant.types.CompilerOptionsComplete;
 import org.closureextensions.ant.types.CompilerOptionsFactory;
-import org.closureextensions.ant.types.Directory;
+import org.closureextensions.ant.types.RestrictedDirSet;
 import org.closureextensions.ant.types.StringNestedElement;
 
 /**
@@ -195,7 +195,7 @@ public final class ClosureBuilderPythonTask extends Task {
   private CompilerOptionsComplete compilerOptions;
   private final List<FileSet> inputs;
   private final List<StringNestedElement> namespaces;
-  private final List<Directory> roots;
+  private final List<RestrictedDirSet> roots;
   private final List<FileSet> sources;
 
 
@@ -325,9 +325,17 @@ public final class ClosureBuilderPythonTask extends Task {
     this.namespaces.add(namespace);
   }
 
-  /** @param root path to be traversed to build the dependencies */
-  public void addRoot(Directory root) {
-    this.roots.add(root);
+  /**
+   * Adds root directories to be recursively scanned for JavaScript source
+   * files. By default, only the directory specified with the {@code dir}
+   * attribute is scanned. If includes and/or excludes patterns are specified,
+   * directories are recursively scanned for matching subdirectories. See
+   * {@link RestrictedDirSet}.
+   *
+   * @param roots directories to be recursively scanned for JavaScript sources
+   */
+  public void addRoots(RestrictedDirSet roots) {
+    this.roots.add(roots);
   }
 
   /**
@@ -476,8 +484,15 @@ public final class ClosureBuilderPythonTask extends Task {
     cmdline.arguments(
         AntUtil.getFilePathsFromCollectionOfFileSet(getProject(),
             this.sources));
-    for (Directory dir : this.roots) {
-      cmdline.flagAndArgument("--root", dir.getDirectory().getAbsolutePath());
+
+    // Process <roots> nested elements.
+    List<File> rootDirectories = Lists.newArrayList();
+    for (RestrictedDirSet dirSet : this.roots) {
+      rootDirectories.addAll(dirSet.getMatchedDirectories());
+    }
+
+    for (File dir : rootDirectories) {
+      cmdline.flagAndArgument("--root", dir.getAbsolutePath());
     }
 
     // Execute closurebuilder.py in "list" mode to generate the manifest.
