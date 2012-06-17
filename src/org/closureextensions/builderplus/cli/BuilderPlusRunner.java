@@ -152,7 +152,7 @@ public final class BuilderPlusRunner {
       manifestFile = this.outputManifest;
     } else {
       // Save a copy of the manifest in directory '.builder-plus'.
-      manifestFile = new File(builderPlusCache, "temp_manifest.txt");
+      manifestFile = new File(builderPlusCache, "manifest.txt");
       Files.write(manifestString, manifestFile, Charsets.UTF_8);
     }
 
