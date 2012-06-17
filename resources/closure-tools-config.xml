@@ -38,9 +38,6 @@
       location="${closure-compiler.dir}/build/compiler.jar" />
   <property name="outputwrapper" value="(function(){%output%})();" />
 
-  <property name="closure-linter.py" value="gjslint" />
-  <property name="fix-js-style.py" value="fixjsstyle" />
-
   <property name="plovr.dir" location="${closure-tools.dir}/plovr" />
   <property name="plovr.jar" location="${plovr.dir}/build/plovr.jar" />
 
