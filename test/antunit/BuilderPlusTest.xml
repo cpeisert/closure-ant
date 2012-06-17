@@ -236,7 +236,7 @@ limitations under the License.
 
   <target name="testInputCssRenamingMap_CLOSURE_COMPILED">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}"
         outputRenamingMapFormat="CLOSURE_COMPILED"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -244,7 +244,7 @@ limitations under the License.
     </stylesheets>
 
     <builder-plus
-        cssRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}"
+        cssRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}"
         outputManifest="${manifest.CLOSURE_COMPILED.txt}"
         outputMode="MANIFEST"
         outputFile="${json-in-style.soy.compiled.js}">
@@ -261,7 +261,7 @@ limitations under the License.
 
   <target name="testInputCssRenamingMap_CLOSURE_UNCOMPILED">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}"
         outputRenamingMapFormat="CLOSURE_UNCOMPILED"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -269,7 +269,7 @@ limitations under the License.
     </stylesheets>
 
     <builder-plus
-        cssRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}"
+        cssRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}"
         outputManifest="${manifest.CLOSURE_COMPILED.txt}"
         outputMode="MANIFEST">
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
@@ -284,7 +284,7 @@ limitations under the License.
 
   <target name="testInputCssRenamingMap_JSON">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputRenamingMapFormat="JSON"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -292,7 +292,7 @@ limitations under the License.
     </stylesheets>
 
     <builder-plus
-        cssRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        cssRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputManifest="${manifest.CLOSURE_COMPILED.txt}"
         outputMode="COMPILED"
         outputFile="${json-in-style.soy.compiled.js}">
@@ -310,7 +310,7 @@ limitations under the License.
   <target name="testInputCssRenamingMap_PROPERTIES">
     <stylesheets
         outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_PROPERTIES}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_PROPERTIES}"
         outputRenamingMapFormat="PROPERTIES"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -318,7 +318,7 @@ limitations under the License.
     </stylesheets>
 
     <builder-plus
-        cssRenamingMapPropertiesFile="${json-in-style.outputRenamingMap_PROPERTIES}"
+        cssRenamingMapPropertiesFile="${json-in-style.soy.outputRenamingMap_PROPERTIES}"
         outputManifest="${manifest.CLOSURE_COMPILED.txt}"
         outputMode="MANIFEST">
       <mainsources dir="${json-in-style.js.dir}" includes="**/*.js" />
@@ -333,7 +333,7 @@ limitations under the License.
 
   <target name="testOutputCssRenamingMap_CLOSURE_UNCOMPILED">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputRenamingMapFormat="JSON"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -345,7 +345,7 @@ limitations under the License.
       CSS renaming map using format CLOSURE_UNCOMPILED.
     -->
     <builder-plus
-        cssRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        cssRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputManifest="${manifest.CLOSURE_UNCOMPILED.txt}"
         outputMode="COMPILED"
         outputFile="${json-in-style.soy.raw.js}">
@@ -361,7 +361,7 @@ limitations under the License.
     <!-- Generate index.html for testing in browser. -->
     <soy
         cssHandlingScheme="goog"
-        cssRenamingMap="${json-in-style.outputRenamingMap_JSON}">
+        cssRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}">
       <soyfileset dir="${json-in-style.soy.dir}" includes="**/*.soy" />
       <rendertemplate
           outputPathFormat="${json-in-style.soy-output.html}"

@@ -56,13 +56,13 @@ limitations under the License.
   <property name="json-in-style.soy-output.html"
       location="${json-in-style.soy-output.dir}/index.html" />
 
-  <property name="json-in-style.outputRenamingMap_CLOSURE_COMPILED"
+  <property name="json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED"
       location="${json-in-style.soy-output.dir}/renaming_CLOSURE_COMPILED.js" />
-  <property name="json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED"
+  <property name="json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED"
       location="${json-in-style.soy-output.dir}/renaming_CLOSURE_UNCOMPILED.js" />
-  <property name="json-in-style.outputRenamingMap_JSON"
+  <property name="json-in-style.soy.outputRenamingMap_JSON"
       location="${json-in-style.soy-output.dir}/renaming.json" />
-  <property name="json-in-style.outputRenamingMap_PROPERTIES"
+  <property name="json-in-style.soy.outputRenamingMap_PROPERTIES"
       location="${json-in-style.soy-output.dir}/renaming.properties" />
 
   <property name="copyright">/*

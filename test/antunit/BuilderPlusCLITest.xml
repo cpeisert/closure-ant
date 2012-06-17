@@ -260,7 +260,7 @@ limitations under the License.
 
   <target name="testInputCssRenamingMap_CLOSURE_COMPILED">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_COMPILED}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}"
         outputRenamingMapFormat="CLOSURE_COMPILED"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -268,7 +268,7 @@ limitations under the License.
     </stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--css_renaming_map=${json-in-style.outputRenamingMap_CLOSURE_COMPILED}" />
+      <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}" />
       <arg value="--compiler_jar=${closure-compiler.jar}" />
       <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
       <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
@@ -286,7 +286,7 @@ limitations under the License.
 
   <target name="testInputCssRenamingMap_CLOSURE_UNCOMPILED">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}"
         outputRenamingMapFormat="CLOSURE_UNCOMPILED"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -294,7 +294,7 @@ limitations under the License.
     </stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--css_renaming_map=${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}" />
+      <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}" />
       <arg value="--compiler_jar=${closure-compiler.jar}" />
       <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
       <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
@@ -312,7 +312,7 @@ limitations under the License.
 
   <target name="testInputCssRenamingMap_JSON">
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputRenamingMapFormat="JSON"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -320,7 +320,7 @@ limitations under the License.
     </stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--css_renaming_map=${json-in-style.outputRenamingMap_JSON}" />
+      <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_JSON}" />
       <arg value="--compiler_jar=${closure-compiler.jar}" />
       <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
       <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
@@ -339,7 +339,7 @@ limitations under the License.
   <target name="testInputCssRenamingMap_PROPERTIES">
     <stylesheets
         outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_PROPERTIES}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_PROPERTIES}"
         outputRenamingMapFormat="PROPERTIES"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -347,7 +347,7 @@ limitations under the License.
     </stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--css_renaming_map_properties_file=${json-in-style.outputRenamingMap_PROPERTIES}" />
+      <arg value="--css_renaming_map_properties_file=${json-in-style.soy.outputRenamingMap_PROPERTIES}" />
       <arg value="--compiler_jar=${closure-compiler.jar}" />
       <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
       <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
@@ -366,7 +366,7 @@ limitations under the License.
   <target name="testError_CssRenamingMapSpecifiedAsPropertiesAndJSON">
     <stylesheets
         outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_PROPERTIES}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_PROPERTIES}"
         outputRenamingMapFormat="PROPERTIES"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -374,7 +374,7 @@ limitations under the License.
     </stylesheets>
 
     <stylesheets outputFile="${json-in-style.soy-output.css}"
-        outputRenamingMap="${json-in-style.outputRenamingMap_JSON}"
+        outputRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputRenamingMapFormat="JSON"
         renamingType="CLOSURE"
         prettyPrint="true">
@@ -384,8 +384,8 @@ limitations under the License.
     <expectfailure>
       <!-- May not specify both JSON and Properties file renaming maps. -->
       <java jar="${builderplus.jar}" fork="true" failonerror="true">
-        <arg value="--css_renaming_map=${json-in-style.outputRenamingMap_JSON}" />
-        <arg value="--css_renaming_map_properties_file=${json-in-style.outputRenamingMap_PROPERTIES}" />
+        <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_JSON}" />
+        <arg value="--css_renaming_map_properties_file=${json-in-style.soy.outputRenamingMap_PROPERTIES}" />
         <arg value="--compiler_jar=${closure-compiler.jar}" />
         <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
         <arg value='--output_file="${json-in-style.soy.compiled.js}"' />

@@ -263,7 +263,7 @@ limitations under the License.
         <data replaceProperties="true">
           {
             'scriptFiles': [
-              '${json-in-style.outputRenamingMap_CLOSURE_UNCOMPILED}',
+              '${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}',
               '${json-in-style.soy.raw.js}'
             ]
           }
