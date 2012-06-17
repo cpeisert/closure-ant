@@ -114,7 +114,5 @@ limitations under the License.
     </antunit>
   </target>
   
-  <target name="test" depends="junit-test, antunit-test">
-
-  </target>
+  <target name="test" depends="junit-test, antunit-test" />
 </project>
