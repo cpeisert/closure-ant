@@ -657,7 +657,9 @@ public final class ClosureCompilerTask extends Task
         compilerFlags.append(String.format("%n"));
       }
     }
-    File tempFlagFile = cache.createTempFile("temp_flag_file.txt");
+    File tempFlagFile = cache.createTempFile(String.format(
+        "compiler_flag_file_for_target[%s].txt",
+        this.getOwningTarget().getName()));
     try {
       Files.write(compilerFlags.toString(), tempFlagFile, Charsets.UTF_8);
     } catch (IOException e) {
