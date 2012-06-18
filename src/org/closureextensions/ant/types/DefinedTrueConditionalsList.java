@@ -16,10 +16,6 @@
 
 package org.closureextensions.ant.types;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-
 import java.util.List;
 
 /**
@@ -28,29 +24,28 @@ import java.util.List;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class DefinedTrueConditionalsList {
-
-  private List<String> trueConditionals;
+public final class DefinedTrueConditionalsList extends StringList {
 
   public DefinedTrueConditionalsList() {
-    this.trueConditionals = Lists.newArrayList();
+    super();
   }
 
   /**
-   * @param trueConditionals list of conditions to be set to {@code true}
-   *    delimited by whitespace and/or commas
+   * Sets the conditionals to be set to {@code true}, where each conditional is
+   * delimited by whitespace and/or commas.
+   *
+   * @param trueConditionals list of conditionals to be set to {@code true}
    */
   public void setTrueConditionalsList(String trueConditionals) {
-    CharMatcher matcher = CharMatcher.WHITESPACE.or(CharMatcher.anyOf(","));
-    Iterable<String> splitConditionals = Splitter
-        .on(matcher).omitEmptyStrings().trimResults().split(trueConditionals);
-
-    for (String trueConditional : splitConditionals) {
-      this.trueConditionals.add(trueConditional);
-    }
+    setListOfStrings(trueConditionals);
   }
 
+  /**
+   * Gets the list of {@code true} conditionals.
+   *
+   * @return a {@link List} of {@code true} conditions
+   */
   public List<String> getTrueConditionals() {
-    return this.trueConditionals;
+    return getListOfStrings();
   }
 }
