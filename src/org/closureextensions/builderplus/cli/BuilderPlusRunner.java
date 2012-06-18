@@ -55,6 +55,8 @@ import org.kohsuke.args4j.CmdLineException;
  */
 public final class BuilderPlusRunner {
 
+  private static final int CACHE_EXPIRATION_DAYS = 2;
+
   private CssRenamingMap cssRenamingMap;
   private File compilerJar;
   private boolean forceRecompile;
@@ -141,6 +143,8 @@ public final class BuilderPlusRunner {
 
     File builderPlusCache = new File(".builder-plus");
     builderPlusCache.mkdir();
+    FileUtil.deleteFilesOlderThanNumberOfDays(builderPlusCache, "*",
+        CACHE_EXPIRATION_DAYS);
     List<String> manifestList = createManifest(compilationLevel,
         builderPlusCache);
     String manifestString = Joiner.on(String.format("%n")).skipNulls()
