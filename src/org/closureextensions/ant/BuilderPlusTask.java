@@ -435,14 +435,19 @@ public final class BuilderPlusTask extends Task {
     return this.compilerOptions;
   }
 
-  /** @param mainSources program entry points */
+  /**
+   * Adds "main" sources (that is, program entry points) for which transitive
+   * dependencies will be calculated.
+   *
+   * @param mainSources program entry points
+   */
   public void addMainSources(FileSet mainSources) {
     this.mainSources.add(mainSources);
   }
 
   /**
    * A list of namespaces separated by whitespace and/or commas that represent
-   * program entry points for which dependencies will be calculated.
+   * program entry points for which transitive dependencies will be calculated.
    *
    * @param namespaces a list of Closure namespaces
    */
@@ -464,9 +469,11 @@ public final class BuilderPlusTask extends Task {
   }
 
   /**
-   * @param sourceFiles source files available to the build process that will
-   *     be used if they are transitively required by one of the
-   *     {@code namespaces} or {@code inputs}
+   * Adds source files that will be used if they are transitively required by
+   * one or more of the program entry points, which are specified as either
+   * namespaces or "main" sources.
+   *
+   * @param sourceFiles source files available to the build process
    */
   public void addSources(FileSet sourceFiles) {
     this.sources.add(sourceFiles);

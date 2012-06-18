@@ -129,7 +129,7 @@ public final class DepsWriterPythonTask extends Task {
   }
 
   /**
-   * Execute the Deps Writer task.
+   * Executes the Deps Writer task.
    *
    * @throws BuildException on error.
    */
