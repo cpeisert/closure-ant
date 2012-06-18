@@ -16,13 +16,20 @@
 
 package org.closureextensions.ant;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.BuildListener;
+import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Execute;
@@ -30,10 +37,10 @@ import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.FileSet;
 
 import org.closureextensions.ant.types.ClosureLinterErrors;
-import org.closureextensions.ant.types.Directory;
-import org.closureextensions.common.deps.DirectoryPathPrefixPair;
-import org.closureextensions.common.deps.FilePathDepsPathPair;
-import org.closureextensions.common.util.StringUtil;
+import org.closureextensions.ant.types.DocTagList;
+import org.closureextensions.ant.types.FileExtensionList;
+import org.closureextensions.ant.types.NamespaceList;
+import org.closureextensions.ant.types.RestrictedDirSet;
 
 /**
  * Closure Linter Ant task. This task is a wrapper for the Closure Linter
@@ -61,6 +68,10 @@ public final class ClosureLinterTask extends Task {
     ;
   }
 
+  private final static String FIXJSSTYLE = "fixjsstyle";
+  private final static String GJSLINT = "gjslint";
+  private final static String PYTHON = "python";
+
   // Note: the Closure Linter command line flags are defined in the following
   // source files: checker.py, checkerbase.py, ecmalintrules.py,
   // error_fixer.py, error_check.py, errorrules.py, fixjsstyle.py, gjslint.py,
@@ -86,8 +97,9 @@ public final class ClosureLinterTask extends Task {
   // Corresponds to flag --error_trace defined in checkerbase.py.
   private Boolean errorTrace;
 
-  private File fixjsstylePythonScript;
-  private File gjslintPythonScript;
+  private String fixjsstylePythonScript;
+  private boolean force;
+  private String gjslintPythonScript;
   private ClosureLinterMode linterMode;
   private File logFile;
 
@@ -109,14 +121,12 @@ public final class ClosureLinterTask extends Task {
   // Nested elements
 
   // Corresponds to flag --additional_extensions defined in gjslint.py.
-  private final List<String> additionalJavaScriptExtensions;
+  private final List<String> additionalJSFileExtensions;
 
   private ClosureLinterErrors closureLinterErrors;
 
   // Corresponds to flag --custom_jsdoc_tags defined in ecmalintrules.py.
   private final List<String> customJsDocTags;
-
-  //
 
   // Corresponds to flag --ignored_extra_namespaces defined in checker.py.
   private final List<String> extraNamespacesToIgnore;
@@ -128,7 +138,7 @@ public final class ClosureLinterTask extends Task {
   private final List<String> namespaces;
 
   // Serves sames purpose as flag --recurse defined in simplefileflags.py.
-  private final List<Directory> roots;
+  private final List<RestrictedDirSet> roots;
 
   // Serves same purpose as passing JavaScript source files as extra arguments
   // to gjslint or fixjsstyle
@@ -139,7 +149,7 @@ public final class ClosureLinterTask extends Task {
 
 
   /**
-   * Constructs a new Ant task for Deps Writer.
+   * Constructs a new Closure Linter Ant task.
    */
   public ClosureLinterTask() {
     // Attributes
@@ -149,18 +159,19 @@ public final class ClosureLinterTask extends Task {
     this.debugTokens = null;
     this.disableIndentationFixing = null;
     this.errorTrace = null;
-    this.fixjsstylePythonScript = null;
-    this.gjslintPythonScript = null;
+    this.fixjsstylePythonScript = FIXJSSTYLE;
+    this.force = false;
+    this.gjslintPythonScript = GJSLINT;
     this.linterMode = ClosureLinterMode.LINT;
     this.logFile = null;
     this.multiProcess = null;
-    this.pythonExecutable = "python";
+    this.pythonExecutable = PYTHON;
     this.showSummary = null;
     this.timingStats = null;
     this.unixMode = null;
 
     // Nested elements
-    this.additionalJavaScriptExtensions = Lists.newArrayList();
+    this.additionalJSFileExtensions = Lists.newArrayList();
     this.closureLinterErrors = null;
     this.customJsDocTags = Lists.newArrayList();
     this.extraNamespacesToIgnore = Lists.newArrayList();
@@ -178,20 +189,35 @@ public final class ClosureLinterTask extends Task {
    * Sets the fixjsstyle.py Python script file. Setting this attribute is not
    * necessary if {@code fixjsstyle} is defined on your PATH.
    *
-   * @param file the fixjsstyle Python script
+   * @param fixjsstyle the fixjsstyle Python script
    */
-  public void setFixjsstylePythonScript(File file) {
-    this.fixjsstylePythonScript = file;
+  public void setFixjsstylePythonScript(String fixjsstyle) {
+    this.fixjsstylePythonScript = fixjsstyle;
+  }
+
+  /**
+   * Sets whether Closure Linter should always execute. If {@code true},
+   * Closure Linter will always run. If {@code false}, then if the last
+   * execution of Closure Linter did not yield any errors or warnings and the
+   * last modified date for all of the specified source files precedes the
+   * date and time that Closure Linter last ran, then execution will be
+   * skipped.
+   *
+   * @param force {@code True} to force execution of Closure Linter. Defaults
+   *     to {@code false}.
+   */
+  public void setForce(boolean force) {
+    this.force = force;
   }
 
   /**
    * Sets the gjslint.py Python script file. Setting this attribute is not
    * necessary if {@code gjslint} is defined on your PATH.
    *
-   * @param file the gjslint Python script
+   * @param gjslint the gjslint Python script
    */
-  public void setGjslintPythonScript(File file) {
-    this.gjslintPythonScript = file;
+  public void setGjslintPythonScript(String gjslint) {
+    this.gjslintPythonScript = gjslint;
   }
 
   /**
@@ -216,92 +242,238 @@ public final class ClosureLinterTask extends Task {
 
   // Nested element setters
 
+  /**
+   * Adds a list of additional JavaScript file extensions (other than "js")
+   * separated by whitespace and/or commas. These additional file extensions
+   * are only used if root directories are specified with the {@literal
+   * <roots>} nested element.
+   *
+   * @param fileExtensionList a list of additional JavaScript file extensions
+   */
+  public void addConfiguredJSFileExtensionList(
+      FileExtensionList fileExtensionList) {
+    this.additionalJSFileExtensions.addAll(
+        fileExtensionList.getFileExtensions());
+  }
+
+  /**
+   * Adds error flag controlling how the linter handles various errors.
+   *
+   * @param linterErrors flags controlling the handling of errors
+   * @throws BuildException if {@literal <closurelintererrors>} nested element
+   *     already used in the current task
+   */
+  public void addClosureLinterErrors(ClosureLinterErrors linterErrors) {
+    if (this.closureLinterErrors == null) {
+      this.closureLinterErrors = linterErrors;
+    } else {
+      throw new BuildException("nested element <closurelintererrors> may "
+          + "only be used once per <" + getTaskName() + "> task");
+    }
+  }
+
+  /**
+   * Adds a list of custom JavaScript doc tags separated by whitespace and/or
+   * commas.
+   *
+   * @param docTagList a list of custom JavaScript doc tags
+   */
+  public void addConfiguredCustomJsDocTagList(DocTagList docTagList) {
+    this.customJsDocTags.addAll(docTagList.getDocTags());
+  }
+
+  /**
+   * Adds a list of fully qualified namespaces that should not be reported as
+   * extra by the linter regardless of whether they are actually used. The
+   * namespaces may be separated by whitespace and/or commas.
+   *
+   * @param ignoredExtraNamespaces a list of custom JavaScript doc tags
+   */
+  public void addConfiguredIgnoredExtraNamespacesList(
+      NamespaceList ignoredExtraNamespaces) {
+    this.extraNamespacesToIgnore.addAll(ignoredExtraNamespaces.getNamespaces());
+  }
+
+  /**
+   * Adds "main" sources (that is, program entry points) for which transitive
+   * dependencies will be calculated.
+   *
+   * @param mainSources program entry points
+   */
+  public void addMainSources(FileSet mainSources) {
+    this.mainSources.add(mainSources);
+  }
+
+  /**
+   * A list of namespaces separated by whitespace and/or commas that represent
+   * program entry points for which transitive dependencies will be calculated.
+   *
+   * @param namespaces a list of Closure namespaces
+   */
+  public void addConfiguredNamespaceList(NamespaceList namespaces) {
+    this.namespaces.addAll(namespaces.getNamespaces());
+  }
+
+  /**
+   * Adds root directories to be recursively scanned for JavaScript source
+   * files. By default, only the directory specified with the {@code dir}
+   * attribute is scanned. If includes and/or excludes patterns are specified,
+   * directories are recursively scanned for matching subdirectories. See
+   * {@link RestrictedDirSet}.
+   *
+   * @param roots directories to be recursively scanned for JavaScript sources
+   */
+  public void addRoots(RestrictedDirSet roots) {
+    this.roots.add(roots);
+  }
+
+  /**
+   * Adds source files that are not considered program entry points. See {@link
+   * #addMainSources(org.apache.tools.ant.types.FileSet)}.
+   *
+   * @param sourceFiles source files to lint
+   */
+  public void addSources(FileSet sourceFiles) {
+    this.sources.add(sourceFiles);
+  }
+
+  /**
+   * Adds source files with relaxed documentation checks. For example,
+   * the following errors will not be reported for these files.
+   *
+   * <p><ul>
+   * <li>Missing documentation</li>
+   * <li>Missing descriptions</li>
+   * <li>Methods whose {@code @return} tags do not have a matching {@code
+   * return} statement</li>
+   * </ul></p>
+   *
+   * @param sourceFiles source files with relaxed documentation checks
+   */
+  public void addSourcesWithRelaxedDocChecks(FileSet sourceFiles) {
+    this.sourcesWithRelaxedDocumentationChecks.add(sourceFiles);
+  }
 
 
   /**
-   * Execute the Deps Writer task.
+   * Executes the Closure Linter task.
    *
    * @throws org.apache.tools.ant.BuildException on error.
    */
   public void execute() {
 
-    // Verify task preconditions
-
-    if (this.fixjsstylePythonScript == null) {
-      String fixjsstylePath =
-          SharedAntProperty.FIX_JS_STYLE_PY.getValue(getProject());
-      if (fixjsstylePath != null) {
-        this.fixjsstylePythonScript = new File(fixjsstylePath);
-      } else {
-        throw new BuildException("\"fixjsstylePythonScript\" is "
-            + "not set. Verify that your PATH includes fixjsstyle.");
-      }
-    }
-
     // Build the command line.
 
-    CommandLineBuilder cmdline = new CommandLineBuilder();
-    cmdline.argument(this.pythonExecutable);
-    cmdline.argument(this.gjslintPythonScript);
+    CommandLineBuilder cmdline = getAntTaskSettingsExcludingSources();
+    List<String> mainSourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
+        getProject(), this.mainSources);
+    List<String> sourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
+        getProject(), this.sources);
+    List<String> sourcesRelaxedDocChecksPaths = AntUtil
+        .getFilePathsFromCollectionOfFileSet(
+            getProject(), this.sourcesWithRelaxedDocumentationChecks);
 
-    /*for (FilePathDepsPathPair pair : this.paths) {
-      if (pair.getFilePath() == null) {
-        throw new BuildException("null file path");
-      }
-      if (pair.getDepsPath() != null) {
-        cmdline.flagAndArgument("--path_with_depspath",
-            "'" + pair.getFilePath() + "' '" + pair.getDepsPath() + "'");
-      } else {
-        cmdline.argument(pair.getFilePath());
-      }
+    boolean skipBuild = false;
+
+    BuildCache cache = new BuildCache(this);
+    BuildSettings currentBuildSettings = new BuildSettings(
+        /*taskSettings, currentSources*/);
+    if (!this.force) {
+      // Check if linting/fixing sources may be skipped (e.g. if the last
+      // Closure Linter build produced zero errors/warnings and none of the
+      // source files has been modified since the last Closure Linter build.
+
+      BuildSettings previousBuildSettings = cache.get();
+
+      // TODO(cpeisert): implement logic to determine if build may be skipped
     }
 
-    for (DirectoryPathPrefixPair dirPrefixPair : roots) {
-      if (dirPrefixPair.getDirPath() == null) {
-        throw new BuildException("null root directory path");
+    if (!skipBuild) {
+      ByteArrayOutputStream pythonProcessOutput = new ByteArrayOutputStream();
+      if(!changeDefaultLoggerOutputStream(pythonProcessOutput)) {
+        throw new BuildException("unable to change the default logger's output "
+            + "stream");
       }
-      if (dirPrefixPair.getPrefix() != null) {
-        cmdline.flagAndArgument("--root_with_prefix",
-            StringUtil.quoteStringIfContainsWhitespace(
-                dirPrefixPair.getDirPath()) + " " +
-            StringUtil.quoteStringIfContainsWhitespace(
-                dirPrefixPair.getPrefix()));
-      } else {
-        cmdline.flagAndArgument("--root",
-            StringUtil.quoteStringIfContainsWhitespace(
-                dirPrefixPair.getDirPath()));
+
+      LogStreamHandler logStreamHandler;
+      logStreamHandler = new LogStreamHandler(this, Project.MSG_INFO,
+          Project.MSG_WARN);
+      Execute runner = new Execute(logStreamHandler);
+      runner.setVMLauncher(false);
+      runner.setAntRun(getProject());
+      runner.setCommandline(cmdline.toStringArray());
+      int exitCode = executeClosureLinter(runner);
+
+      if (!this.force) {
+        boolean buildFailed = exitCode != 0;
+        currentBuildSettings.setBuildFailed(buildFailed);
+        cache.put(currentBuildSettings);
       }
     }
-
-    LogStreamHandler logStreamHandler;
-    logStreamHandler = new LogStreamHandler(this, Project.MSG_INFO,
-        Project.MSG_WARN);
-    Execute runner = new Execute(logStreamHandler);
-    runner.setVMLauncher(false);
-    runner.setAntRun(getProject());
-    runner.setCommandline(cmdline.toStringArray());
-    executeDepsWriter(runner);*/
   }
 
   /**
-   * Execute depswriter.py.
+   * Changes the output stream used by the current Ant project's {@link
+   * org.apache.tools.ant.DefaultLogger}.
+   *
+   * @param outputStream the output stream to use for the default logger
+   * @return {@code true} if the default logger's output stream was
+   *     successfully changed
+   */
+  private boolean changeDefaultLoggerOutputStream(OutputStream outputStream) {
+    for (Object obj : getProject().getBuildListeners()) {
+      BuildListener listener = (BuildListener) obj;
+      if (listener instanceof DefaultLogger) {
+        PrintStream printStream = new PrintStream(outputStream);
+        ((DefaultLogger) listener).setOutputPrintStream(printStream);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   *
+   *
+   * @return
+   */
+  private CommandLineBuilder getAntTaskSettingsExcludingSources() {
+    CommandLineBuilder cmdline = new CommandLineBuilder();
+
+    cmdline.argument(this.pythonExecutable);
+
+    if (ClosureLinterMode.LINT.equals(this.linterMode)) {
+      cmdline.argument(this.gjslintPythonScript);
+    } else {
+      cmdline.argument(this.fixjsstylePythonScript);
+    }
+
+    // TODO(cpeisert): implement
+
+    return cmdline;
+  }
+
+  /**
+   * Executes gjslint or fixjsstyle depending on the Closure Linter mode.
    *
    * @param runner the {@link org.apache.tools.ant.taskdefs.Execute} runner
-   * @return the exit code returned by depswriter.py
-   * @throws org.apache.tools.ant.BuildException if there is an {@link java.io.IOException}
+   * @return the exit code returned by either gjslint or fixjsstyle
+   * @throws org.apache.tools.ant.BuildException if there is an
+   *     {@link IOException}
    */
-  private int executeDepsWriter(Execute runner) {
+  private int executeClosureLinter(Execute runner) {
     int exitCode = 0;
-    /*try {
+    try {
       exitCode = runner.execute();
       if (exitCode != 0) {
-        log("Error: " + this.pythonExecutable + " "
-            + this.depsWriterPythonScript + " finished with exit code "
-            + exitCode);
+        String executableScript = ClosureLinterMode.LINT.equals(this.linterMode)
+            ? this.gjslintPythonScript : this.fixjsstylePythonScript;
+        log("Error: " + this.pythonExecutable + " " + executableScript
+            + " finished with exit code " + exitCode);
       }
     } catch (IOException e) {
       throw new BuildException(e);
-    }*/
+    }
     return exitCode;
   }
 }
