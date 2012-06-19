@@ -17,6 +17,7 @@
 package org.closureextensions.ant;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import java.io.ByteArrayOutputStream;
@@ -26,7 +27,9 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Set;
 
+import com.google.common.collect.Sets;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.DefaultLogger;
@@ -41,6 +44,9 @@ import org.closureextensions.ant.types.DocTagList;
 import org.closureextensions.ant.types.FileExtensionList;
 import org.closureextensions.ant.types.NamespaceList;
 import org.closureextensions.ant.types.RestrictedDirSet;
+import org.closureextensions.common.JsClosureSourceFile;
+import org.closureextensions.common.SourceFileFactory;
+import org.closureextensions.common.util.FileUtil;
 
 /**
  * Closure Linter Ant task. This task is a wrapper for the Closure Linter
@@ -364,14 +370,14 @@ public final class ClosureLinterTask extends Task {
 
     // Build the command line.
 
-    CommandLineBuilder cmdline = getAntTaskSettingsExcludingSources();
-    List<String> mainSourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
-        getProject(), this.mainSources);
-    List<String> sourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
-        getProject(), this.sources);
-    List<String> sourcesRelaxedDocChecksPaths = AntUtil
-        .getFilePathsFromCollectionOfFileSet(
-            getProject(), this.sourcesWithRelaxedDocumentationChecks);
+    CommandLineBuilder cmdline = createCommandLineFromTaskSettings();
+    Set<String> allSourcePaths = null;
+    try {
+      allSourcePaths = getAllSourcePaths();
+    } catch (IOException e) {
+      throw new BuildException(e);
+    }
+
 
     boolean skipBuild = false;
 
@@ -389,8 +395,8 @@ public final class ClosureLinterTask extends Task {
     }
 
     if (!skipBuild) {
-      ByteArrayOutputStream pythonProcessOutput = new ByteArrayOutputStream();
-      if(!changeDefaultLoggerOutputStream(pythonProcessOutput)) {
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      if(!changeDefaultLoggerOutputStream(outputStream)) {
         throw new BuildException("unable to change the default logger's output "
             + "stream");
       }
@@ -422,10 +428,9 @@ public final class ClosureLinterTask extends Task {
    */
   private boolean changeDefaultLoggerOutputStream(OutputStream outputStream) {
     for (Object obj : getProject().getBuildListeners()) {
-      BuildListener listener = (BuildListener) obj;
-      if (listener instanceof DefaultLogger) {
+      if (obj instanceof DefaultLogger) {
         PrintStream printStream = new PrintStream(outputStream);
-        ((DefaultLogger) listener).setOutputPrintStream(printStream);
+        ((DefaultLogger) obj).setOutputPrintStream(printStream);
         return true;
       }
     }
@@ -437,7 +442,7 @@ public final class ClosureLinterTask extends Task {
    *
    * @return
    */
-  private CommandLineBuilder getAntTaskSettingsExcludingSources() {
+  private CommandLineBuilder createCommandLineFromTaskSettings() {
     CommandLineBuilder cmdline = new CommandLineBuilder();
 
     cmdline.argument(this.pythonExecutable);
@@ -448,9 +453,66 @@ public final class ClosureLinterTask extends Task {
       cmdline.argument(this.fixjsstylePythonScript);
     }
 
+    List<String> mainSourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
+        getProject(), this.mainSources);
+    List<String> sourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
+        getProject(), this.sources);
+    List<String> sourcePathsRelaxedDocChecks = AntUtil
+        .getFilePathsFromCollectionOfFileSet(
+            getProject(), this.sourcesWithRelaxedDocumentationChecks);
+
     // TODO(cpeisert): implement
 
     return cmdline;
+  }
+
+  /**
+   * Creates a set of all source files that will be passed to Closure Linter,
+   * including files located anywhere below the specified root directories
+   * with file extension ".js" or any of the extensions specified by nested
+   * {@code jsFileExtensionList} elements.
+   *
+   * @return a set of all source paths to be passed to Closure Linter
+   * @throws IOException if error scanning root directories
+   */
+  private Set<String> getAllSourcePaths() throws IOException {
+    Set<String> allSources = Sets.newHashSet();
+
+    List<String> mainSourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
+        getProject(), this.mainSources);
+    allSources.addAll(mainSourcePaths);
+
+    List<String> sourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
+        getProject(), this.sources);
+    allSources.addAll(sourcePaths);
+
+    List<String> sourcePathsRelaxedDocChecks = AntUtil
+        .getFilePathsFromCollectionOfFileSet(
+            getProject(), this.sourcesWithRelaxedDocumentationChecks);
+    allSources.addAll(sourcePathsRelaxedDocChecks);
+
+    // Process <roots> nested elements.
+    List<File> rootDirectories = Lists.newArrayList();
+    for (RestrictedDirSet dirSet : this.roots) {
+      rootDirectories.addAll(dirSet.getMatchedDirectories());
+    }
+
+    // TODO(cpeisert): normalize extensions to either retain or strip dot
+    // prefixes
+    Set<String> jsFileExtensions = Sets.newHashSet();
+    jsFileExtensions.addAll(this.additionalJSFileExtensions);
+    jsFileExtensions.add(".js");
+
+    for (File dir : rootDirectories) {
+      for (String extension : jsFileExtensions) {
+        List<String> paths = FileUtil.scanDirectory(dir,
+            /* includes */ ImmutableList.of("**/*" + extension),
+            /* excludes */ ImmutableList.of(".*"));
+        allSources.addAll(paths);
+      }
+    }
+
+    return allSources;
   }
 
   /**
