@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -368,8 +369,6 @@ public final class ClosureLinterTask extends Task {
    */
   public void execute() {
 
-    // Build the command line.
-
     CommandLineBuilder cmdline = createCommandLineFromTaskSettings();
     Set<String> allSourcePaths = null;
     try {
@@ -378,28 +377,33 @@ public final class ClosureLinterTask extends Task {
       throw new BuildException(e);
     }
 
-
     boolean skipBuild = false;
-
     BuildCache cache = new BuildCache(this);
-    BuildSettings currentBuildSettings = new BuildSettings(
-        /*taskSettings, currentSources*/);
+
     if (!this.force) {
-      // Check if linting/fixing sources may be skipped (e.g. if the last
-      // Closure Linter build produced zero errors/warnings and none of the
-      // source files has been modified since the last Closure Linter build.
+      // The Closure Linter build may be skipped if the following three
+      // conditions are satisfied: 1) the last Closure Linter build produced
+      // zero errors, 2) the specified settings for the command line did not
+      // change, and 3) none of the source files for the current build has
+      // been modified since the last build.
 
-      BuildSettings previousBuildSettings = cache.get();
+      BuildSettings previousBuild = cache.get();
 
-      // TODO(cpeisert): implement logic to determine if build may be skipped
+      if (previousBuild != null && !previousBuild.isBuildFailed()) {
+        if (previousBuild.getCommandLineOrConfig().equals(cmdline.toString())) {
+          if (sourcesUpToDate(allSourcePaths, previousBuild.getBuildTime())) {
+            skipBuild = true;
+          }
+        }
+      }
     }
 
     if (!skipBuild) {
-      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      /*ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       if(!changeDefaultLoggerOutputStream(outputStream)) {
         throw new BuildException("unable to change the default logger's output "
             + "stream");
-      }
+      }*/
 
       LogStreamHandler logStreamHandler;
       logStreamHandler = new LogStreamHandler(this, Project.MSG_INFO,
@@ -411,6 +415,9 @@ public final class ClosureLinterTask extends Task {
       int exitCode = executeClosureLinter(runner);
 
       if (!this.force) {
+        // Save current build settings.
+        BuildSettings currentBuildSettings = new BuildSettings(
+            cmdline.toString(), allSourcePaths);
         boolean buildFailed = exitCode != 0;
         currentBuildSettings.setBuildFailed(buildFailed);
         cache.put(currentBuildSettings);
@@ -419,6 +426,7 @@ public final class ClosureLinterTask extends Task {
   }
 
   /**
+   * TODO(cpeisert): Delete this method if not needed
    * Changes the output stream used by the current Ant project's {@link
    * org.apache.tools.ant.DefaultLogger}.
    *
@@ -426,7 +434,7 @@ public final class ClosureLinterTask extends Task {
    * @return {@code true} if the default logger's output stream was
    *     successfully changed
    */
-  private boolean changeDefaultLoggerOutputStream(OutputStream outputStream) {
+  /*private boolean changeDefaultLoggerOutputStream(OutputStream outputStream) {
     for (Object obj : getProject().getBuildListeners()) {
       if (obj instanceof DefaultLogger) {
         PrintStream printStream = new PrintStream(outputStream);
@@ -435,12 +443,13 @@ public final class ClosureLinterTask extends Task {
       }
     }
     return false;
-  }
+  }*/
 
   /**
+   * Create the command line to execute either the gjslint or fixjsstyle Python
+   * script with the appropriate flags based on the Ant task settings.
    *
-   *
-   * @return
+   * @return the command line
    */
   private CommandLineBuilder createCommandLineFromTaskSettings() {
     CommandLineBuilder cmdline = new CommandLineBuilder();
@@ -497,8 +506,7 @@ public final class ClosureLinterTask extends Task {
       rootDirectories.addAll(dirSet.getMatchedDirectories());
     }
 
-    // TODO(cpeisert): normalize extensions to either retain or strip dot
-    // prefixes
+    // TODO(cpeisert): normalize extensions to either retain or strip dot prefix
     Set<String> jsFileExtensions = Sets.newHashSet();
     jsFileExtensions.addAll(this.additionalJSFileExtensions);
     jsFileExtensions.add(".js");
@@ -513,6 +521,27 @@ public final class ClosureLinterTask extends Task {
     }
 
     return allSources;
+  }
+
+  /**
+   * Check if a collection of source files are up-to-date relative to
+   * some specified time.
+   *
+   * @param sources source files to check
+   * @param timeInMilliseconds the reference time for comparing the source
+   *     files' last modified time
+   * @return {@code true} if the source files are up-to-date relative to the
+   *     specified time
+   */
+  private boolean sourcesUpToDate(Collection<String> sources,
+      Long timeInMilliseconds) {
+    for (String filePath : sources) {
+      if (new File(filePath).lastModified() > timeInMilliseconds) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
