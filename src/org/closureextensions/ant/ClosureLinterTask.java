@@ -16,9 +16,9 @@
 
 package org.closureextensions.ant;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.DefaultLogger;
@@ -191,6 +190,19 @@ public final class ClosureLinterTask extends Task {
 
 
   // Attribute setters
+
+  /**
+   * Sets whether an audible beep should be emitted when errors are found.
+   *
+   * @param beep {@code true} to enable beeps. Defaults to {@code true}.
+   */
+  public void setBeep(boolean beep) {
+    this.beep = beep;
+  }
+
+  // TODO(cpeisert): add setters for missing field
+
+
 
   /**
    * Sets the fixjsstyle.py Python script file. Setting this attribute is not
@@ -369,9 +381,10 @@ public final class ClosureLinterTask extends Task {
    */
   public void execute() {
 
-    CommandLineBuilder cmdline = createCommandLineFromTaskSettings();
+    CommandLineBuilder cmdline = null;
     Set<String> allSourcePaths = null;
     try {
+      cmdline = createCommandLineFromTaskSettings();
       allSourcePaths = getAllSourcePaths();
     } catch (IOException e) {
       throw new BuildException(e);
@@ -399,6 +412,7 @@ public final class ClosureLinterTask extends Task {
     }
 
     if (!skipBuild) {
+      // TODO(cpeisert): use outputStream to capture Ant log to logFile
       /*ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       if(!changeDefaultLoggerOutputStream(outputStream)) {
         throw new BuildException("unable to change the default logger's output "
@@ -450,11 +464,15 @@ public final class ClosureLinterTask extends Task {
    * script with the appropriate flags based on the Ant task settings.
    *
    * @return the command line
+   * @throws IOException if one of the main sources cannot be read
    */
-  private CommandLineBuilder createCommandLineFromTaskSettings() {
+  private CommandLineBuilder createCommandLineFromTaskSettings()
+      throws IOException {
     CommandLineBuilder cmdline = new CommandLineBuilder();
 
-    cmdline.argument(this.pythonExecutable);
+    // TODO(cpeisert): test on windows to determine if "python" must be
+    // explicitly specified on command line
+    //cmdline.argument(this.pythonExecutable);
 
     if (ClosureLinterMode.LINT.equals(this.linterMode)) {
       cmdline.argument(this.gjslintPythonScript);
@@ -462,15 +480,82 @@ public final class ClosureLinterTask extends Task {
       cmdline.argument(this.fixjsstylePythonScript);
     }
 
+    // Attributes
+
+    if(Boolean.TRUE.equals(this.beep)) {
+      cmdline.argument("--beep");
+    }
+    if(Boolean.TRUE.equals(this.checkJavaScriptInHtmlFiles)) {
+      cmdline.argument("--check_html");
+    }
+    if(Boolean.TRUE.equals(this.debugIndentation)) {
+      cmdline.argument("--debug_indentation");
+    }
+    if(Boolean.TRUE.equals(this.debugTokens)) {
+      cmdline.argument("--debug_tokens");
+    }
+    if(Boolean.TRUE.equals(this.disableIndentationFixing)) {
+      cmdline.argument("--disable_indentation_fixing");
+    }
+    if(Boolean.TRUE.equals(this.errorTrace)) {
+      cmdline.argument("--error_trace");
+    }
+    if(Boolean.TRUE.equals(this.multiProcess)) {
+      cmdline.argument("--multiprocess");
+    }
+    if(Boolean.TRUE.equals(this.showSummary)) {
+      cmdline.argument("--summary");
+    }
+    if(Boolean.TRUE.equals(this.timingStats)) {
+      cmdline.argument("--time");
+    }
+    if(Boolean.TRUE.equals(this.unixMode)) {
+      cmdline.argument("--unix_mode");
+    }
+
+    // Nested elements
+
+    Set<String> allSourcesExcludingRootDirs = Sets.newHashSet();
+
+    cmdline.flagAndArguments("--additional_extensions",
+        this.additionalJSFileExtensions);
+    cmdline.commandLineBuilder(
+        this.closureLinterErrors.getCommandLineForErrorFlags());
+    cmdline.flagAndArguments("--custom_jsdoc_tags", this.customJsDocTags);
+    cmdline.flagAndArguments("--ignored_extra_namespaces",
+        this.extraNamespacesToIgnore);
+    cmdline.flagAndArguments("--closurized_namespaces", this.namespaces);
+
+    // Get the goog.provided namespaces from the main sources and pass to
+    // Closure Linter with flag --closurized_namespaces.
     List<String> mainSourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
         getProject(), this.mainSources);
-    List<String> sourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
-        getProject(), this.sources);
+
+    for (String mainSourcePath : mainSourcePaths) {
+      JsClosureSourceFile jsFile = SourceFileFactory
+          .newJsClosureSourceFile(new File(mainSourcePath));
+      cmdline.flagAndArguments("--closurized_namespaces", jsFile.getProvides());
+    }
+
+    // Process <roots> nested elements.
+    List<File> rootDirectories = Lists.newArrayList();
+    for (RestrictedDirSet dirSet : this.roots) {
+      rootDirectories.addAll(dirSet.getMatchedDirectories());
+    }
+    cmdline.flagAndArguments("--recurse", rootDirectories);
+
     List<String> sourcePathsRelaxedDocChecks = AntUtil
         .getFilePathsFromCollectionOfFileSet(
             getProject(), this.sourcesWithRelaxedDocumentationChecks);
+    cmdline.flagAndArguments("--limited_doc_files",
+        sourcePathsRelaxedDocChecks);
 
-    // TODO(cpeisert): implement
+    List<String> sourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
+        getProject(), this.sources);
+
+    allSourcesExcludingRootDirs.addAll(mainSourcePaths);
+    allSourcesExcludingRootDirs.addAll(sourcePaths);
+    cmdline.arguments(allSourcesExcludingRootDirs);
 
     return cmdline;
   }

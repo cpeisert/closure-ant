@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+================================================================================
+  AntUnit tests for Closure Stylesheets.
+================================================================================
+-->
+<project name="closure-linter-test" default="test">
+
+  <dirname property="antunit.dir" file="${ant.file.closure-linter-test}" />
+
+  <property name="test.dir" location="${antunit.dir}/.." />
+  <property name="test-projects.dir" location="${test.dir}/test_projects" />
+  <property name="test.build.dir" location="${test.dir}/build" />
+  <property name="test.lib.dir" location="${test.dir}/lib" />
+  <import file="${test.lib.dir}/antunit.xml" />
+
+  <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
+  <property name="closure-ant-tasks.lib.dir"
+      location="${closure-ant-tasks.dir}/lib" />
+  <property name="closure-ant-tasks.build.dir"
+      location="${closure-ant-tasks.dir}/build" />
+  <property name="closure-tools-config.xml"
+      location="${closure-ant-tasks.build.dir}/closure-tools-config.xml" />
+  <import file="${closure-tools-config.xml}" />
+
+  <import file="${test-projects.dir}/json-in-style/jsonInStyle.xml" />
+  <import file="${test-projects.dir}/project101/project101.xml" />
+
+  
+  <!--
+  ==============================================================================
+    Set up and tear down
+  ==============================================================================
+  -->
+
+  <!-- Executed once for this test suite before all other targets. -->
+  <target name="suiteSetUp">
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${json-in-style.output.dir}" />
+    <mkdir dir="${project101.output.dir}" />
+  </target>
+
+
+  <!--
+  ==============================================================================
+    Tests
+  ==============================================================================
+  -->
+
+
+  <target name="testLintNoErrors">
+    <closure-linter>
+      <closurelintererrors all="true" />
+      <mainsources dir="${project101.js.dir}" includes="project101.js" />
+      <sources dir="${project101.js.dir}" includes="moocher.js" />
+
+    </closure-linter>
+  </target>
+
+  
+  <!-- Run this test suite. -->
+  <target name="test">
+    <antunit>
+      <file file="${antunit.dir}/ClosureLinterTest.xml" />
+      <plainlistener loglevel="info" />
+    </antunit>
+  </target>
+</project>
