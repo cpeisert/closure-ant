@@ -248,10 +248,10 @@ public final class ClosureLinterErrors {
     CommandLineBuilder cmdline = new CommandLineBuilder();
 
     if (Boolean.TRUE.equals(this.all)) {
-      cmdline.argument("--all");
+      cmdline.flagAndArgument("--jslint_error", "all");
       cmdline.argument("--jsdoc");
     } else if (Boolean.FALSE.equals(this.all)) {
-      cmdline.argument("--noall");
+      cmdline.flagAndArgument("--jslint_noerror", "all");
       cmdline.argument("--nojsdoc");
     }
 
