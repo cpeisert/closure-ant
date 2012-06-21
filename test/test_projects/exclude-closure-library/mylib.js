@@ -21,19 +21,19 @@ goog.provide('mylib');
  *
  * @param {string} text The text to wrap.
  * @param {number} width The maximum number of characters per line.
- * @param {string} brk The text to use at the end of each line. For example,
- *     '\n' or '&lt;br&gt;'.
+ * @param {string} lineSeparator The text to use at the end of each line. For
+ *     example, '\n' or '&lt;br&gt;'.
  * @return {String}
  */
-mylib.wordwrap = function (text, width, brk) {
+mylib.wordwrap = function (text, width, lineSeparator) {
   if (text == null) {
     throw Error("text is null");
   }
 
-  brk = brk || '\n';
+  lineSeparator = lineSeparator || '\n';
   width = width || 75;
 
   var regex = '.{1,' + width + '}(\\s|$)|\\S+?(\\s|$)';
 
-  return text.match(RegExp(regex, 'g')).join(brk);
-}
+  return text.match(RegExp(regex, 'g')).join(lineSeparator);
+};
