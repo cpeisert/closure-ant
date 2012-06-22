@@ -16,9 +16,11 @@
 
 package org.closureextensions.ant;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,6 +32,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.ant.antunit.AntUnit;
+import org.apache.ant.antunit.LogCapturer;
+import org.apache.ant.antunit.listener.BaseAntUnitListener;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.DefaultLogger;
@@ -47,6 +52,7 @@ import org.closureextensions.ant.types.RestrictedDirSet;
 import org.closureextensions.common.JsClosureSourceFile;
 import org.closureextensions.common.SourceFileFactory;
 import org.closureextensions.common.util.FileUtil;
+
 
 /**
  * Closure Linter Ant task. This task is a wrapper for the Closure Linter
@@ -200,9 +206,56 @@ public final class ClosureLinterTask extends Task {
     this.beep = beep;
   }
 
-  // TODO(cpeisert): add setters for missing field
+  /**
+   * Sets whether to check JavaScript in HTML files.
+   *
+   * @param checkJSInHtmlFiles {@code true} to check HTML in JavaScript files.
+   *     Defaults to {@code false}.
+   */
+  public void setCheckJSInHtmlFiles(boolean checkJSInHtmlFiles) {
+    this.checkJavaScriptInHtmlFiles = checkJSInHtmlFiles;
+  }
 
+  /**
+   * Whether to print debugging information for indentation.
+   *
+   * @param debugIndentation {@code true} to print debugging information for
+   *     indentation. Defaults to {@code false}.
+   */
+  public void setDebugIndentation(boolean debugIndentation) {
+    this.debugIndentation = debugIndentation;
+  }
 
+  /**
+   * Whether to print all tokens for debugging.
+   *
+   * @param debugTokens {@code true} to print all tokens for debugging.
+   *     Defaults to {@code false}.
+   */
+  public void setDebugTokens(boolean debugTokens) {
+    this.debugTokens = debugTokens;
+  }
+
+  /**
+   * Whether to disable automatic fixing of indentation. Only applicable for
+   * linter mode FIX, otherwise ignored.
+   *
+   * @param disableIndentationFixing {@code true} to disable automatic
+   *     indentation fixing. Defaults to {@code false}.
+   */
+  public void setDisableIndentationFixing(boolean disableIndentationFixing) {
+    this.disableIndentationFixing = disableIndentationFixing;
+  }
+
+  /**
+   * Whether to show error exceptions.
+   *
+   * @param errorTrace {@code true} to show error exceptions. Defaults to
+   *     {@code false}.
+   */
+  public void setErrorTrace(boolean errorTrace) {
+    this.errorTrace = errorTrace;
+  }
 
   /**
    * Sets the fixjsstyle.py Python script file. Setting this attribute is not
@@ -237,6 +290,28 @@ public final class ClosureLinterTask extends Task {
    */
   public void setGjslintPythonScript(String gjslint) {
     this.gjslintPythonScript = gjslint;
+  }
+
+  /**
+   * Sets the linter mode to either FIX or LINT. In FIX mode, simple JavaScript
+   * style guide violations are automatically fixed. In LINT mode, style guide
+   * violations are reported but no source files are changed.
+   *
+   * <p><b>WARNING:</b> Back up your files or store them in a source control
+   * system before using FIX mode in case the script makes unwanted changes.
+   * </p>
+   *
+   * @param linterMode
+   */
+  public void setLinterMode(String linterMode) {
+    if ("FIX".equalsIgnoreCase(linterMode)) {
+      this.linterMode = ClosureLinterMode.FIX;
+    } else if ("LINT".equalsIgnoreCase(linterMode)) {
+      this.linterMode = ClosureLinterMode.LINT;
+    } else {
+      throw new BuildException("linterMode expected to be FIX or LINT but "
+          + "was " + linterMode);
+    }
   }
 
   /**
@@ -412,12 +487,11 @@ public final class ClosureLinterTask extends Task {
     }
 
     if (!skipBuild) {
-      // TODO(cpeisert): use outputStream to capture Ant log to logFile
-      /*ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       if(!changeDefaultLoggerOutputStream(outputStream)) {
         throw new BuildException("unable to change the default logger's output "
             + "stream");
-      }*/
+      }
 
       LogStreamHandler logStreamHandler;
       logStreamHandler = new LogStreamHandler(this, Project.MSG_INFO,
@@ -427,6 +501,27 @@ public final class ClosureLinterTask extends Task {
       runner.setAntRun(getProject());
       runner.setCommandline(cmdline.toStringArray());
       int exitCode = executeClosureLinter(runner);
+
+      // TODO(cpeisert): Strip the following text from log output:
+      /*Some of the errors reported by GJsLint may be auto-fixable using the script
+          [antunit] fixjsstyle. Please double check any changes it makes and report any bugs. The
+          [antunit] script can be run by executing:
+      [antunit]
+      [antunit] fixjsstyle --jslint_error*/
+
+      // TODO(cpeisert): write log message about running Closure Linter in FIX
+      // mode if current mode is LINT and exitCode != 0
+
+      // TODO(cpeisert): write the entire log contents (after remove message
+      // above)
+
+      if (this.logFile != null) {
+        try {
+          Files.write(outputStream.toString(), this.logFile, Charsets.UTF_8);
+        } catch (IOException e) {
+          throw new BuildException(e);
+        }
+      }
 
       if (!this.force) {
         // Save current build settings.
@@ -440,7 +535,6 @@ public final class ClosureLinterTask extends Task {
   }
 
   /**
-   * TODO(cpeisert): Delete this method if not needed
    * Changes the output stream used by the current Ant project's {@link
    * org.apache.tools.ant.DefaultLogger}.
    *
@@ -448,16 +542,29 @@ public final class ClosureLinterTask extends Task {
    * @return {@code true} if the default logger's output stream was
    *     successfully changed
    */
-  /*private boolean changeDefaultLoggerOutputStream(OutputStream outputStream) {
+  private boolean changeDefaultLoggerOutputStream(OutputStream outputStream) {
     for (Object obj : getProject().getBuildListeners()) {
+      System.out.println("DEBUG: buildlistener class => " + obj.getClass());
+
       if (obj instanceof DefaultLogger) {
         PrintStream printStream = new PrintStream(outputStream);
         ((DefaultLogger) obj).setOutputPrintStream(printStream);
         return true;
+      } else if (("class org.apache.ant.antunit.listener."
+          + "BaseAntUnitListener$LogGrabber").equals(
+          obj.getClass().toString())) {
+        // The Ant task is being executed by AntUnit for testing.
+        Project project = getProject();
+        project.removeBuildListener((BuildListener)obj);
+        DefaultLogger logger = new DefaultLogger();
+        logger.setMessageOutputLevel(Project.MSG_INFO);
+        logger.setOutputPrintStream(new PrintStream(outputStream));
+        project.addBuildListener(logger);
+        return true;
       }
     }
     return false;
-  }*/
+  }
 
   /**
    * Create the command line to execute either the gjslint or fixjsstyle Python
@@ -484,33 +591,53 @@ public final class ClosureLinterTask extends Task {
 
     if(Boolean.TRUE.equals(this.beep)) {
       cmdline.argument("--beep");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--nobeep");
     }
     if(Boolean.TRUE.equals(this.checkJavaScriptInHtmlFiles)) {
       cmdline.argument("--check_html");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--nocheck_html");
     }
     if(Boolean.TRUE.equals(this.debugIndentation)) {
       cmdline.argument("--debug_indentation");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--nodebug_indentation");
     }
     if(Boolean.TRUE.equals(this.debugTokens)) {
       cmdline.argument("--debug_tokens");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--nodebug_tokens");
     }
     if(Boolean.TRUE.equals(this.disableIndentationFixing)) {
       cmdline.argument("--disable_indentation_fixing");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--nodisable_indentation_fixing");
     }
     if(Boolean.TRUE.equals(this.errorTrace)) {
       cmdline.argument("--error_trace");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--noerror_trace");
     }
     if(Boolean.TRUE.equals(this.multiProcess)) {
       cmdline.argument("--multiprocess");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--nomultiprocess");
     }
     if(Boolean.TRUE.equals(this.showSummary)) {
       cmdline.argument("--summary");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--nosummary");
     }
     if(Boolean.TRUE.equals(this.timingStats)) {
       cmdline.argument("--time");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--notime");
     }
     if(Boolean.TRUE.equals(this.unixMode)) {
       cmdline.argument("--unix_mode");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--nounix_mode");
     }
 
     // Nested elements
@@ -644,8 +771,8 @@ public final class ClosureLinterTask extends Task {
       if (exitCode != 0) {
         String executableScript = ClosureLinterMode.LINT.equals(this.linterMode)
             ? this.gjslintPythonScript : this.fixjsstylePythonScript;
-        log("Error: " + this.pythonExecutable + " " + executableScript
-            + " finished with exit code " + exitCode);
+        log("Error: " + executableScript + " finished with exit code "
+            + exitCode);
       }
     } catch (IOException e) {
       throw new BuildException(e);
