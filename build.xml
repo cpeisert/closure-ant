@@ -37,6 +37,7 @@ limitations under the License.
                              
   <path id="classpath">
     <fileset dir="${lib.dir}" includes="**/*.jar" />
+    <fileset dir="${test.dir}/lib" includes="*antunit*.jar" />
   </path>
 
 
@@ -131,6 +132,8 @@ default JDK.&#13;&#10;">
       <zipfileset includes="resources/*soy*"
           src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
 
+      <zipfileset includes="**/*.class" src="${test.dir}/lib/ant-antunit.jar" />
+
       <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/closure-stylesheets-no-deps.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
@@ -179,6 +182,8 @@ newer]) using the system's default JDK.&#13;&#10;">
           src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
       <zipfileset includes="resources/*soy*"
           src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
+
+      <zipfileset includes="**/*.class" src="${test.dir}/lib/ant-antunit.jar" />
 
       <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/closure-stylesheets-no-deps.jar" />
@@ -245,6 +250,8 @@ closure-commons and closure-template-extensions).&#13;&#10;">
           src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
       <zipfileset includes="resources/*soy*"
           src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
+
+      <zipfileset includes="**/*.class" src="${test.dir}/lib/ant-antunit.jar" />
     </jar>
   </target>
   
