@@ -1,0 +1,36 @@
+{namespace soy101 autoescape="contextual"}
+
+/**
+ * Entry point for soy101 template tests.
+ */
+{template .executeAll}
+  <hr><p><b>2.</b></p>
+  util.printMap() called from Soy:<br>
+  {call soy101.util.printMap}
+    {param map: [
+      'name': 'Alf',
+      'additionalNames': ['Bob', 'Cid', 'Dee']]
+    /}
+  {/call}
+
+  <hr><p><b>3.</b></p>
+  Testing the {{'{msg}'}} command:<br>
+  {call .disclaimer}
+    {param indemnifiedParty: 'Morpheus' /}
+  {/call}
+
+  <hr><p><b>4.</b></p>
+  Testing the {{'{css} and {msg}'}} commands:<br>
+  {call soy101.util.announceAllTestsComplete /}
+{/template}
+
+/**
+ * Display legal disclaimer.
+ *
+ * @param indemnifiedParty the individual or entity being indemnified
+ */
+{template .disclaimer}
+  {msg desc="Legal disclaimer regarding the effects of probing the depths of the rabbit hole."}
+  By swallowing either the red pill or the blue pill I agree to forever hold
+  {sp}{$indemnifiedParty} harmless for all purposes.{/msg}
+{/template}

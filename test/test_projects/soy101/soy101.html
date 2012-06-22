@@ -1,0 +1,32 @@
+<html>
+<head>
+  <title>Soy 101 Test Project</title>
+  <style type="text/css">
+    body {margin: 10px; font-family: sans-serif; font-size: 1em;
+      line-height: 1.4em;}
+    p {width: 40em;}
+    .verdant {color: green; font-style: italic; font-weight: bold;}
+    .error {color: crimson; font-weight: bold;}
+  </style>
+  <script src="soy101.compiled.js" charset="UTF-8"></script>
+</head>
+<body>
+<h3>Testing Soy101 templates...</h3>
+<p class="error">If you do not see four test sections below, then something
+  went horribly wrong.</p>
+<script type="text/javascript">
+  var soyData = {
+    map: {'name': 'Alf', 'additionalNames': ['Bob', 'Cid', 'Dee']}
+  };
+
+  document.write('<p><b>1.</b></p>');
+  document.write('soy101.util.printMap() called from JavaScript:<br>'
+      + soy101.util.printMap(soyData));
+  document.write(soy101.executeAll());
+  var elements = goog.dom.getElementsByTagNameAndClass('p', 'error');
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].parentNode.removeChild(elements[i]);
+  }
+</script>
+</body>
+</html>

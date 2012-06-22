@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="SoyMsgBundle" datatype="x-soy-msg-bundle" xml:space="preserve" source-language="en" target-language="de">
+    <body>
+      <trans-unit id="3303999997970681015" datatype="html">
+        <source>By swallowing either the red pill or the blue pill I agree to forever hold <x id="INDEMNIFIED_PARTY"/> harmless for all purposes.</source>
+        <target>Durch Schlucken entweder die rote Pille oder die blaue Pille Ich stimme für immer, das Ich <x id="INDEMNIFIED_PARTY"/> unschädlich für alle Zwecke halten werde.</target>
+        <note priority="1" from="description">Legal disclaimer regarding the effects of probing the depths of the rabbit hole.</note>
+      </trans-unit>
+      <trans-unit id="6955684650289384374" datatype="html">
+        <source><x id="START_PARAGRAPH"/>All tests finished successfully!<x id="END_PARAGRAPH"/></source>
+        <target><x id="START_PARAGRAPH"/>Alle Tests erfolgreich abgeschlossen!<x id="END_PARAGRAPH"/></target>
+        <note priority="1" from="description">Inform user that all tests completed successfully.</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

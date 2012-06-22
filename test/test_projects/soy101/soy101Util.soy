@@ -1,0 +1,29 @@
+{namespace soy101.util autoescape="contextual"}
+
+/**
+ * Print a map formatted as:
+ * {
+ *   "<key>": "<value>",
+ *   ...
+ * }
+ *
+ * @param map The map to print.
+ */
+{template .printMap}
+{{'{'}}<br>
+{foreach $key in keys($map)}
+  &nbsp;&nbsp;"{$key}":{sp}"{$map[$key]}"
+  {if not isLast($key)},{/if}
+  <br>
+{/foreach}
+{{'}'}}<br>
+{/template}
+
+/**
+ * Display success message.
+ */
+{template .announceAllTestsComplete}
+  {msg desc="Inform user that all tests completed successfully."}
+    <p class="{css verdant}">All tests finished successfully!</p>
+  {/msg}
+{/template}

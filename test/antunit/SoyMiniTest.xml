@@ -45,6 +45,11 @@ limitations under the License.
   <property name="plovr_soyweb.output.dir"
       location="${test.build.dir}/antunit/plovr_soyweb" />
 
+  <import file="${test.dir}/test_projects/soy101/soy101.xml" />
+  <property name="soy101.build.dir" location="${soy101.output.dir}/build" />
+  <property name="soy101.compiled.js"
+      location="${soy101.build.dir}/soy101.compiled.js" />
+
   
   <!--
   =============================================================================
@@ -56,6 +61,13 @@ limitations under the License.
   <target name="suiteSetUp">
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${plovr_soyweb.output.dir}" />
+
+    <mkdir dir="${soy101.output.dir}" />
+    <copy file="${soy101.dir}/soyutils_usegoog.js"
+        todir="${soy101.output.dir}" />
+
+    <mkdir dir="${soy101.build.dir}" />
+    <copy file="${soy101.html}" todir="${soy101.build.dir}" />
   </target>
 
   <!--
@@ -77,6 +89,25 @@ limitations under the License.
     <assertFileExists file="${plovr_soyweb.output.dir}/settings.js" />
     <assertFileExists file="${plovr_soyweb.output.dir}/tasks.js" />
     <assertFileExists file="${plovr_soyweb.output.dir}/tasks2.js" />
+  </target>
+
+
+  <target name="testSoyWithClosureCompilerCharsetUTF-8">
+    <soy cssHandlingScheme="goog">
+      <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+      <compiletojs
+          outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
+          shouldGenerateJsdoc="true"
+          shouldProvideRequireSoyNamespaces="true" />
+    </soy>
+    <assertFileExists file="${soy101.output.dir}/soy101.js" />
+
+    <builder-plus forcerecompile="true" outputfile="${soy101.compiled.js}"
+        outputmode="compiled">
+      <compiler charset="UTF-8" compilationlevel="simple" prettyprint="true" />
+      <mainsources dir="${soy101.output.dir}" includes="*.js" />
+      <sources dir="${closure-library.dir}" includes="**/*.js" />
+    </builder-plus>
   </target>
   
 
