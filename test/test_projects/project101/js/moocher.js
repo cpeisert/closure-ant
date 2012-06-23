@@ -19,16 +19,18 @@
 goog.require('goog.date.Date');
 goog.require('goog.dom');
 
+
 /**
  * Shares a message with the world.
  *
- * @param {string} message the message for the world
+ * @param {string} message The message for the world.
  */
 var moocherHelloWorld = function(message) {
   var weekNumber = new goog.date.Date().getWeekNumber();
-  var p = goog.dom.createDom('p', undefined, 'week ' + weekNumber + ': '
-      + message);
+  var p = goog.dom.createDom('p', undefined, 'week ' + weekNumber + ': ' +
+      message);
   goog.dom.appendChild(goog.dom.getElement('div_main'), p);
 };
 
-moocherHelloWorld("It is satisfying to mooch off of goog.date.Date and goog.dom.");
+moocherHelloWorld('It is satisfying to mooch off of goog.date.Date and ' +
+    'goog.dom.');

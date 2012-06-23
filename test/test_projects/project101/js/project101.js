@@ -19,16 +19,17 @@ goog.provide('project101');
 goog.require('goog.date.Date');
 goog.require('goog.dom');
 
+
 /**
  * Shares a message with the world.
  *
- * @param {string} message the message for the world
+ * @param {string} message The message for the world.
  */
 project101.displayMessage = function(message) {
   var weekNumber = new goog.date.Date().getWeekNumber();
-  var p = goog.dom.createDom('p', undefined, 'week ' + weekNumber + ': '
-      + message);
+  var p = goog.dom.createDom('p', undefined, 'week ' + weekNumber + ': ' +
+      message);
   goog.dom.appendChild(goog.dom.getElement('div_main'), p);
 };
-project101.displayMessage("project101.displayMessage() is alive! No dead "
-    + "code elimination here...");
+project101.displayMessage('project101.displayMessage() is alive! No dead ' +
+    'code elimination here...');
