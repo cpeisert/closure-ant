@@ -16,10 +16,8 @@ limitations under the License.
 -->
 <project name="closure-ant-tasks" basedir="." default="jar">
 
-  <!-- Use JDK 1.6 to build jar file. Use JDK 1.7 to generate JavaDoc. -->
-  <property name="JDK1.6.dir" location="/usr/lib/jvm/jdk1.6" />
+  <!-- Use JDK 1.7 to generate JavaDoc. -->
   <property name="JDK1.7.dir" location="/usr/lib/jvm/jdk1.7" />
-  <property name="javac1.6" location="${JDK1.6.dir}/bin/javac" />
   <property name="javadoc1.7" location="${JDK1.7.dir}/bin/javadoc" />
   
   <!--
@@ -107,10 +105,12 @@ limitations under the License.
 
 
   <target name="compile" depends="init"
-      description="Compiles the Java source using the system's default JDK.">
+      description="Compiles the Java source using the system's default JDK to be compatible with Java SE 1.6.">
     <javac srcdir="${src.dir}" destdir="${classes.dir}"
         classpathref="classpath" debug="on" deprecation="on"
-        source="1.6" includeantruntime="false">
+        includeantruntime="false"
+        source="1.6"
+        target="1.6">
       <compilerarg value="-Xlint"/>
     </javac>
   </target>
@@ -262,21 +262,8 @@ builderplus.jar using the system's default JDK.&#13;&#10;" />
   
 
   <!--
-    For "release" builds, use JDK 1.6 to compile sources for the jar file and
-    JDK 1.7 to generate JavaDoc.
+    For "release" builds, JDK 1.7 to generate JavaDoc.
   -->
-  
-  <target name="compile_1.6" depends="init"
-      description="Compiles the Java source using JDK 1.6.">
-    <javac executable="${javac1.6}"
-        srcdir="${src.dir}" destdir="${classes.dir}"
-        classpathref="classpath" debug="on" deprecation="on"
-        includeantruntime="false"
-        source="1.6"
-        target="1.6">
-      <compilerarg value="-Xlint"/>
-    </javac>
-  </target>
   
 
   <target name="javadoc_1.7"
@@ -308,7 +295,7 @@ builderplus.jar using the system's default JDK.&#13;&#10;" />
 
   
   <target name="release" 
-      depends="compile_1.6, jar, builder-plus-jar, javadoc_1.7"
+      depends="compile, jar, builder-plus-jar, javadoc_1.7"
       description="Creates standalone closure-ant-tasks-&lt;release.stamp>.jar
 and builderplus-&lt;release.stamp>.jar using JDK 1.6 and generates JavaDoc using
 JDK 1.7.&#13;&#10;">
