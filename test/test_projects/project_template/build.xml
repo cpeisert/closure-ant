@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+================================================================================
+  Project template
+================================================================================
+-->
+<project name="template" default="build">
+
+  <dirname property="template.dir" file="${ant.file.template}" />
+
+  <property name="build.dir" location="${template.dir}/build" />
+  <property name="template.js.dir" location="${template.dir}/js" />
+  <property name="template.html.dir" location="${template.dir}/html" />
+  <property name="template.index.html"
+      location="${template.html.dir}/index.html" />
+  <property name="template.compiled.js"
+      location="${build.dir}/template.compiled.js" />
+
+  <property name="test.dir" location="${template.dir}/../.." />
+  <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
+  <property name="closure-ant-tasks.lib.dir" location="${closure-ant-tasks.dir}/lib" />
+  <property name="closure-ant-tasks.build.dir"
+      location="${closure-ant-tasks.dir}/build" />
+  <property name="closure-tools-config.xml"
+      location="${closure-ant-tasks.build.dir}/closure-tools-config.xml" />
+  <import file="${closure-tools-config.xml}" />
+
+
+  <target name="init">
+    <mkdir dir="${build.dir}" />
+    <copy todir="${build.dir}">
+      <fileset dir="${template.html.dir}" includes="**/*.html" />
+    </copy>
+  </target>
+
+
+  <target name="raw" depends="init">
+    <builder-plus outputMode="raw" outputfile="${template.compiled.js}">
+      <mainsources dir="${template.js.dir}" includes="**/*.js" />
+      <roots dir="${closure-library.dir}" />
+    </builder-plus>
+  </target>
+
+
+  <target name="whitespace" depends="init">
+    <builder-plus outputMode="compiled" outputfile="${template.compiled.js}">
+      <mainsources dir="${template.js.dir}" includes="**/*.js" />
+      <roots dir="${closure-library.dir}" />
+      <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
+    </builder-plus>
+  </target>
+
+  
+  <target name="simple" depends="init">
+    <builder-plus outputMode="compiled" outputfile="${template.compiled.js}">
+      <mainsources dir="${template.js.dir}" includes="**/*.js" />
+      <roots dir="${closure-library.dir}" />
+      <compiler compilationLevel="SIMPLE" prettyPrint="true"
+          warninglevel="VERBOSE" />
+    </builder-plus>
+  </target>
+
+
+  <target name="advanced" depends="init">
+    <builder-plus outputMode="compiled" outputfile="${template.compiled.js}">
+      <mainsources dir="${template.js.dir}" includes="**/*.js" />
+      <roots dir="${closure-library.dir}" />
+      <compiler compilationLevel="ADVANCED" warninglevel="VERBOSE" />
+    </builder-plus>
+  </target>
+
+
+  <target name="plovr-advanced" depends="init">
+    <plovr plovrMode="build" forceRecompile="true"
+        configID="myapp"
+        outputfile="${template.compiled.js}">
+      <inputs dir="${template.js.dir}" includes="**/*.js" />
+      <compiler compilationMode="advanced" warninglevel="VERBOSE">
+        <compilercheck name="checkVars" value="WARNING" />
+      </compiler>
+    </plovr>
+  </target>
+
+
+  <target name="build" depends="advanced" />
+</project>
