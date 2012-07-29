@@ -24,17 +24,17 @@ import com.google.common.io.Files;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.ant.antunit.AntUnit;
-import org.apache.ant.antunit.LogCapturer;
-import org.apache.ant.antunit.listener.BaseAntUnitListener;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.DefaultLogger;
@@ -64,7 +64,9 @@ import org.closureextensions.common.util.FileUtil;
  *
  * <p>If {@code gjslint} and {@code fixjsstyle} are defined on your PATH,
  * then the Python script locations do not need to be specified when using
- * the Closure Linter Ant task.</p>
+ * the Closure Linter Ant task. To execute the Python scripts directly,
+ * it may be necessary to explicitly set the Python executable. See {@link
+ * #setPythonExecutable(String)}.</p>
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
@@ -82,7 +84,6 @@ public final class ClosureLinterTask extends Task {
 
   private final static String FIXJSSTYLE = "fixjsstyle";
   private final static String GJSLINT = "gjslint";
-  private final static String PYTHON = "python";
 
   // Note: the Closure Linter command line flags are defined in the following
   // source files: checker.py, checkerbase.py, ecmalintrules.py,
@@ -119,6 +120,7 @@ public final class ClosureLinterTask extends Task {
   private Boolean multiProcess;
 
   private String pythonExecutable;
+  private boolean showCommandLine;
 
   // Corresponds to flag --summary defined in gjslint.py.
   private Boolean showSummary;
@@ -177,7 +179,8 @@ public final class ClosureLinterTask extends Task {
     this.linterMode = ClosureLinterMode.LINT;
     this.logFile = null;
     this.multiProcess = null;
-    this.pythonExecutable = PYTHON;
+    this.pythonExecutable = null;
+    this.showCommandLine = false;
     this.showSummary = null;
     this.timingStats = null;
     this.unixMode = null;
@@ -301,7 +304,7 @@ public final class ClosureLinterTask extends Task {
    * system before using FIX mode in case the script makes unwanted changes.
    * </p>
    *
-   * @param linterMode
+   * @param linterMode the Closure Linter mode. Options: FIX or LINT
    */
   public void setLinterMode(String linterMode) {
     if ("FIX".equalsIgnoreCase(linterMode)) {
@@ -325,12 +328,68 @@ public final class ClosureLinterTask extends Task {
   }
 
   /**
-   * Sets the Python interpreter executable.
+   * Whether to parallalize linting using the multiprocessing module. Disabled
+   * by default.
    *
-   * @param python the Python executable. Defaults to "python".
+   * @param multiProcess {@code true} to use multiprocessing. Defaults to
+   *     {@code false}.
+   */
+  public void setMultiProcess(boolean multiProcess) {
+    this.multiProcess = multiProcess;
+  }
+
+  /**
+   * Sets the Python interpreter executable. If Closure Linter is installed
+   * such that {@code gjslint} and {@code fixjsstyle} are defined on your PATH,
+   * then the Python executable should not be set. Only set the executable if
+   * explicitly specifying the Python scripts {@code gjslint.py} and {@code
+   * fixjsstyle.py}.
+   *
+   * @param python the Python executable, for example, {@code python}
    */
   public void setPythonExecutable(String python) {
     this.pythonExecutable = python;
+  }
+
+  /**
+   * Whether to print the full command line used to run gjslint or
+   * fixjsstyle.
+   *
+   * @param showCommandLine {@code true} to print the command line. Defaults
+   *     to {@code false}.
+   */
+  public void setShowCommandLine(boolean showCommandLine) {
+    this.showCommandLine = showCommandLine;
+  }
+
+  /**
+   * Whether to show an error count summary.
+   *
+   * @param showSummary {@code true} to show an error count summary. Defaults
+   *     to {@code false}.
+   */
+  private void setShowSummary(boolean showSummary) {
+    this.showSummary = showSummary;
+  }
+
+  /**
+   * Whether to emit timing statistics.
+   *
+   * @param timingStats {@code true} to emit timing stats. Defaults to {@code
+   *     false}.
+   */
+  private void setTimingStats(boolean timingStats) {
+    this.timingStats = timingStats;
+  }
+
+  /**
+   * Whether to emit warnings in standard unix format.
+   *
+   * @param unixMode {@code true} to emit warnings in standard unix format.
+   *     Defaults to {@code false}.
+   */
+  private void setUnixMode(boolean unixMode) {
+    this.unixMode = unixMode;
   }
 
 
@@ -488,10 +547,7 @@ public final class ClosureLinterTask extends Task {
 
     if (!skipBuild) {
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-      if(!changeDefaultLoggerOutputStream(outputStream)) {
-        throw new BuildException("unable to change the default logger's output "
-            + "stream");
-      }
+      DefaultLogger logger = changeDefaultLoggerOutputStream(outputStream);
 
       LogStreamHandler logStreamHandler;
       logStreamHandler = new LogStreamHandler(this, Project.MSG_INFO,
@@ -500,24 +556,49 @@ public final class ClosureLinterTask extends Task {
       runner.setVMLauncher(false);
       runner.setAntRun(getProject());
       runner.setCommandline(cmdline.toStringArray());
-      int exitCode = executeClosureLinter(runner);
+      if (this.showCommandLine) {
+        log("Executing command: " + cmdline.toString());
+      }
+      executeClosureLinter(runner);
 
-      // TODO(cpeisert): Strip the following text from log output:
-      /*Some of the errors reported by GJsLint may be auto-fixable using the script
-          [antunit] fixjsstyle. Please double check any changes it makes and report any bugs. The
-          [antunit] script can be run by executing:
-      [antunit]
-      [antunit] fixjsstyle --jslint_error*/
+      String antOutput = outputStream.toString();
 
-      // TODO(cpeisert): write log message about running Closure Linter in FIX
-      // mode if current mode is LINT and exitCode != 0
+      // Remove task identifier from log output. For example: [closure-linter]
+      Pattern taskLabel = Pattern.compile("(?s)\\[" + getTaskName() + "\\] ");
+      Matcher taskMatcher = taskLabel.matcher(antOutput);
+      StringBuffer buffer = new StringBuffer();
+      while (taskMatcher.find()) {
+        taskMatcher.appendReplacement(buffer, "");
+      }
+      taskMatcher.appendTail(buffer);
+      antOutput = buffer.toString();
 
-      // TODO(cpeisert): write the entire log contents (after remove message
-      // above)
+      // If errors were found, suggest using linterMode FIX instead of the
+      // default message to use fixjsstyle directly.
+      if (runner.isFailure()
+          && ClosureLinterMode.LINT.equals(this.linterMode)) {
+        Pattern p = Pattern.compile("(?ms)Some of the errors reported.*"
+            + "fixjsstyle .*$");
+        Matcher m = p.matcher(antOutput);
+        StringBuffer sb = new StringBuffer();
+        if (m.find()) {
+          m.appendReplacement(sb, "Some of the errors reported by Closure "
+              + "Linter may be auto-fixable by using linterMode FIX. Back up "
+              + "your files or store them in a source control system before "
+              + "using FIX mode in case the script makes unwanted changes.");
+        }
+        m.appendTail(sb);
+        antOutput = sb.toString();
+      }
+
+      // Restore Ant's default output stream to standard out.
+      logger.setOutputPrintStream(new PrintStream(new FileOutputStream(
+          FileDescriptor.out)));
+      log(antOutput);
 
       if (this.logFile != null) {
         try {
-          Files.write(outputStream.toString(), this.logFile, Charsets.UTF_8);
+          Files.write(antOutput, this.logFile, Charsets.UTF_8);
         } catch (IOException e) {
           throw new BuildException(e);
         }
@@ -527,9 +608,14 @@ public final class ClosureLinterTask extends Task {
         // Save current build settings.
         BuildSettings currentBuildSettings = new BuildSettings(
             cmdline.toString(), allSourcePaths);
-        boolean buildFailed = exitCode != 0;
-        currentBuildSettings.setBuildFailed(buildFailed);
+        currentBuildSettings.setBuildFailed(runner.isFailure());
         cache.put(currentBuildSettings);
+      }
+      if (runner.isFailure()) {
+        String executableScript = ClosureLinterMode.LINT.equals(this.linterMode)
+            ? this.gjslintPythonScript : this.fixjsstylePythonScript;
+        throw new BuildException(executableScript + " finished with exit code "
+            + runner.getExitValue());
       }
     }
   }
@@ -539,31 +625,36 @@ public final class ClosureLinterTask extends Task {
    * org.apache.tools.ant.DefaultLogger}.
    *
    * @param outputStream the output stream to use for the default logger
-   * @return {@code true} if the default logger's output stream was
-   *     successfully changed
+   * @return the default logger
+   * @throws BuildException if the default logger's output stream cannot be
+   *     changed
    */
-  private boolean changeDefaultLoggerOutputStream(OutputStream outputStream) {
-    for (Object obj : getProject().getBuildListeners()) {
-      System.out.println("DEBUG: buildlistener class => " + obj.getClass());
+  private DefaultLogger changeDefaultLoggerOutputStream(OutputStream outputStream) {
+    DefaultLogger logger = null;
 
+    for (Object obj : getProject().getBuildListeners()) {
       if (obj instanceof DefaultLogger) {
         PrintStream printStream = new PrintStream(outputStream);
-        ((DefaultLogger) obj).setOutputPrintStream(printStream);
-        return true;
+        logger = (DefaultLogger) obj;
+        logger.setOutputPrintStream(printStream);
       } else if (("class org.apache.ant.antunit.listener."
           + "BaseAntUnitListener$LogGrabber").equals(
           obj.getClass().toString())) {
         // The Ant task is being executed by AntUnit for testing.
         Project project = getProject();
         project.removeBuildListener((BuildListener)obj);
-        DefaultLogger logger = new DefaultLogger();
+        logger = new DefaultLogger();
         logger.setMessageOutputLevel(Project.MSG_INFO);
         logger.setOutputPrintStream(new PrintStream(outputStream));
         project.addBuildListener(logger);
-        return true;
       }
     }
-    return false;
+
+    if (logger == null) {
+      throw new BuildException("unable to change the default Ant logger "
+          + "output stream");
+    }
+    return logger;
   }
 
   /**
@@ -577,9 +668,9 @@ public final class ClosureLinterTask extends Task {
       throws IOException {
     CommandLineBuilder cmdline = new CommandLineBuilder();
 
-    // TODO(cpeisert): test on windows to determine if "python" must be
-    // explicitly specified on command line
-    //cmdline.argument(this.pythonExecutable);
+    if (this.pythonExecutable != null) {
+      cmdline.argument(this.pythonExecutable);
+    }
 
     if (ClosureLinterMode.LINT.equals(this.linterMode)) {
       cmdline.argument(this.gjslintPythonScript);
@@ -596,53 +687,51 @@ public final class ClosureLinterTask extends Task {
     }
     if(Boolean.TRUE.equals(this.checkJavaScriptInHtmlFiles)) {
       cmdline.argument("--check_html");
-    } else if (Boolean.FALSE.equals(this.beep)) {
+    } else if (Boolean.FALSE.equals(this.checkJavaScriptInHtmlFiles)) {
       cmdline.argument("--nocheck_html");
     }
     if(Boolean.TRUE.equals(this.debugIndentation)) {
       cmdline.argument("--debug_indentation");
-    } else if (Boolean.FALSE.equals(this.beep)) {
+    } else if (Boolean.FALSE.equals(this.debugIndentation)) {
       cmdline.argument("--nodebug_indentation");
     }
     if(Boolean.TRUE.equals(this.debugTokens)) {
       cmdline.argument("--debug_tokens");
-    } else if (Boolean.FALSE.equals(this.beep)) {
+    } else if (Boolean.FALSE.equals(this.debugTokens)) {
       cmdline.argument("--nodebug_tokens");
     }
     if(Boolean.TRUE.equals(this.disableIndentationFixing)) {
       cmdline.argument("--disable_indentation_fixing");
-    } else if (Boolean.FALSE.equals(this.beep)) {
+    } else if (Boolean.FALSE.equals(this.disableIndentationFixing)) {
       cmdline.argument("--nodisable_indentation_fixing");
     }
     if(Boolean.TRUE.equals(this.errorTrace)) {
       cmdline.argument("--error_trace");
-    } else if (Boolean.FALSE.equals(this.beep)) {
+    } else if (Boolean.FALSE.equals(this.errorTrace)) {
       cmdline.argument("--noerror_trace");
     }
     if(Boolean.TRUE.equals(this.multiProcess)) {
       cmdline.argument("--multiprocess");
-    } else if (Boolean.FALSE.equals(this.beep)) {
+    } else if (Boolean.FALSE.equals(this.multiProcess)) {
       cmdline.argument("--nomultiprocess");
     }
     if(Boolean.TRUE.equals(this.showSummary)) {
       cmdline.argument("--summary");
-    } else if (Boolean.FALSE.equals(this.beep)) {
+    } else if (Boolean.FALSE.equals(this.showSummary)) {
       cmdline.argument("--nosummary");
     }
     if(Boolean.TRUE.equals(this.timingStats)) {
       cmdline.argument("--time");
-    } else if (Boolean.FALSE.equals(this.beep)) {
+    } else if (Boolean.FALSE.equals(this.timingStats)) {
       cmdline.argument("--notime");
     }
     if(Boolean.TRUE.equals(this.unixMode)) {
       cmdline.argument("--unix_mode");
-    } else if (Boolean.FALSE.equals(this.beep)) {
+    } else if (Boolean.FALSE.equals(this.unixMode)) {
       cmdline.argument("--nounix_mode");
     }
 
     // Nested elements
-
-    Set<String> allSourcesExcludingRootDirs = Sets.newHashSet();
 
     cmdline.flagAndArguments("--additional_extensions",
         this.additionalJSFileExtensions);
@@ -680,8 +769,11 @@ public final class ClosureLinterTask extends Task {
     List<String> sourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
         getProject(), this.sources);
 
+    Set<String> allSourcesExcludingRootDirs = Sets.newHashSet();
+
     allSourcesExcludingRootDirs.addAll(mainSourcePaths);
     allSourcesExcludingRootDirs.addAll(sourcePaths);
+    allSourcesExcludingRootDirs.addAll(sourcePathsRelaxedDocChecks);
     cmdline.arguments(allSourcesExcludingRootDirs);
 
     return cmdline;
@@ -746,7 +838,7 @@ public final class ClosureLinterTask extends Task {
    *     specified time
    */
   private boolean sourcesUpToDate(Collection<String> sources,
-      Long timeInMilliseconds) {
+                                  Long timeInMilliseconds) {
     for (String filePath : sources) {
       if (new File(filePath).lastModified() > timeInMilliseconds) {
         return false;
@@ -768,12 +860,6 @@ public final class ClosureLinterTask extends Task {
     int exitCode = 0;
     try {
       exitCode = runner.execute();
-      if (exitCode != 0) {
-        String executableScript = ClosureLinterMode.LINT.equals(this.linterMode)
-            ? this.gjslintPythonScript : this.fixjsstylePythonScript;
-        log("Error: " + executableScript + " finished with exit code "
-            + exitCode);
-      }
     } catch (IOException e) {
       throw new BuildException(e);
     }
