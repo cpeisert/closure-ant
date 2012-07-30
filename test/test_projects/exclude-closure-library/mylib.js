@@ -16,6 +16,7 @@
 
 goog.provide('mylib');
 
+
 /**
  * Wrap text at {@code width} characters without splitting words.
  *
@@ -23,11 +24,11 @@ goog.provide('mylib');
  * @param {number} width The maximum number of characters per line.
  * @param {string} lineSeparator The text to use at the end of each line. For
  *     example, '\n' or '&lt;br&gt;'.
- * @return {String}
+ * @return {string} The wrapped text.
  */
-mylib.wordwrap = function (text, width, lineSeparator) {
+mylib.wordwrap = function(text, width, lineSeparator) {
   if (text == null) {
-    throw Error("text is null");
+    throw Error('text is null');
   }
 
   lineSeparator = lineSeparator || '\n';

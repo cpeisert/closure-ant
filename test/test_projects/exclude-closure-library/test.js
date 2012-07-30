@@ -22,13 +22,13 @@ goog.require('mylib');
 /**
  * Shares a message with the world.
  *
- * @param {string} message the message for the world
+ * @param {string} message The message for the world.
  */
 test.sayHello = function(message) {
   message = mylib.wordwrap(message, 30);
   alert(message);
 };
 
-test.sayHello('Hi, guys, this is Eddie your shipboard computer and I '
-    + 'just know I\'m gonna get a bundle of kicks out of any program you want '
-    + 'to run through me.');
+test.sayHello('Hi, guys, this is Eddie your shipboard computer and I ' +
+    'just know I\'m gonna get a bundle of kicks out of any program you want ' +
+    'to run through me.');
