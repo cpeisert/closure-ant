@@ -22,40 +22,46 @@ goog.require('goog.events');
 goog.require('goog.events.Event');
 goog.require('goog.events.EventType');
 goog.require('goog.format.JsonPrettyPrinter');
+goog.require('goog.positioning.AnchoredViewportPosition');
 goog.require('goog.positioning.ClientPosition');
 goog.require('goog.positioning.Corner');
-goog.require('goog.positioning.AnchoredViewportPosition');
 goog.require('goog.style');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.HsvPalette');
 goog.require('goog.ui.Popup');
-
 goog.require('jsonstyle.JsonStyleManager');
 
 
 /** @type {goog.ui.HsvPalette} */
 jsonstyle.colorPalette;
 
-/** @type {string} */
-jsonstyle.colorPopupID = "colorPopup";
 
 /** @type {string} */
-jsonstyle.outputElementID = "outputPrettyPrint";
+jsonstyle.colorPopupID = 'colorPopup';
+
 
 /** @type {string} */
-jsonstyle.inputTextareaID = "jsonInputTextarea";
+jsonstyle.outputElementID = 'outputPrettyPrint';
+
+
+/** @type {string} */
+jsonstyle.inputTextareaID = 'jsonInputTextarea';
+
 
 /** @type {!Element} */
 jsonstyle.colorPopupElement = /** @type {!Element} */
     (document.getElementById(jsonstyle.colorPopupID));
 
+
 /** @type {!Element} */
 jsonstyle.outputElement = /** @type {!Element} */
     (document.getElementById(jsonstyle.outputElementID));
 
+
 /** @type {!Element} */
 jsonstyle.inputTextarea = /** @type {!Element} */
     (document.getElementById(jsonstyle.inputTextareaID));
+
 
 /** @type {jsonstyle.JsonStyleManager} */
 jsonstyle.jsonStyleManager;
@@ -66,15 +72,16 @@ jsonstyle.jsonStyleManager;
  *
  * @param {string} json String of JSON to pretty print.
  * @param {!Element} element The HTML element to insert the pretty-printed JSON.
- * @param {number=} indentation Number of spaces to indent each level. Defaults
- *     to 2.
+ * @param {number=} opt_indentation Number of spaces to indent each level.
+ *     Defaults to 2.
  */
-jsonstyle.prettyPrintJSON = function(json, element, indentation) {
+jsonstyle.prettyPrintJSON = function(json, element, opt_indentation) {
   var delimiters = new goog.format.JsonPrettyPrinter.HtmlDelimiters();
-  delimiters.indent = goog.isDef(indentation) ? indentation : 2;
+  delimiters.indent = goog.isDef(opt_indentation) ? opt_indentation : 2;
   var formatter = new goog.format.JsonPrettyPrinter(delimiters);
   element.innerHTML = formatter.format(json);
 };
+
 
 /** @type {goog.ui.Popup} */
 jsonstyle.colorPopup = new goog.ui.Popup(jsonstyle.colorPopupElement);
@@ -96,10 +103,11 @@ jsonstyle.onTextareaChange = function(event) {
         jsonstyle.outputElement);
   } catch (error) {
     jsonstyle.outputElement.innerHTML =
-        '<span class="' + goog.getCssName('error')
-        + '">JSON syntax error.</span>';
+        '<span class="' + goog.getCssName('error') +
+        '">JSON syntax error.</span>';
   }
 };
+
 
 /**
  * Event handler for window resize.
@@ -112,6 +120,7 @@ jsonstyle.onResize = function(event) {
   }
 };
 
+
 /**
  * Update the appropriate JSON style color based on which button is clicked and
  * the selected color from the color palette.
@@ -123,26 +132,27 @@ jsonstyle.onColorPaletteAction = function(event) {
     var color = jsonstyle.colorPalette.getColor();
 
     switch (jsonstyle.colorPalette.buttonClickedId) {
-      case "buttonPropertyName":
+      case 'buttonPropertyName':
         jsonstyle.jsonStyleManager.setPropertyNameColor(color);
         break;
-      case "buttonBooleanValue":
+      case 'buttonBooleanValue':
         jsonstyle.jsonStyleManager.setBooleanValueColor(color);
         break;
-      case "buttonNumberValue":
+      case 'buttonNumberValue':
         jsonstyle.jsonStyleManager.setNumberValueColor(color);
         break;
-      case "buttonNullValue":
+      case 'buttonNullValue':
         jsonstyle.jsonStyleManager.setNullValueColor(color);
         break;
-      case "buttonStringValue":
+      case 'buttonStringValue':
         jsonstyle.jsonStyleManager.setStringValueColor(color);
         break;
-      default: throw Error("unrecognized button ID: "
-          + jsonstyle.colorPalette.buttonClickedId);
+      default: throw Error('unrecognized button ID: ' +
+          jsonstyle.colorPalette.buttonClickedId);
     }
   }
 };
+
 
 /**
  * Toggle the visibility of the color-selector popup window (that is, if it is
@@ -154,7 +164,7 @@ jsonstyle.onColorPaletteAction = function(event) {
 jsonstyle.togglePopup = function(event) {
   var popup = jsonstyle.colorPopup;
   var buttonEl = /** @type {!Element} */ (event.target);
-  if (!goog.string.startsWith(buttonEl.getAttribute("id"), 'button')) {
+  if (!goog.string.startsWith(buttonEl.getAttribute('id'), 'button')) {
     buttonEl = /** @type {!Element} */ (event.target.parentNode);
   }
 
@@ -167,7 +177,7 @@ jsonstyle.togglePopup = function(event) {
         buttonEl, goog.positioning.Corner.BOTTOM_LEFT));
     popup.setVisible(true);
 
-    var buttonId = buttonEl.getAttribute("id");
+    var buttonId = buttonEl.getAttribute('id');
     var color = jsonstyle.getButtonColorByButtonID(buttonId);
 
     jsonstyle.colorPalette.buttonClickedId = buttonId;
@@ -175,29 +185,30 @@ jsonstyle.togglePopup = function(event) {
   }
 };
 
+
 /**
  * Get the button font color for the button with the specified ID.
- * @param buttonId The button ID.
+ * @param {string} buttonId The button ID.
  * @return {string} The button's font color.
  */
 jsonstyle.getButtonColorByButtonID = function(buttonId) {
   switch (buttonId) {
-    case "buttonPropertyName":
+    case 'buttonPropertyName':
       return jsonstyle.jsonStyleManager.getPropertyNameColor();
       break;
-    case "buttonBooleanValue":
+    case 'buttonBooleanValue':
       return jsonstyle.jsonStyleManager.getBooleanValueColor();
       break;
-    case "buttonNumberValue":
+    case 'buttonNumberValue':
       return jsonstyle.jsonStyleManager.getNumberValueColor();
       break;
-    case "buttonNullValue":
+    case 'buttonNullValue':
       return jsonstyle.jsonStyleManager.getNullValueColor();
       break;
-    case "buttonStringValue":
+    case 'buttonStringValue':
       return jsonstyle.jsonStyleManager.getStringValueColor();
       break;
-    default: throw Error("unrecognized button ID: " + buttonId);
+    default: throw Error('unrecognized button ID: ' + buttonId);
   }
 };
 
@@ -210,7 +221,7 @@ jsonstyle.getButtonColorByButtonID = function(buttonId) {
  */
 jsonstyle.initializeColorPopup = function() {
   var popup = jsonstyle.colorPopup;
-  
+
   popup.setAutoHide(false);
   popup.setHideOnEscape(true);
   popup.setPinnedCorner(goog.positioning.Corner.TOP_LEFT);
@@ -225,6 +236,7 @@ jsonstyle.initializeColorPopup = function() {
   goog.events.listen(jsonstyle.colorPalette, goog.ui.Component.EventType.ACTION,
       jsonstyle.onColorPaletteAction);
 };
+
 
 /**
  * Initialize application.
@@ -267,7 +279,10 @@ jsonstyle.initializeApp = function() {
   goog.events.listen(window, goog.events.EventType.RESIZE, jsonstyle.onResize);
 };
 
-// Application entry point.
+
+/**
+ * Application entry point.
+ */
 window.onload = function() {
   jsonstyle.initializeApp();
 };

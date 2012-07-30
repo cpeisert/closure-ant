@@ -32,6 +32,7 @@ goog.require('goog.string');
 goog.require('goog.style');
 
 
+
 /**
  * Helper object to store information for a JSON style used by
  * {@code goog.format.JsonPrettyPrinter}.
@@ -50,6 +51,7 @@ jsonstyle.JsonStyle = function(cssClass, opt_color) {
   this.installedStyleElement_ = undefined;
 };
 
+
 /**
  * @return {string} The name of the JSON style CSS class without a dot ('.')
  *     prefix.
@@ -58,15 +60,18 @@ jsonstyle.JsonStyle.prototype.getCssClass = function() {
   return this.cssClass_;
 };
 
+
 /** @return {string} The style color. */
 jsonstyle.JsonStyle.prototype.getColor = function() {
   return this.color_;
 };
 
-/** @param color The style color. */
+
+/** @param {string} color The style color. */
 jsonstyle.JsonStyle.prototype.setColor = function(color) {
   this.color_ = color;
 };
+
 
 /**
  * @return {Element|undefined} The HTML style element used to install this
@@ -76,6 +81,7 @@ jsonstyle.JsonStyle.prototype.getInstalledStyleElement = function() {
   return this.installedStyleElement_;
 };
 
+
 /**
  * @param {!Element} element The HTML element into which this style was
  *     installed.
@@ -83,6 +89,7 @@ jsonstyle.JsonStyle.prototype.getInstalledStyleElement = function() {
 jsonstyle.JsonStyle.prototype.setInstalledStyleElement = function(element) {
   this.installedStyleElement_ = element;
 };
+
 
 /**
  * @return {string} A CSS style string representing this object. For example,
@@ -94,6 +101,7 @@ jsonstyle.JsonStyle.prototype.getCssString = function() {
 
 
 //------------------------------------------------------------------------------
+
 
 
 /**
@@ -219,10 +227,12 @@ jsonstyle.JsonStyleManager = function(opt_domHelper, opt_colors) {
   this.nullValueStyle_.setInstalledStyleElement(element);
 };
 
+
 /** @return {string} The color set for JSON property names. */
 jsonstyle.JsonStyleManager.prototype.getPropertyNameColor = function() {
   return this.propertyNameStyle_.getColor();
 };
+
 
 /**
  * Set the JSON property name color for the document specified by the
@@ -238,10 +248,12 @@ jsonstyle.JsonStyleManager.prototype.setPropertyNameColor = function(color) {
   }
 };
 
+
 /** @return {string} The color set for JSON string values. */
 jsonstyle.JsonStyleManager.prototype.getStringValueColor = function() {
   return this.stringValueStyle_.getColor();
 };
+
 
 /**
  * Set the JSON string value color for the document specified by the
@@ -257,10 +269,12 @@ jsonstyle.JsonStyleManager.prototype.setStringValueColor = function(color) {
   }
 };
 
+
 /** @return {string} The color set for JSON number values. */
 jsonstyle.JsonStyleManager.prototype.getNumberValueColor = function() {
   return this.numberValueStyle_.getColor();
 };
+
 
 /**
  * Set the JSON number value color for the document specified by the
@@ -276,10 +290,12 @@ jsonstyle.JsonStyleManager.prototype.setNumberValueColor = function(color) {
   }
 };
 
+
 /** @return {string} The color set for JSON boolean values. */
 jsonstyle.JsonStyleManager.prototype.getBooleanValueColor = function() {
   return this.booleanValueStyle_.getColor();
 };
+
 
 /**
  * Set the JSON boolean value color for the document specified by the
@@ -295,10 +311,12 @@ jsonstyle.JsonStyleManager.prototype.setBooleanValueColor = function(color) {
   }
 };
 
+
 /** @return {string} The color set for JSON null values. */
 jsonstyle.JsonStyleManager.prototype.getNullValueColor = function() {
   return this.nullValueStyle_.getColor();
 };
+
 
 /**
  * Set the JSON null value color for the document specified by the
