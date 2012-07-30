@@ -810,9 +810,10 @@ public final class ClosureLinterTask extends Task {
       rootDirectories.addAll(dirSet.getMatchedDirectories());
     }
 
-    // TODO(cpeisert): normalize extensions to either retain or strip dot prefix
     Set<String> jsFileExtensions = Sets.newHashSet();
-    jsFileExtensions.addAll(this.additionalJSFileExtensions);
+    for (String ext : this.additionalJSFileExtensions) {
+      jsFileExtensions.add(ext.replaceFirst("^([^\\.]+)", ".$1"));
+    }
     jsFileExtensions.add(".js");
 
     for (File dir : rootDirectories) {
