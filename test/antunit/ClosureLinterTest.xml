@@ -29,6 +29,7 @@ limitations under the License.
   <property name="test.build.dir" location="${test.dir}/build" />
   <property name="test.lib.dir" location="${test.dir}/lib" />
   <import file="${test.lib.dir}/antunit.xml" />
+  <property name="linter_test.dir" location="${test-projects.dir}/linter_test" />
 
   <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
   <property name="closure-ant-tasks.lib.dir"
@@ -39,10 +40,9 @@ limitations under the License.
       location="${closure-ant-tasks.build.dir}/closure-tools-config.xml" />
   <import file="${closure-tools-config.xml}" />
 
-  <import file="${test-projects.dir}/json-in-style/jsonInStyle.xml" />
   <import file="${test-projects.dir}/project101/project101.xml" />
 
-  
+
   <!--
   ==============================================================================
     Set up and tear down
@@ -52,7 +52,7 @@ limitations under the License.
   <!-- Executed once for this test suite before all other targets. -->
   <target name="suiteSetUp">
     <mkdir dir="${test.build.dir}" />
-    <mkdir dir="${json-in-style.output.dir}" />
+    <mkdir dir="${test.build.dir}/antunit" />
     <mkdir dir="${project101.output.dir}" />
   </target>
 
@@ -65,15 +65,36 @@ limitations under the License.
 
 
   <target name="testLintNoErrors">
-    <closure-linter>
+    <closure-linter logfile="${test.build.dir}/antunit/linter.log">
       <closurelintererrors all="true" />
       <mainsources dir="${project101.js.dir}" includes="project101.js" />
       <sources dir="${project101.js.dir}" includes="moocher.js" />
-
     </closure-linter>
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="no errors found" />
   </target>
 
-  
+
+  <target name="testCheckJavaScriptInHtmlFile">
+    <expectfailure>
+      <closure-linter checkJsInHtmlFiles="true"
+          linterMode="lint" showCommandLine="true"
+          logfile="${test.build.dir}/antunit/linter.log">
+        <closurelintererrors all="true" />
+        <mainsources dir="${linter_test.dir}" includes="*.html" />
+      </closure-linter>
+    </expectfailure>
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="${linter_test.dir}/index.html" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="E:0240: @param descriptions must end with valid punctuation" />
+  </target>
+
+
   <!-- Run this test suite. -->
   <target name="test">
     <antunit>

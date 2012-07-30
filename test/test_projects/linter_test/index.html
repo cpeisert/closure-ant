@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Lint embedded JavaScript</title>
+</head>
+
+<body>
+
+<script>
+  /**
+   * enough lint errors to destroy a dryer
+   *
+   * @param {string} param1 description is not a sentence
+   * @param param2 missing type annotation
+   */
+  lint.errors.MyConstructor = function(param1) {
+    var x = goog.dom.getElementsByTagNameAndClass("body");
+    var longString = 'This is a long string and the concatenation operator '
+        + 'should appear on the previous line.';
+  }
+</script>
+
+</body>
+</html>
