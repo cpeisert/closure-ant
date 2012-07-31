@@ -735,8 +735,12 @@ public final class ClosureLinterTask extends Task {
 
     cmdline.flagAndArguments("--additional_extensions",
         this.additionalJSFileExtensions);
-    cmdline.commandLineBuilder(
-        this.closureLinterErrors.getCommandLineForErrorFlags());
+
+    if (this.closureLinterErrors != null) {
+      cmdline.commandLineBuilder(this.closureLinterErrors
+          .getCommandLineForErrorFlags());
+    }
+
     cmdline.flagAndArguments("--custom_jsdoc_tags", this.customJsDocTags);
     cmdline.flagAndArguments("--ignored_extra_namespaces",
         this.extraNamespacesToIgnore);
