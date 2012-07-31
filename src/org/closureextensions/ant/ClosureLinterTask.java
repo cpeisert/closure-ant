@@ -220,7 +220,10 @@ public final class ClosureLinterTask extends Task {
   }
 
   /**
-   * Whether to print debugging information for indentation.
+   * Whether to print debugging information for indentation. The error flag
+   * {@code indentation} must be set to {@code true}, either with
+   * ({@link ClosureLinterErrors#setIndentation(boolean)}) or with
+   * ({@link ClosureLinterErrors#setAll(boolean)}).
    *
    * @param debugIndentation {@code true} to print debugging information for
    *     indentation. Defaults to {@code false}.
