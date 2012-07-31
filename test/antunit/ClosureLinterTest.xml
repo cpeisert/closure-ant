@@ -112,18 +112,20 @@ limitations under the License.
 
 
   <target name="testPrintDebugInfoForIndentation">
-
-    <closure-linter debugindentation="true"
+    <expectfailure>
+      <closure-linter debugindentation="true"
           linterMode="lint" showCommandLine="true"
           logfile="${test.build.dir}/antunit/linter.log">
-        <mainsources dir="${linter_test.dir}" includes="*.js" />
+        <mainsources dir="${linter_test.dir}" includes="indentation_errors.js" />
+        <closurelintererrors indentation="true" />
       </closure-linter>
-
+    </expectfailure>
 
     <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
     <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
-        value="${linter_test.dir}/lint_errors.js" />
-
+        value="${linter_test.dir}/indentation_errors.js" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="Line #1: stack []" />
   </target>
 
 
