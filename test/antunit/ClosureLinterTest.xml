@@ -95,6 +95,39 @@ limitations under the License.
   </target>
 
 
+  <target name="testIgnoreJavaScriptInHtmlFile">
+    <closure-linter checkJsInHtmlFiles="false"
+        linterMode="lint" showCommandLine="true"
+        logfile="${test.build.dir}/antunit/linter.log">
+      <closurelintererrors all="true" />
+      <mainsources dir="${linter_test.dir}" includes="*.html" />
+    </closure-linter>
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="${linter_test.dir}/index.html" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="no errors found" />
+  </target>
+
+
+  <target name="testPrintDebugInfoForIndentation">
+
+    <closure-linter debugindentation="true"
+          linterMode="lint" showCommandLine="true"
+          logfile="${test.build.dir}/antunit/linter.log">
+        <mainsources dir="${linter_test.dir}" includes="*.js" />
+      </closure-linter>
+
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="${linter_test.dir}/lint_errors.js" />
+
+  </target>
+
+
+
   <!-- Run this test suite. -->
   <target name="test">
     <antunit>

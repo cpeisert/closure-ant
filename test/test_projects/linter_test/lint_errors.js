@@ -21,8 +21,16 @@ goog.require('goog.dom');
  * @param {string} param1 description is not a sentence
  * @param param2 missing type annotation
  */
-lint.errors.MyConstructor = function(param1) {
-  var x = goog.dom.getElementsByTagNameAndClass("body");
-  var longString = 'This is a long string and the concatenation operator '
-      + 'should appear on the previous line.';
+goog.scope(function() {
+  lint.errors.MyConstructor = function(param1) {
+    var body = goog.dom.getElementsByTagNameAndClass("body")[0];
+    var longString = 'The concatenation operator should appear on the '
+        + 'previous line.';
+
+    var missingSemicolon = "The string to nowhere..." // missing semicolon
+
+    var z = body == null ? 'ghost'
+        : 'corporeal';
+  }
 }
+);
