@@ -65,7 +65,7 @@ limitations under the License.
 
 
   <target name="testLintNoErrors">
-    <closure-linter logfile="${test.build.dir}/antunit/linter.log">
+    <closure-linter force="true" logfile="${test.build.dir}/antunit/linter.log">
       <closurelintererrors all="true" />
       <mainsources dir="${project101.js.dir}" includes="project101.js" />
       <sources dir="${project101.js.dir}" includes="moocher.js" />
@@ -111,7 +111,7 @@ limitations under the License.
   </target>
 
 
-  <target name="testPrintDebugInfoForIndentation">
+  <target name="testDebugIndentation">
     <expectfailure>
       <closure-linter
           linterMode="lint" showCommandLine="true"
@@ -126,6 +126,41 @@ limitations under the License.
         value="${linter_test.dir}/indentation_errors.js" />
     <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
         value="Line #1: stack []" />
+  </target>
+
+
+  <target name="testDebugTokens">
+    <expectfailure>
+      <closure-linter debugTokens="true"
+          linterMode="lint" showCommandLine="true"
+          logfile="${test.build.dir}/antunit/linter.log">
+        <mainsources dir="${linter_test.dir}" includes="lint_errors.js" />
+      </closure-linter>
+    </expectfailure>
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="${linter_test.dir}/lint_errors.js" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="&lt;JavaScriptToken: 1" />
+  </target>
+
+
+  <target name="testSkipIfUpToDate">
+    <logcapturer />
+    <closure-linter logfile="${test.build.dir}/antunit/linter.log">
+      <mainsources dir="${project101.js.dir}" includes="project101.js" />
+      <sources dir="${project101.js.dir}" includes="moocher.js" />
+    </closure-linter>
+
+    <!-- This invocation should skip linting. -->
+    <closure-linter logfile="${test.build.dir}/antunit/linter.log">
+      <mainsources dir="${project101.js.dir}" includes="project101.js" />
+      <sources dir="${project101.js.dir}" includes="moocher.js" />
+    </closure-linter>
+
+    <assertLogContains
+      text="None of the source files or linter settings changed. Linting skipped." />
   </target>
 
 
