@@ -512,6 +512,8 @@ public final class ClosureLinterTask extends Task {
         if (previousBuild.getCommandLineOrConfig().equals(cmdline.toString())) {
           if (sourcesUpToDate(allSourcePaths, previousBuild.getBuildTime())) {
             skipBuild = true;
+            log("None of the source files or linter settings changed. " +
+                "Linting skipped.");
           }
         }
       }
