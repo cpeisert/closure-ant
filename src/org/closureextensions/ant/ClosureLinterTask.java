@@ -104,9 +104,6 @@ public final class ClosureLinterTask extends Task {
   // Corresponds to flag --disable_indentation_fixing defined in error_fixer.py.
   private Boolean disableIndentationFixing;
 
-  // Corresponds to flag --error_trace defined in checkerbase.py.
-  private Boolean errorTrace;
-
   private String fixjsstylePythonScript;
   private boolean force;
   private String gjslintPythonScript;
@@ -168,7 +165,6 @@ public final class ClosureLinterTask extends Task {
     this.checkJavaScriptInHtmlFiles = null;
     this.debugTokens = null;
     this.disableIndentationFixing = null;
-    this.errorTrace = null;
     this.fixjsstylePythonScript = FIXJSSTYLE;
     this.force = false;
     this.gjslintPythonScript = GJSLINT;
@@ -234,16 +230,6 @@ public final class ClosureLinterTask extends Task {
    */
   public void setDisableIndentationFixing(boolean disableIndentationFixing) {
     this.disableIndentationFixing = disableIndentationFixing;
-  }
-
-  /**
-   * Whether to show error exceptions.
-   *
-   * @param errorTrace {@code true} to show error exceptions. Defaults to
-   *     {@code false}.
-   */
-  public void setErrorTrace(boolean errorTrace) {
-    this.errorTrace = errorTrace;
   }
 
   /**
@@ -685,11 +671,6 @@ public final class ClosureLinterTask extends Task {
       cmdline.argument("--disable_indentation_fixing");
     } else if (Boolean.FALSE.equals(this.disableIndentationFixing)) {
       cmdline.argument("--nodisable_indentation_fixing");
-    }
-    if(Boolean.TRUE.equals(this.errorTrace)) {
-      cmdline.argument("--error_trace");
-    } else if (Boolean.FALSE.equals(this.errorTrace)) {
-      cmdline.argument("--noerror_trace");
     }
     if(Boolean.TRUE.equals(this.multiProcess)) {
       cmdline.argument("--multiprocess");
