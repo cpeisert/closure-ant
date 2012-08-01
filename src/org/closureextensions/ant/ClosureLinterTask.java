@@ -98,9 +98,6 @@ public final class ClosureLinterTask extends Task {
   // Corresponds to flag --check_html defined in gjslint.py.
   private Boolean checkJavaScriptInHtmlFiles;
 
-  // Corresponds to flag --debug_indentation defined in indentation.py.
-  private Boolean debugIndentation;
-
   // Corresponds to flag --debug_tokens defined in checkerbase.py.
   private Boolean debugTokens;
 
@@ -169,7 +166,6 @@ public final class ClosureLinterTask extends Task {
     // Attributes
     this.beep = null;
     this.checkJavaScriptInHtmlFiles = null;
-    this.debugIndentation = null;
     this.debugTokens = null;
     this.disableIndentationFixing = null;
     this.errorTrace = null;
@@ -217,19 +213,6 @@ public final class ClosureLinterTask extends Task {
    */
   public void setCheckJSInHtmlFiles(boolean checkJSInHtmlFiles) {
     this.checkJavaScriptInHtmlFiles = checkJSInHtmlFiles;
-  }
-
-  /**
-   * Whether to print debugging information for indentation. The error flag
-   * {@code indentation} must be set to {@code true}, either with
-   * ({@link ClosureLinterErrors#setIndentation(boolean)}) or with
-   * ({@link ClosureLinterErrors#setAll(boolean)}).
-   *
-   * @param debugIndentation {@code true} to print debugging information for
-   *     indentation. Defaults to {@code false}.
-   */
-  public void setDebugIndentation(boolean debugIndentation) {
-    this.debugIndentation = debugIndentation;
   }
 
   /**
@@ -692,11 +675,6 @@ public final class ClosureLinterTask extends Task {
       cmdline.argument("--check_html");
     } else if (Boolean.FALSE.equals(this.checkJavaScriptInHtmlFiles)) {
       cmdline.argument("--nocheck_html");
-    }
-    if(Boolean.TRUE.equals(this.debugIndentation)) {
-      cmdline.argument("--debug_indentation");
-    } else if (Boolean.FALSE.equals(this.debugIndentation)) {
-      cmdline.argument("--nodebug_indentation");
     }
     if(Boolean.TRUE.equals(this.debugTokens)) {
       cmdline.argument("--debug_tokens");

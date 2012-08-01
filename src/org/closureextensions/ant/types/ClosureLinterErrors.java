@@ -33,6 +33,9 @@ public final class ClosureLinterErrors {
   // Corresponds to flag combination: --jslint_error braces_around_type
   private Boolean bracesAroundType;
 
+  // Corresponds to flag --debug_indentation defined in indentation.py.
+  private Boolean debugIndentation;
+
   // Corresponds to flag combination: --jslint_error indentation
   private Boolean indentation;
 
@@ -59,6 +62,7 @@ public final class ClosureLinterErrors {
     this.all = null;
     this.blankLinesAtTopLevel = null;
     this.bracesAroundType = null;
+    this.debugIndentation = null;
     this.indentation = null;
     this.missingJsDoc = null;
     this.noBracesAroundInheritDoc = null;
@@ -116,6 +120,26 @@ public final class ClosureLinterErrors {
   /** @return {@code true} if braces around types in JsDoc tags enforced */
   public Boolean getBracesAroundType() {
     return this.bracesAroundType;
+  }
+
+  /**
+   * Whether to print debugging information for indentation. The error flag
+   * {@code indentation} must also be set to {@code true} to see indentation
+   * debugging information.
+   *
+   * ({@link ClosureLinterErrors#setIndentation(boolean)}) or with
+   * ({@link ClosureLinterErrors#setAll(boolean)}).
+   *
+   * @param debugIndentation {@code true} to print debugging information for
+   *     indentation. Defaults to {@code false}.
+   */
+  public void setDebugIndentation(boolean debugIndentation) {
+    this.debugIndentation = debugIndentation;
+  }
+
+  /** @return {@code true} if indentation debugging is enabled */
+  public Boolean getDebugIndentation() {
+    return this.debugIndentation;
   }
 
   /**
@@ -254,56 +278,52 @@ public final class ClosureLinterErrors {
       cmdline.flagAndArgument("--jslint_noerror", "all");
       cmdline.argument("--nojsdoc");
     }
-
     if (Boolean.TRUE.equals(this.strict)) {
       cmdline.argument("--strict");
     } else if (Boolean.FALSE.equals(this.strict)) {
       cmdline.argument("--nostrict");
     }
-
     if (Boolean.TRUE.equals(this.blankLinesAtTopLevel)) {
       cmdline.flagAndArgument("--jslint_error", "blank_lines_at_top_level");
     } else if (Boolean.FALSE.equals(this.blankLinesAtTopLevel)) {
       cmdline.flagAndArgument("--jslint_noerror", "blank_lines_at_top_level");
     }
-
     if (Boolean.TRUE.equals(this.bracesAroundType)) {
       cmdline.flagAndArgument("--jslint_error", "braces_around_type");
     } else if (Boolean.FALSE.equals(this.bracesAroundType)) {
       cmdline.flagAndArgument("--jslint_noerror", "braces_around_type");
     }
-
+    if(Boolean.TRUE.equals(this.debugIndentation)) {
+      cmdline.argument("--debug_indentation");
+    } else if (Boolean.FALSE.equals(this.debugIndentation)) {
+      cmdline.argument("--nodebug_indentation");
+    }
     if (Boolean.TRUE.equals(this.indentation)) {
       cmdline.flagAndArgument("--jslint_error", "indentation");
     } else if (Boolean.FALSE.equals(this.indentation)) {
       cmdline.flagAndArgument("--jslint_noerror", "indentation");
     }
-
     if (Boolean.TRUE.equals(this.missingJsDoc)) {
       cmdline.argument("--jsdoc");
     } else if (Boolean.FALSE.equals(this.missingJsDoc)) {
       cmdline.argument("--nojsdoc");
     }
-
     if (Boolean.TRUE.equals(this.noBracesAroundInheritDoc)) {
       cmdline.flagAndArgument("--jslint_error", "no_braces_around_inherit_doc");
     } else if (Boolean.FALSE.equals(this.noBracesAroundInheritDoc)) {
       cmdline.flagAndArgument("--jslint_noerror",
           "no_braces_around_inherit_doc");
     }
-
     if (Boolean.TRUE.equals(this.optionalTypeMarker)) {
       cmdline.flagAndArgument("--jslint_error", "optional_type_marker");
     } else if (Boolean.FALSE.equals(this.optionalTypeMarker)) {
       cmdline.flagAndArgument("--jslint_noerror", "optional_type_marker");
     }
-
     if (Boolean.TRUE.equals(this.unusedPrivateMembers)) {
       cmdline.flagAndArgument("--jslint_error", "unused_private_members");
     } else if (Boolean.FALSE.equals(this.unusedPrivateMembers)) {
       cmdline.flagAndArgument("--jslint_noerror", "unused_private_members");
     }
-
     if (Boolean.TRUE.equals(this.wellFormedAuthor)) {
       cmdline.flagAndArgument("--jslint_error", "well_formed_author");
     } else if (Boolean.FALSE.equals(this.wellFormedAuthor)) {

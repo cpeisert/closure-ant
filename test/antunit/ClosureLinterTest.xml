@@ -113,11 +113,11 @@ limitations under the License.
 
   <target name="testPrintDebugInfoForIndentation">
     <expectfailure>
-      <closure-linter debugindentation="true"
+      <closure-linter
           linterMode="lint" showCommandLine="true"
           logfile="${test.build.dir}/antunit/linter.log">
         <mainsources dir="${linter_test.dir}" includes="indentation_errors.js" />
-        <closurelintererrors indentation="true" />
+        <closurelintererrors debugIndentation="true" indentation="true" />
       </closure-linter>
     </expectfailure>
 
