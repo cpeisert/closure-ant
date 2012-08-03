@@ -164,6 +164,36 @@ limitations under the License.
   </target>
 
 
+  <target name="testShowSummary">
+    <expectfailure>
+      <closure-linter showSummary="true"
+          linterMode="lint" showCommandLine="true"
+          logfile="${test.build.dir}/antunit/linter.log">
+        <mainsources dir="${linter_test.dir}" includes="indentation_errors.js" />
+        <closurelintererrors all="true" />
+      </closure-linter>
+    </expectfailure>
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="indentation_errors.js: 5" />
+  </target>
+
+
+  <target name="testTimingStats">
+    <closure-linter timingstats="true"
+        force="true" logfile="${test.build.dir}/antunit/linter.log">
+      <closurelintererrors all="true" />
+      <mainsources dir="${project101.js.dir}" includes="project101.js" />
+      <sources dir="${project101.js.dir}" includes="moocher.js" />
+    </closure-linter>
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="Done in" />
+  </target>
+
+
 
   <!-- Run this test suite. -->
   <target name="test">
