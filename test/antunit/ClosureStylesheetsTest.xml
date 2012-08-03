@@ -130,7 +130,7 @@ limitations under the License.
 
     <stylesheets
         classpath="${test.build.dir}/classes"
-        functionMapProvider="org.closureextensions.css.CustomGssFunctionMapProvider"
+        functionMapProvider="org.closureant.css.CustomGssFunctionMapProvider"
         forceRecompile="true" outputFile="${json-in-style.output.css}"
         prettyPrint="true">
       <allowednonstandardfunctions functionList="randomColor" />

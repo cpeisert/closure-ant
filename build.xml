@@ -89,7 +89,7 @@ limitations under the License.
       <attribute name="Built-By" value="${user.name}"/>
       <attribute name="Built-Date" value="${DATE_TODAY}"/>
       <attribute name="Main-Class"
-          value="org.closureextensions.builderplus.cli.Main" />
+          value="org.closureant.builderplus.cli.Main" />
       <attribute name="Release" value="${release.stamp}"/>
     </manifest>
   </target>

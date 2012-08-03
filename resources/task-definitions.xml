@@ -17,42 +17,42 @@ limitations under the License.
 
 <antlib>
   <taskdef name="builder-plus"
-      classname="org.closureextensions.ant.BuilderPlusTask" />
+      classname="org.closureant.ant.BuilderPlusTask" />
 
   <taskdef name="closure-builder-python"
-      classname="org.closureextensions.ant.ClosureBuilderPythonTask" />
+      classname="org.closureant.ant.ClosureBuilderPythonTask" />
 
   <!-- Closure Compiler task aliases: closure-compiler or jscomp -->
   <taskdef name="closure-compiler"
-      classname="org.closureextensions.ant.ClosureCompilerTask" />
+      classname="org.closureant.ant.ClosureCompilerTask" />
   <taskdef name="jscomp"
-      classname="org.closureextensions.ant.ClosureCompilerTask" />
+      classname="org.closureant.ant.ClosureCompilerTask" />
 
   <!-- Closure Linter task aliases: closure-linter or gjslint -->
   <taskdef name="closure-linter"
-      classname="org.closureextensions.ant.ClosureLinterTask" />
+      classname="org.closureant.ant.ClosureLinterTask" />
   <taskdef name="gjslint"
-      classname="org.closureextensions.ant.ClosureLinterTask" />
+      classname="org.closureant.ant.ClosureLinterTask" />
 
   <!-- Closure Stylesheets task aliases: closure-stylesheets or stylesheets -->
   <taskdef name="closure-stylesheets"
-      classname="org.closureextensions.ant.ClosureStylesheetsTask" />
+      classname="org.closureant.ant.ClosureStylesheetsTask" />
   <taskdef name="stylesheets"
-      classname="org.closureextensions.ant.ClosureStylesheetsTask" />
+      classname="org.closureant.ant.ClosureStylesheetsTask" />
 
   <!-- Closure Templates task aliases: closure-templates or soy  -->
   <taskdef name="closure-templates"
-      classname="org.closureextensions.ant.SoyTask" />
+      classname="org.closureant.ant.SoyTask" />
   <taskdef name="soy" classname="org.closureextensions.ant.SoyTask" />
 
   <taskdef name="deps-writer"
-      classname="org.closureextensions.ant.DepsWriterTask" />
+      classname="org.closureant.ant.DepsWriterTask" />
 
   <taskdef name="deps-writer-python"
-      classname="org.closureextensions.ant.DepsWriterPythonTask" />
+      classname="org.closureant.ant.DepsWriterPythonTask" />
 
-  <taskdef name="plovr" classname="org.closureextensions.ant.PlovrTask" />
+  <taskdef name="plovr" classname="org.closureant.ant.PlovrTask" />
 
   <taskdef name="plovr-soyweb"
-      classname="org.closureextensions.ant.PlovrSoyWebTask" />
+      classname="org.closureant.ant.PlovrSoyWebTask" />
 </antlib>
