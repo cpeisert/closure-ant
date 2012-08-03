@@ -12,7 +12,7 @@ lint.errors.MyConstructor = function(param1) {
   var longString = 'The concatenation operator should appear on the '
       + 'previous line.';
 
-  var missingSemicolon = "The string to nowhere..." // missing semicolon
+  var missingSemicolon = "The string to nowhere..."
 
   var z = body == null ? 'ghost'
       : 'corporeal';
