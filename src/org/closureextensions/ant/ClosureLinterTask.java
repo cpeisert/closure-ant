@@ -193,7 +193,8 @@ public final class ClosureLinterTask extends Task {
   // Attribute setters
 
   /**
-   * Sets whether an audible beep should be emitted when errors are found.
+   * Sets whether an audible beep should be emitted when errors are found;
+   * only applicable in {@code LINT} mode.
    *
    * @param beep {@code true} to enable beeps. Defaults to {@code true}.
    */
@@ -202,7 +203,8 @@ public final class ClosureLinterTask extends Task {
   }
 
   /**
-   * Sets whether to check JavaScript in HTML files.
+   * Sets whether to check JavaScript in HTML files; only applicable in
+   * {@code LINT} mode.
    *
    * @param checkJSInHtmlFiles {@code true} to check HTML in JavaScript files.
    *     Defaults to {@code false}.
@@ -223,7 +225,7 @@ public final class ClosureLinterTask extends Task {
 
   /**
    * Whether to disable automatic fixing of indentation. Only applicable for
-   * linter mode FIX, otherwise ignored.
+   * linter mode {@code FIX}, otherwise ignored.
    *
    * @param disableIndentationFixing {@code true} to disable automatic
    *     indentation fixing. Defaults to {@code false}.
@@ -300,7 +302,7 @@ public final class ClosureLinterTask extends Task {
   }
 
   /**
-   * Whether to parallalize linting using the multiprocessing module. Disabled
+   * Whether to parallelize linting using the multiprocessing module. Disabled
    * by default.
    *
    * @param multiProcess {@code true} to use multiprocessing. Defaults to
@@ -335,32 +337,35 @@ public final class ClosureLinterTask extends Task {
   }
 
   /**
-   * Whether to show an error count summary.
+   * Whether to show an error count summary; only applicable in {@code LINT}
+   * mode.
    *
    * @param showSummary {@code true} to show an error count summary. Defaults
    *     to {@code false}.
    */
-  private void setShowSummary(boolean showSummary) {
+  public void setShowSummary(boolean showSummary) {
     this.showSummary = showSummary;
   }
 
   /**
-   * Whether to emit timing statistics.
+   * Whether to emit timing statistics. The timing stats are only shown if
+   * there are no errors and the linter mode is set to {@code LINT}.
    *
    * @param timingStats {@code true} to emit timing stats. Defaults to {@code
    *     false}.
    */
-  private void setTimingStats(boolean timingStats) {
+  public void setTimingStats(boolean timingStats) {
     this.timingStats = timingStats;
   }
 
   /**
-   * Whether to emit warnings in standard unix format.
+   * Whether to emit warnings in standard unix format; only applicable in
+   * {@code LINT} mode.
    *
    * @param unixMode {@code true} to emit warnings in standard unix format.
    *     Defaults to {@code false}.
    */
-  private void setUnixMode(boolean unixMode) {
+  public void setUnixMode(boolean unixMode) {
     this.unixMode = unixMode;
   }
 
