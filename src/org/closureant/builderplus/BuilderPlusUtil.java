@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import org.closureant.ant.types.CompilationLevel;
-import org.closureextensions.common.CssRenamingMap;
-import org.closureextensions.common.JsClosureSourceFile;
-import org.closureextensions.common.SourceFileFactory;
+import org.closureant.types.CompilationLevel;
+import org.closureant.css.CssRenamingMap;
+import org.closureant.base.JsClosureSourceFile;
+import org.closureant.base.SourceFileFactory;
 
 /**
  * Static utility functions shared by Builder Plus' Ant task and
@@ -47,7 +47,7 @@ public final class BuilderPlusUtil {
    * Creates a temporary CSS renaming map file in the specified output
    * directory using either the Closure Stylesheets renaming map format
    * CLOSURE_COMPILED or CLOSURE_UNCOMPILED. See {@link
-   * org.closureant.ant.BuilderPlusTask#setCssRenamingMap(String)}.
+   * org.closureant.BuilderPlusTask#setCssRenamingMap(String)}.
    *
    * <p>The temporary renaming map file is then added to the manifest list
    * either immediately before or after Closure's base.js (CLOSURE_COMPILED

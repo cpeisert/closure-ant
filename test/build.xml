@@ -93,7 +93,7 @@ limitations under the License.
         <pathelement location="${test.classes.dir}" />
       </classpath>
       <formatter usefile="false"
-          classname="org.closureextensions.common.junit.CustomJUnitResultFormatter"/>
+          classname="org.closureant.base.junit.CustomJUnitResultFormatter"/>
       <batchtest haltonfailure="true">
         <fileset dir="${test.classes.dir}">
           <include name="**/org/closureextensions/**/*Test.class" />

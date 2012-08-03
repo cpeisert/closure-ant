@@ -31,15 +31,15 @@ import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 
-import org.closureant.ant.ClosureCompilerTask;
-import org.closureant.ant.types.CompilationLevel;
+import org.closureant.ClosureCompilerTask;
+import org.closureant.base.JsClosureSourceFile;
+import org.closureant.base.SourceFileFactory;
 import org.closureant.builderplus.BuilderPlusUtil;
 import org.closureant.builderplus.OutputMode;
-import org.closureextensions.common.CssRenamingMap;
-import org.closureextensions.common.deps.ManifestBuilder;
-import org.closureextensions.common.JsClosureSourceFile;
-import org.closureextensions.common.SourceFileFactory;
-import org.closureextensions.common.util.FileUtil;
+import org.closureant.css.CssRenamingMap;
+import org.closureant.deps.ManifestBuilder;
+import org.closureant.types.CompilationLevel;
+import org.closureant.util.FileUtil;
 
 import org.kohsuke.args4j.CmdLineException;
 
@@ -118,17 +118,17 @@ public final class BuilderPlusRunner {
   /**
    * Execute Builder Plus.
    *
-   * @throws org.closureextensions.common.deps.CircularDependencyException if
+   * @throws org.closureant.deps.CircularDependencyException if
    *     the goog.provided and goog.required namespaces form a cycle
    * @throws IllegalStateException if the Closure Compiler jar file is null or
    *     does not exist
    * @throws IOException if the build manifest cannot be written or read
-   * @throws org.closureextensions.common.deps.MissingProvideException if a
+   * @throws org.closureant.deps.MissingProvideException if a
    *     goog.required namespace is not goog.provided by any of the inputs
-   * @throws org.closureextensions.common.deps.MultipleProvideException if a
+   * @throws org.closureant.deps.MultipleProvideException if a
    *     namespace is provided by more than one source file
    * @throws NullPointerException if the manifest file returned by {@link
-   *     #createManifest(org.closureant.ant.types.CompilationLevel, File)} is {@code null}
+   *     #createManifest(org.closureant.types.CompilationLevel, File)} is {@code null}
    */
   public void execute() throws IOException {
     ClosureCompilerTask compilerTask = null;
@@ -258,20 +258,20 @@ public final class BuilderPlusRunner {
    *
    * <p>If a CSS renaming map is specified, it will be written to a temporary
    * file and added to the manifest. See {@link
-   * org.closureant.ant.BuilderPlusTask#setCssRenamingMap(String)}.</p>
+   * org.closureant.BuilderPlusTask#setCssRenamingMap(String)}.</p>
    *
    * @param compilationLevel the Closure Compiler compilation level
    * @param outputDirectory directory to write temporary files, such as CSS
    *     renaming maps
    * @return a manifest file containing a list of the sources after
    *     dependency management
-   * @throws org.closureextensions.common.deps.CircularDependencyException if
+   * @throws org.closureant.deps.CircularDependencyException if
    *     the goog.provided and goog.required namespaces form a cycle
    * @throws IOException if there is an error reading or writing the build
    *     manifest
-   * @throws org.closureextensions.common.deps.MissingProvideException if a
+   * @throws org.closureant.deps.MissingProvideException if a
    *     goog.required namespace is not goog.provided by any of the inputs
-   * @throws org.closureextensions.common.deps.MultipleProvideException if a
+   * @throws org.closureant.deps.MultipleProvideException if a
    *     namespace is provided by more than one source file
    */
   private List<String> createManifest(CompilationLevel compilationLevel,

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.closureant.builderplus.OutputMode;
-import org.closureextensions.common.CssRenamingMap;
+import org.closureant.css.CssRenamingMap;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;

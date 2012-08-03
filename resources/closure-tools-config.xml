@@ -15,8 +15,8 @@
     Change the location of closure-ant-tasks.jar to point to your local copy.
     The default setting is the same directory as this file.
   -->
-  <property name="closure-ant-tasks.jar"
-      location="${config.basedir}/closure-ant-tasks.jar" />
+  <property name="closure-ant.jar"
+      location="${config.basedir}/closure-ant.jar" />
 
   <!--
     Change the location of "closure-tools.dir" to point to your local copy.
@@ -45,5 +45,5 @@
     Loads the closure task definitions.
   -->
   <taskdef resource="task-definitions.xml"
-      classpath="${closure-ant-tasks.jar}" />
+      classpath="${closure-ant.jar}" />
 </project>

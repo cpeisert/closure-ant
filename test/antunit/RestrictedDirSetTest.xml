@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+================================================================================
+  AntUnit tests for RestrictedDirSet Ant data type.
+================================================================================
+-->
+<project name="restricteddirset-test" default="test">
+
+  <dirname property="antunit.dir" file="${ant.file.restricteddirset-test}" />
+
+  <property name="test.dir" location="${antunit.dir}/.." />
+  <property name="test.build.dir" location="${test.dir}/build" />
+  <property name="restricteddirset.root.dir"
+      location="${test.build.dir}/restricteddirset" />
+  <property name="test.lib.dir" location="${test.dir}/lib" />
+  <import file="${test.lib.dir}/antunit.xml" />
+
+  <property name="closure-commons.build.dir" location="${test.dir}/../build" />
+  <property name="closure-commons.jar"
+      location="${closure-commons.build.dir}/closure-commons.jar" />
+  <typedef name="restricteddirset"
+      classname="org.closureant.types.RestrictedDirSet"
+      classpath="${closure-commons.jar}" />
+  
+  <!--
+  =============================================================================
+    Set up and tear down
+  =============================================================================
+  -->
+
+
+  <!-- Executed once for this test suite before all other targets. -->
+  <target name="suiteSetUp">
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${restricteddirset.root.dir}/src" />
+    <mkdir dir="${restricteddirset.root.dir}/home/bob/project/lib/src" />
+    <mkdir dir="${restricteddirset.root.dir}/home/bob/project/test/src" />
+
+    <mkdir dir="${restricteddirset.root.dir}/home/joe/project/src" />
+    <mkdir
+        dir="${restricteddirset.root.dir}/home/joe/project/src/subproject/src"
+    />
+  </target>
+
+
+  <!--
+  =============================================================================
+    Tests
+  =============================================================================
+  -->
+
+  <target name="clean" description="Delete all files created by this script.">
+    <delete dir="${test.build.dir}" />
+  </target>
+
+
+  <target name="testNonRecursiveDirectoryMatch">
+    <logcapturer />
+
+    <restricteddirset dir="${restricteddirset.root.dir}/home"
+        id="matchedDirs" />
+    <pathconvert pathsep="${line.separator}" property="dirList"
+        refid="matchedDirs" />
+    <echo message="${dirList}" />
+
+    <assertLogContains text="${restricteddirset.root.dir}/home" />
+  </target>
+
+
+  <target name="testRecursiveDirectoryMatch">
+    <logcapturer />
+
+    <restricteddirset
+        dir="${restricteddirset.root.dir}/home"
+        includes="**/src/**"
+        excludes="**/test/**"
+        id="matchedDirs2" />
+    <pathconvert pathsep="${line.separator}" property="dirList2"
+        refid="matchedDirs2" />
+    <echo message="${dirList2}" />
+
+    <assertLogContains text="${restricteddirset.root.dir}/home/bob/project/lib/src" />
+    <assertLogContains text="${restricteddirset.root.dir}/home/joe/project/src" />
+    <assertLogDoesntContain
+        text="${restricteddirset.root.dir}/home/joe/project/src/subproject/src"
+    />
+  </target>
+
+
+  <!-- Run this test suite. -->
+  <target name="test">
+    <antunit>
+      <file file="${antunit.dir}/RestrictedDirSetTest.xml" />
+      <plainlistener loglevel="info" />
+    </antunit>
+  </target>
+</project>

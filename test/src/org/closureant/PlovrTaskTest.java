@@ -17,14 +17,13 @@
 package org.closureant;
 
 import org.apache.tools.ant.BuildException;
-import org.closureant.ant.PlovrTask;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
 /**
- * Tests for {@link org.closureant.ant.PlovrTask}.
+ * Tests for {@link PlovrTask}.
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */

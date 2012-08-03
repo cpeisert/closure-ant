@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<project name="closure-ant-tasks" basedir="." default="jar">
+<project name="closure-ant" basedir="." default="jar">
   
   <!--
   ==============================================================================
@@ -43,18 +43,18 @@ limitations under the License.
 
   <property name="build.dir" location="${basedir}/build" />
   <property name="classes.dir" location="${build.dir}/classes" />
-  <property name="closure-ant-tasks.jar" 
-      location="${build.dir}/closure-ant-tasks.jar" />
-   <property name="closure-ant-tasks-no-ant-deps.jar"
-       location="${build.dir}/closure-ant-tasks-no-ant-deps.jar" />
-  <property name="closure-ant-tasks-no-deps.jar"
-      location="${build.dir}/closure-ant-tasks-no-deps.jar" />
+  <property name="closure-ant.jar" 
+      location="${build.dir}/closure-ant.jar" />
+   <property name="closure-ant-no-ant-deps.jar"
+       location="${build.dir}/closure-ant-no-ant-deps.jar" />
+  <property name="closure-ant-no-deps.jar"
+      location="${build.dir}/closure-ant-no-deps.jar" />
   <property name="builderplus.jar" location="${build.dir}/builderplus.jar" />
 
   <property name="javadoc.dir" value="${build.dir}/javadoc" />
 
   <!--
-    To release a new stable version of closure-ant-tasks, change
+    To release a new stable version of closure-ant, change
     release.stamp to "latest" or pass -Drelease.stamp=latest when running ant.
 
     To release a previous stable version, update release.stamp to the
@@ -114,14 +114,12 @@ limitations under the License.
   
   <target name="jar"
       description="Do not execute this target directly. Run the 'build' target
-instead. Creates a standalone closure-ant-tasks.jar.&#13;&#10;">
-    <jar destfile="${closure-ant-tasks.jar}" basedir="${classes.dir}" 
+instead. Creates a standalone closure-ant.jar.&#13;&#10;">
+    <jar destfile="${closure-ant.jar}" basedir="${classes.dir}" 
         update="true" manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
 
       <zipfileset includes="task-definitions.xml" dir="${resources.dir}" />
 
-      <zipfileset includes="**/*.class"
-          src="${lib.dir}/closure-commons-no-deps.jar" />
       <zipfileset includes="**/*.class"
           src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
       <zipfileset includes="resources/*soy*"
@@ -132,16 +130,7 @@ instead. Creates a standalone closure-ant-tasks.jar.&#13;&#10;">
       <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/closure-stylesheets-no-deps.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
-
-      <zipfileset includes="**/*.class" src="${lib.dir}/guava-12.0.jar">
-        <exclude name="com/google/common/annotations/*" />
-        <exclude name="com/google/common/cache/*" />
-        <exclude name="com/google/common/eventbus/*" />
-        <exclude name="com/google/common/hash/*" />
-        <exclude name="com/google/common/math/*" />
-        <exclude name="com/google/common/net/*" />
-        <exclude name="com/google/common/util/*" />
-      </zipfileset>
+      <zipfileset includes="**/*.class" src="${lib.dir}/guava-12.0.jar" />
 
       <zipfileset src="${lib.dir}/jsr305-1.3.9.jar">
         <include name="javax/annotation/Nullable.class" />
@@ -162,10 +151,10 @@ instead. Creates a standalone closure-ant-tasks.jar.&#13;&#10;">
 
 
   <target name="jar-no-ant-deps" depends="compile"
-      description="Creates a closure-ant-tasks.jar excluding ant dependencies
+      description="Creates a closure-ant.jar excluding ant dependencies
 (i.e. the jar relies on the local ant installation [recommend Ant 1.8.0 or
 newer]).&#13;&#10;">
-    <jar destfile="${closure-ant-tasks-no-ant-deps.jar}"
+    <jar destfile="${closure-ant-no-ant-deps.jar}"
         basedir="${classes.dir}" update="true"
         manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
 
@@ -207,8 +196,6 @@ instead. Creates a standalone executable builderplus.jar.&#13;&#10;">
     <jar destfile="${builderplus.jar}" basedir="${classes.dir}" update="true"
         manifest="${build.dir}/BUILDER_PLUS_MANIFEST.MF" duplicate="preserve">
 
-      <zipfileset includes="**/*.class" src="${lib.dir}/closure-commons-no-deps.jar" />
-
       <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
 
@@ -229,17 +216,14 @@ instead. Creates a standalone executable builderplus.jar.&#13;&#10;">
 
 
   <target name="jar-no-deps" depends="compile"
-      description="Creates a non-standalone closure-ant-tasks.jar excluding
+      description="Creates a non-standalone closure-ant.jar excluding
 dependencies (i.e. no ant, gson, or guava classes). However, all dependencies
-in the package org.closureextensions are included (for example,
-closure-commons and closure-template-extensions).&#13;&#10;">
-    <jar destfile="${closure-ant-tasks-no-deps.jar}" basedir="${classes.dir}"
+in the package org.closureant are included.&#13;&#10;">
+    <jar destfile="${closure-ant-no-deps.jar}" basedir="${classes.dir}"
         update="false" manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
       
       <zipfileset includes="task-definitions.xml" dir="${resources.dir}" />
 
-      <zipfileset includes="**/*.class"
-          src="${lib.dir}/closure-commons-no-deps.jar" />
       <zipfileset includes="org/closureextensions/**/*.class"
           src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
       <zipfileset includes="resources/*soy*"
@@ -251,7 +235,7 @@ closure-commons and closure-template-extensions).&#13;&#10;">
   
   
   <target name="build" depends="compile, jar, builder-plus-jar"
-      description="Creates standalone closure-ant-tasks.jar and executable
+      description="Creates standalone closure-ant.jar and executable
 builderplus.jar." />
   
 
@@ -270,7 +254,6 @@ builderplus.jar." />
       <link href="http://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/" />
       <link href="http://docs.guava-libraries.googlecode.com/git/javadoc/" />
       <link href="http://evgeny-goldin.org/javadoc/ant/api/" />
-      <!-- TODO(cpeisert): Add link to closure-commons once API docs published -->
       <!-- TODO(cpeisert): Add link to closure-template-extensions once API docs published -->
       <bottom>
         <![CDATA[
@@ -285,10 +268,10 @@ builderplus.jar." />
   
   <target name="release" 
       depends="compile, jar, builder-plus-jar, javadoc"
-      description="Creates standalone closure-ant-tasks-&lt;release.stamp>.jar,
+      description="Creates standalone closure-ant-&lt;release.stamp>.jar,
 executable builderplus-&lt;release.stamp>.jar, and generates JavaDoc.&#13;&#10;">
-    <move file="${closure-ant-tasks.jar}"
-        tofile="${build.dir}/closure-ant-tasks-${release.stamp}.jar" />
+    <move file="${closure-ant.jar}"
+        tofile="${build.dir}/closure-ant-${release.stamp}.jar" />
     <move file="${builderplus.jar}"
         tofile="${build.dir}/builderplus-${release.stamp}.jar" />
   </target>
