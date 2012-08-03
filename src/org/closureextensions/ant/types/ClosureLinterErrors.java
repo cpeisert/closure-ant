@@ -160,7 +160,8 @@ public final class ClosureLinterErrors {
    * Whether to report errors for missing JsDoc. Even with this flag enabled,
    * existing JsDoc annotations are still verified for correctness.
    *
-   * @param missingJsDoc {@code true} to check for missing JsDoc
+   * @param missingJsDoc {@code true} to check for missing JsDoc. Defaults to
+   *   {@code true}.
    */
   public void setMissingJsDoc(boolean missingJsDoc) {
     this.missingJsDoc = missingJsDoc;
