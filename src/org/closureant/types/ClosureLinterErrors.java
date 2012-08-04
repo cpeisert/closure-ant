@@ -213,14 +213,14 @@ public final class ClosureLinterErrors {
    * Whether to validate against the stricter Closure style. Setting {@code
    * strict} is equivalent to enabling the following error checks:
    *
-   * <p><ul>
+   * <ul>
    * <li>blankLinesAtTopLevel</li>
    * <li>bracesAroundType</li>
    * <li>indentation</li>
    * <li>noBracesAroundInheritDoc</li>
    * <li>optionalTypeMarker</li>
    * <li>wellFormedAuthor</li>
-   * </ul></p>
+   * </ul>
    *
    * @param strict {@code true} to validate against the stricter Closure style
    */
