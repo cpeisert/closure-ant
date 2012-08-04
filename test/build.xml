@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<project name="closure-ant-tasks-test" basedir="." default="test">
+<project name="closure-ant-test" basedir="." default="test">
 
   <!--
   ==============================================================================
@@ -27,22 +27,22 @@ limitations under the License.
   <import file="${test.lib.dir}/antunit.xml" />
   <property name="antunit.dir" location="${basedir}/antunit" />
 
-  <property name="closure-ant-tasks.dir" location="${basedir}/.." />
-  <property name="closure-ant-tasks.lib.dir" location="${closure-ant-tasks.dir}/lib" />
+  <property name="closure-ant.dir" location="${basedir}/.." />
+  <property name="closure-ant.lib.dir" location="${closure-ant.dir}/lib" />
   <property name="closure-tools-config.xml"
-      location="${closure-ant-tasks.dir}/build/closure-tools-config.xml" />
+      location="${closure-ant.dir}/build/closure-tools-config.xml" />
   <import file="${closure-tools-config.xml}" />
-  <property name="closure-ant-tasks.jar" 
-      location="${closure-ant-tasks.dir}/build/closure-ant-tasks.jar" />
+  <property name="closure-ant.jar" 
+      location="${closure-ant.dir}/build/closure-ant.jar" />
 
-  <condition property="closure-ant-tasks.jar.available">
-    <available file="${closure-ant-tasks.jar}" />
+  <condition property="closure-ant.jar.available">
+    <available file="${closure-ant.jar}" />
   </condition>
 
   <path id="test.classpath">
-    <fileset dir="${closure-ant-tasks.lib.dir}" includes="**/*.jar" />
+    <fileset dir="${closure-ant.lib.dir}" includes="**/*.jar" />
     <fileset dir="${test.lib.dir}" includes="**/*.jar" />
-    <pathelement location="${closure-ant-tasks.jar}" />
+    <pathelement location="${closure-ant.jar}" />
   </path>
 
 
@@ -84,8 +84,8 @@ limitations under the License.
   
   
   <target name="junit-test" depends="compile" description="Run JUnit tests.">
-    <fail unless="closure-ant-tasks.jar.available"
-        message="Tests aborted. File not found: [${closure-ant-tasks.jar}]" />
+    <fail unless="closure-ant.jar.available"
+        message="Tests aborted. File not found: [${closure-ant.jar}]" />
 
     <junit printsummary="on" fork="true" forkmode="once" showoutput="true">
       <classpath refid="test.classpath" />
@@ -105,8 +105,8 @@ limitations under the License.
 
   <target name="antunit-test" depends="compile"
       description="Run AntUnit tests.">
-    <fail unless="closure-ant-tasks.jar.available"
-        message="Tests aborted. File not found: [${closure-ant-tasks.jar}]" />
+    <fail unless="closure-ant.jar.available"
+        message="Tests aborted. File not found: [${closure-ant.jar}]" />
     
     <antunit>
       <plainlistener loglevel="info" />

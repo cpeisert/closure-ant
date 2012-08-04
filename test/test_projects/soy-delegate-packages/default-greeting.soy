@@ -1,0 +1,17 @@
+{namespace delegate.test autoescape="contextual"}
+
+/**
+ * Entry point for delegate tests.
+ */
+{template .hello}
+  <p>{delcall helloDelegates /}</p>
+{/template}
+
+/**
+ * Default implementation: Professional greeting.
+ */
+{deltemplate helloDelegates}
+  {msg desc="Professional greeting to the delegation."}
+  Ladies and gentlemen, I am honored to welcome you to the {globalEventName}.
+  {/msg}
+{/deltemplate}

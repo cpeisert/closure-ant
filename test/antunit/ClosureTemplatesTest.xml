@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+================================================================================
+  AntUnit tests for ClosureTemplatesTask (task name: soy).
+================================================================================
+-->
+<project name="SoyTaskTest" default="test">
+
+  <dirname property="antunit.dir" file="${ant.file.SoyTaskTest}" />
+
+  <property name="test.dir" location="${antunit.dir}/.." />
+  <property name="test-projects.dir" location="${test.dir}/test_projects" />
+  <property name="test.build.dir" location="${test.dir}/build" />
+  <property name="test.src.dir" location="${test.dir}/src" />
+  <property name="test.lib.dir" location="${test.dir}/lib" />
+  <import file="${test.lib.dir}/antunit.xml" />
+
+  <property name="closure-template-extensions.dir" location="${test.dir}/.." />
+  <property name="closure-template-extensions.resources.dir"
+      location="${closure-template-extensions.dir}/resources" />
+  <property name="closure-template-extensions.lib.dir"
+      location="${closure-template-extensions.dir}/lib" />
+  <property name="closure-template-extensions.build.dir"
+      location="${closure-template-extensions.dir}/build" />
+  <property name="closure-tools-config.xml"
+      location="${closure-template-extensions.build.dir}/closure-tools-config.xml" />
+  <import file="${closure-tools-config.xml}" />
+  <property name="template-extensions.jar"
+      location="${closure-template-extensions.build.dir}/template-extensions.jar"/>
+
+  <!-- Test projects. -->
+  <import file="${test.dir}/test_projects/soy101/soy101.xml" />
+  <property name="soy101.executeAll.rendered.html"
+      location="${soy101.output.dir}/soy101.executeAll_rendered.html" />
+  <property name="hello-soy.dir" location="${test-projects.dir}/hello-soy" />
+  <property name="hello-soy.output.dir"
+      location="${test.build.dir}/antunit/hellosoy" />
+  <property name="delegate-packages.dir"
+      location="${test-projects.dir}/soy-delegate-packages" />
+  <property name="delegate-packages.output.dir"
+      location="${test.build.dir}/antunit/delegate-packages" />
+  <property name="helloDelegates.output.html"
+      location="${test.build.dir}/antunit/delegate-packages/helloDelegates.html"/>
+
+  <path id="test.classpath">
+    <fileset dir="${closure-template-extensions.lib.dir}" includes="**/*.jar" />
+    <fileset dir="${test.lib.dir}" includes="**/*.jar" />
+    <pathelement location="${template-extensions.jar}" />
+  </path>
+
+  <property name="test.classes.dir" location="${test.build.dir}/classes" />
+  
+  <!--
+  =============================================================================
+    Set up and tear down
+  =============================================================================
+  -->
+
+  <!-- Executed once for this test suite before all other targets. -->
+  <target name="suiteSetUp">
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${test.classes.dir}" />
+    <mkdir dir="${soy101.output.dir}" />
+    <mkdir dir="${hello-soy.output.dir}" />
+    <mkdir dir="${delegate-packages.output.dir}" />
+    <copy file="${soy101.html}" todir="${soy101.output.dir}" />
+    <copy file="${closure-template-extensions.resources.dir}/soyutils.js"
+        todir="${soy101.output.dir}" />
+    <antcall target="compile" inheritAll="false" />
+  </target>
+
+
+  <target name="compile"
+      description="Compiles test sources including the plovr Soy function plugin demo.">
+    <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}"
+        classpathref="test.classpath" debug="on" deprecation="on"
+        includeantruntime="false"
+        source="1.6" target="1.6">
+      <compilerarg value="-Xlint"/>
+      <include name="org/plovr/soy/function/*" />
+    </javac>
+  </target>
+
+  <!--
+  =============================================================================
+    Tests for compiling Soy templates to JavaScript.
+  =============================================================================
+  -->
+
+  <target name="testCompileToJs_cssHandlingSchemeGOOG">
+    <soy cssHandlingScheme="goog">
+      <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+      <compiletojs codeStyle="concat"
+          outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js" />
+    </soy>
+
+    <assertFileExists file="${soy101.output.js}" />
+    <assertFileExists file="${soy101Util.output.js}" />
+
+    <assertResourceContains resource="${soy101Util.output.js}"
+        value="goog.getCssName" />
+    <assertResourceDoesntContain resource="${soy101.output.js}"
+        value="output.append" />
+  </target>
+
+
+  <target name="testCompileToJs_shouldGenerateJsdoc">
+    <soy>
+      <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+      <compiletojs codeStyle="STRINGBUILDER"
+          outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
+          shouldGenerateJsdoc="true" />
+    </soy>
+
+    <assertFileExists file="${soy101.output.js}" />
+    <assertResourceContains resource="${soy101.output.js}"
+        value="* @notypecheck" />
+  </target>
+
+
+  <target name="testCompileToJs_shouldProvideRequireSoyNamespaces">
+    <soy>
+      <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+      <compiletojs codeStyle="STRINGBUILDER"
+          outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
+          shouldProvideRequireSoyNamespaces="true" />
+    </soy>
+
+    <assertFileExists file="${soy101.output.js}" />
+    <assertResourceContains resource="${soy101.output.js}"
+        value="goog.provide('soy101')" />
+  </target>
+
+
+  <target name="testCompileToJs_ErrorForShouldGenerateGoogMsgDefs_without_bidiGlobalDir_or_useGoogIsRtlForBidiGlobalDir">
+    <expectfailure>
+      <soy>
+        <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+        <compiletojs codeStyle="STRINGBUILDER"
+            outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
+            shouldGenerateGoogMsgDefs="true"
+            useGoogIsRtlForBidiGlobalDir="false" />
+      </soy>
+    </expectfailure>
+  </target>
+
+
+  <target name="testCompileToJs_ErrorForUseGoogIsRtlForBidiGlobalDir_without_shouldGenerateGoogMsgDefs_and_shouldProvideRequireSoyNamespaces">
+    <expectfailure>
+      <soy>
+        <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+        <compiletojs codeStyle="STRINGBUILDER"
+            outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
+            shouldGenerateGoogMsgDefs="false"
+            shouldProvideRequireSoyNamespaces="false"
+            useGoogIsRtlForBidiGlobalDir="true" />
+      </soy>
+    </expectfailure>
+  </target>
+
+
+  <target name="testCompileToJs_delegateTemplate">
+    <soy cssHandlingScheme="goog">
+      <soyfileset dir="soy-delegate-packages" includes="**/*.soy" />
+      <compiletimeglobal name="globalEventName" value="'Soy Congress'" />
+      <compiletojs codeStyle="concat"
+          outputPathFormat="${delegate-packages.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js" />
+    </soy>
+
+    <assertFileExists
+        file="${delegate-packages.output.dir}/default-greeting.js" />
+  </target>
+
+
+  <!--
+  =============================================================================
+    Tests for translation options.
+  =============================================================================
+  -->
+
+  <target name="testExtractMsgs_targetLocales">
+    <soy>
+      <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+      <translation extractedMessagesSourceLocale="en"
+          extractedMessagesOutputFile="${soy101.output.dir}/soy101_msgs_{LOCALE}.xlf">
+        <extractedmessagestargetlocales locales="en, de" />
+      </translation>
+    </soy>
+
+    <assertFileExists file="${soy101.output.dir}/soy101_msgs_en.xlf" />
+    <assertFileExists file="${soy101.output.dir}/soy101_msgs_de.xlf" />
+    <assertResourceContains resource="${soy101.output.dir}/soy101_msgs_en.xlf"
+        value='file original="SoyMsgBundle"' />
+  </target>
+
+
+  <target name="testCompileToLocalizedJs">
+    <soy>
+      <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+      <translation>
+        <translationfileset dir="${soy101.dir}" includes="**/*.xlf" />
+      </translation>
+      <compiletojs codeStyle="STRINGBUILDER" outputPathFormat=
+          "${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}_{LOCALE}.js"
+          shouldGenerateJsdoc="true" />
+    </soy>
+
+    <assertFileExists file="${soy101.output.dir}/soy101_de.js" />
+  </target>
+
+
+  <target name="testCompileToLocalizedJs_errorDueToNonUniqueOutputPath">
+    <expectfailure>
+      <soy>
+        <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+        <translation>
+          <translationfileset dir="${soy101.dir}" includes="**/*.xlf" />
+        </translation>
+        <compiletojs codeStyle="STRINGBUILDER" outputPathFormat=
+            "${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
+            shouldGenerateJsdoc="true" />
+      </soy>
+    </expectfailure>
+  </target>
+
+
+  <target name="testRenderLocalizedContent">
+    <soy>
+      <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+      <translation>
+        <translationfileset dir="${soy101.dir}" includes="**/*.xlf" />
+      </translation>
+      <rendertemplate templateName="soy101.executeAll"
+          outputPathFormat="${soy101.output.dir}/{TEMPLATE_NAME}_{LOCALE}.html"/>
+    </soy>
+
+    <assertFileExists file="${soy101.output.dir}/executeAll_en.html" />
+    <assertFileExists file="${soy101.output.dir}/executeAll_de.html" />
+    <assertResourceContains resource="${soy101.output.dir}/executeAll_de.html"
+        value="Morpheus unschädlich für alle Zwecke" />
+  </target>
+
+
+  <!--
+  =============================================================================
+    Tests for generating Java parse info.
+  =============================================================================
+  -->
+
+  <target name="testJavaParseInfo">
+    <soy>
+      <soyfileset dir="${hello-soy.dir}" includes="*.soy" />
+      <javaparseinfo outputDirectory="${hello-soy.output.dir}"
+           sourceOfClassnames="filename" outputJavaPackage="hellosoy" />
+    </soy>
+
+    <assertFileExists file="${hello-soy.output.dir}/HelloworldSoyInfo.java" />
+  </target>
+
+
+  <!--
+  =============================================================================
+    Tests for rendering Soy templates.
+  =============================================================================
+  -->
+
+  <target name="testRenderTemplate_HTMLFragment">
+    <soy cssHandlingScheme="goog">
+      <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
+      <rendertemplate templateName="soy101.executeAll"
+          outputPathFormat="${soy101.executeAll.rendered.html}"/>
+    </soy>
+
+    <assertFileExists file="${soy101.executeAll.rendered.html}" />
+    <assertResourceContains resource="${soy101.executeAll.rendered.html}"
+        value="hold Morpheus harmless for all purposes" />
+  </target>
+
+
+  <target name="testRenderTemplateWithParameters">
+    <soy cssHandlingScheme="goog">
+      <soyfileset dir="${hello-soy.dir}" includes="*.soy" />
+      <rendertemplate templateName="examples.helloName"
+          outputPathFormat="${hello-soy.output.dir}/helloName_rendered.txt">
+        <data json="{'name': 'Billy Bob', 'greetingWord': 'Bonjour'}" />
+      </rendertemplate>
+    </soy>
+
+    <assertFileExists file="${hello-soy.output.dir}/helloName_rendered.txt" />
+    <assertResourceContains
+        resource="${hello-soy.output.dir}/helloName_rendered.txt"
+        value="Bonjour Billy Bob!" />
+  </target>
+
+
+  <target name="testRender_delegatePackageWithGlobalVariable">
+    <soy>
+      <soyfileset dir="soy-delegate-packages"
+          includes="default-greeting.soy" />
+      <compiletimeglobal name="globalEventName" value="'Soy Congress'" />
+      <rendertemplate templateName="delegate.test.hello"
+          outputPathFormat="${helloDelegates.output.html}" />
+    </soy>
+
+    <assertFileExists file="${helloDelegates.output.html}" />
+    <assertResourceContains resource="${helloDelegates.output.html}"
+        value="Ladies and gentlemen" />
+  </target>
+
+
+  <target name="testRender_delegatePackageWithNonDefaultImplementation">
+    <soy>
+      <soyfileset dir="soy-delegate-packages" includes="**/*.soy" />
+      <compiletimeglobal name="globalEventName" value="'Soy Congress'" />
+      <activedelegatepackagelist packages="specialGreeting" />
+      <rendertemplate templateName="delegate.test.hello"
+          outputPathFormat="${helloDelegates.output.html}" />
+    </soy>
+
+    <assertFileExists file="${helloDelegates.output.html}" />
+    <assertResourceContains resource="${helloDelegates.output.html}"
+        value="This is an amazing event" />
+  </target>
+
+
+  <!--
+  =============================================================================
+    Tests for Soy plugin modules.
+  =============================================================================
+  -->
+
+  <target name="testPluginModules">
+
+    <echo file="${soy101.dir}/substring_test.soy">
+{namespace test}
+/** Soy module plugin test: substring */
+{template .testingSubstring}
+  {substring('specialist', 3, 9)}
+{/template}
+    </echo>
+
+    <soy soyPluginClasspath="${test.classes.dir}">
+      <pluginmodules classNames="org.plovr.soy.function.PlovrModule" />
+      <soyfileset dir="${soy101.dir}" includes="substring_test.soy" />
+      <compiletojs codeStyle="STRINGBUILDER"
+          outputPathFormat="${soy101.output.dir}/soySubstringTest.js"
+          shouldProvideRequireSoyNamespaces="true" />
+    </soy>
+
+    <delete file="${soy101.dir}/substring_test.soy" />
+    <assertFileExists file="${soy101.output.dir}/soySubstringTest.js" />
+  </target>
+
+
+  <!--
+    AntUnit does not work for testing the Soy task due to:
+
+    java.lang.OutOfMemoryError: PermGen space
+
+    This error results from AntUnit spawning sub-projects for each test-task
+    being executed, each with its own classloader. Hence, each nested <soy>
+    task call creates a new ClosureTemplatesTask instance along with a new Guice injector
+    and associated SoyModule. Since these classloaders are not released for
+    garbage collection until after AntUnit has finished running the entire test
+    suite, memory usage grows rapidly. For less memory-intensive tasks, the
+    class-loading redundancy does not result PermGen memory errors unless the
+    test suite contains a very large number of AntUnit tests. Hence, AntUnit
+    is still used for integration testing for all of the other Closure Ant
+    Tasks.
+  -->
+
+
+  <target name="test-setup" depends="suiteSetUp, compile" />
+
+  <target name="unit-tests" depends="
+  testCompileToJs_cssHandlingSchemeGOOG,
+  testCompileToJs_shouldGenerateJsdoc,
+  testCompileToJs_shouldProvideRequireSoyNamespaces,
+  testCompileToJs_ErrorForShouldGenerateGoogMsgDefs_without_bidiGlobalDir_or_useGoogIsRtlForBidiGlobalDir,
+  testCompileToJs_ErrorForUseGoogIsRtlForBidiGlobalDir_without_shouldGenerateGoogMsgDefs_and_shouldProvideRequireSoyNamespaces,
+  testCompileToJs_delegateTemplate,
+  testExtractMsgs_targetLocales,
+  testCompileToLocalizedJs,
+  testCompileToLocalizedJs_errorDueToNonUniqueOutputPath,
+  testRenderLocalizedContent,
+  testJavaParseInfo,
+  testRenderTemplate_HTMLFragment,
+  testRenderTemplateWithParameters,
+  testRender_delegatePackageWithGlobalVariable,
+  testRender_delegatePackageWithNonDefaultImplementation,
+  testPluginModules" />
+
+  <target name="test" depends="test-setup, unit-tests" />
+
+</project>

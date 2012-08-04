@@ -1,0 +1,18 @@
+<html>
+<head>
+  <title>The Hello World of Closure Templates</title>
+  <script type="text/javascript" src="soyutils.js"></script>
+  <script type="text/javascript" src="helloworld.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+  // Exercise the .helloWorld template
+  document.write(examples.helloWorld());
+  // Exercise the .helloName template
+  document.write('<hr>' + examples.helloName({'name': 'Ana'}));
+  // Exercise the .helloNames template
+  document.write('<hr>' + examples.helloNames(
+      {'name': 'Ana', 'additionalNames': ['Bob', 'Cid', 'Dee']}));
+</script>
+</body>
+</html>

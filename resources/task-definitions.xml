@@ -16,8 +16,7 @@ limitations under the License.
 -->
 
 <antlib>
-  <taskdef name="builder-plus"
-      classname="org.closureant.BuilderPlusTask" />
+  <taskdef name="builder-plus" classname="org.closureant.BuilderPlusTask" />
 
   <taskdef name="closure-builder-python"
       classname="org.closureant.ClosureBuilderPythonTask" />
@@ -25,23 +24,20 @@ limitations under the License.
   <taskdef name="closure-compiler"
       classname="org.closureant.ClosureCompilerTask" />
 
-  <taskdef name="closure-linter"
-      classname="org.closureant.ClosureLinterTask" />
+  <taskdef name="closure-linter" classname="org.closureant.ClosureLinterTask" />
 
   <taskdef name="closure-stylesheets"
       classname="org.closureant.ClosureStylesheetsTask" />
 
   <taskdef name="closure-templates"
-      classname="org.closureant.SoyTask" />
+      classname="org.closureant.ClosureTemplatesTask" />
 
-  <taskdef name="deps-writer"
-      classname="org.closureant.DepsWriterTask" />
+  <taskdef name="deps-writer" classname="org.closureant.DepsWriterTask" />
 
   <taskdef name="deps-writer-python"
       classname="org.closureant.DepsWriterPythonTask" />
 
   <taskdef name="plovr" classname="org.closureant.PlovrTask" />
 
-  <taskdef name="plovr-soyweb"
-      classname="org.closureant.PlovrSoyWebTask" />
+  <taskdef name="plovr-soyweb" classname="org.closureant.PlovrSoyWebTask" />
 </antlib>
