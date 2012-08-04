@@ -1,8 +1,8 @@
-#Closure Ant Tasks
+#Closure Ant
 
-Closure Ant Tasks are a collection of [Apache Ant](http://ant.apache.org/)
-tasks that simplify development using the Google [Closure
-Tools](https://developers.google.com/closure/) and [plovr](http://plovr.com/).
+Closure Ant is an [Apache Ant](http://ant.apache.org/) library consisting of
+tasks for [Google Closure Tools](https://developers.google.com/closure/) and
+[plovr](http://plovr.com/).
 
 
 - - - - -
