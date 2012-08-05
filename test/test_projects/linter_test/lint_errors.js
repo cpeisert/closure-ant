@@ -1,4 +1,6 @@
 goog.provide('lint.errors.MyConstructor');
+
+goog.require('lint.errors.Indentation');
 goog.require('goog.dom');
 
 /**
@@ -6,6 +8,7 @@ goog.require('goog.dom');
  *
  * @param {string} param1 description is not a sentence
  * @param param2 missing type annotation
+ * @constructor
  */
 lint.errors.MyConstructor = function(param1) {
   var body = goog.dom.getElementsByTagNameAndClass("body")[0];

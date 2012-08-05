@@ -79,7 +79,7 @@ limitations under the License.
 
   <target name="testCheckJavaScriptInHtmlFile">
     <expectfailure>
-      <closure-linter checkJsInHtmlFiles="true"
+      <closure-linter checkJsInHtmlFiles="true" force="true"
           linterMode="lint" showCommandLine="true"
           logfile="${test.build.dir}/antunit/linter.log">
         <closurelintererrors all="true" />
@@ -96,7 +96,7 @@ limitations under the License.
 
 
   <target name="testIgnoreJavaScriptInHtmlFile">
-    <closure-linter checkJsInHtmlFiles="false"
+    <closure-linter checkJsInHtmlFiles="false" force="true"
         linterMode="lint" showCommandLine="true"
         logfile="${test.build.dir}/antunit/linter.log">
       <closurelintererrors all="true" />
@@ -113,7 +113,7 @@ limitations under the License.
 
   <target name="testDebugIndentation">
     <expectfailure>
-      <closure-linter
+      <closure-linter force="true"
           linterMode="lint" showCommandLine="true"
           logfile="${test.build.dir}/antunit/linter.log">
         <mainsources dir="${linter_test.dir}" includes="indentation_errors.js" />
@@ -131,7 +131,7 @@ limitations under the License.
 
   <target name="testDebugTokens">
     <expectfailure>
-      <closure-linter debugTokens="true"
+      <closure-linter debugTokens="true" force="true"
           linterMode="lint" showCommandLine="true"
           logfile="${test.build.dir}/antunit/linter.log">
         <mainsources dir="${linter_test.dir}" includes="lint_errors.js" />
@@ -164,22 +164,6 @@ limitations under the License.
   </target>
 
 
-  <target name="testShowSummary">
-    <expectfailure>
-      <closure-linter showSummary="true"
-          linterMode="lint" showCommandLine="true"
-          logfile="${test.build.dir}/antunit/linter.log">
-        <mainsources dir="${linter_test.dir}" includes="indentation_errors.js" />
-        <closurelintererrors all="true" />
-      </closure-linter>
-    </expectfailure>
-
-    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
-    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
-        value="indentation_errors.js: 5" />
-  </target>
-
-
   <target name="testTimingStats">
     <closure-linter timingstats="true"
         force="true" logfile="${test.build.dir}/antunit/linter.log">
@@ -193,6 +177,98 @@ limitations under the License.
         value="Done in" />
   </target>
 
+
+  <target name="testUnixMode">
+    <expectfailure>
+      <closure-linter unixmode="true" force="true"
+          linterMode="lint" showCommandLine="true"
+          logfile="${test.build.dir}/antunit/linter.log">
+        <mainsources dir="${linter_test.dir}" includes="indentation_errors.js" />
+        <closurelintererrors all="true" />
+      </closure-linter>
+    </expectfailure>
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="(New Error 0006)" />
+  </target>
+
+
+  <target name="testJsFileExt_Roots_CustomJsDocTag">
+    <expectfailure>
+      <closure-linter force="true"
+          linterMode="lint" showCommandLine="true"
+          logfile="${test.build.dir}/antunit/linter.log">
+        <jsfileextensionlist fileextensions="foo" />
+        <roots dir="${linter_test.dir}" />
+        <closurelintererrors all="true" />
+      </closure-linter>
+    </expectfailure>
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="file_ext_test.foo" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="Invalid JsDoc tag: mydoctag" />
+  </target>
+
+
+  <target name="testNonStandardJsFileExtSpecifiedAsMainSource">
+    <expectfailure>
+      <closure-linter force="true"
+          linterMode="lint" showCommandLine="true"
+          logfile="${test.build.dir}/antunit/linter.log">
+        <mainsources dir="${linter_test.dir}" includes="*.foo" />
+        <closurelintererrors all="true" />
+      </closure-linter>
+    </expectfailure>
+  </target>
+
+
+  <target name="testCustomJsDocTag">
+    <expectfailure>
+      <closure-linter force="true"
+          linterMode="lint" showCommandLine="true"
+          logfile="${test.build.dir}/antunit/linter.log">
+        <customjsdoctaglist doctags="mydoctag" />
+        <mainsources dir="${linter_test.dir}" includes="indentation_errors.js" />
+        <closurelintererrors all="true" />
+      </closure-linter>
+    </expectfailure>
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceDoesntContain resource="${test.build.dir}/antunit/linter.log"
+        value="Invalid JsDoc tag: mydoctag" />
+  </target>
+
+
+  <target name="testNamespaceList">
+    <expectfailure>
+      <closure-linter force="true"
+          linterMode="lint" showCommandLine="true"
+          logfile="${test.build.dir}/antunit/linter.log">
+        <closurelintererrors all="true" />
+        <namespacelist namespaces="lint.namespace, not.goog.provided" />
+        <sources dir="${linter_test.dir}" includes="namespace.js" />
+      </closure-linter>
+    </expectfailure>
+
+    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
+    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
+        value="goog.provide('not.goog.provided');" />
+  </target>
+
+
+  <target name="testSourcesWithRelaxedDocumentationChecks">
+    <expectfailure>
+      <closure-linter force="true"
+          linterMode="lint" showCommandLine="true"
+          logfile="${test.build.dir}/antunit/linter.log">
+        <sourceswithrelaxeddocchecks dir="${linter_test.dir}" includes="*.js" />
+        <closurelintererrors all="true" />
+      </closure-linter>
+    </expectfailure>
+  </target>
 
 
   <!-- Run this test suite. -->

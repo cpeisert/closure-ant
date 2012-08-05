@@ -1,0 +1,9 @@
+goog.provide('lint.errors.Foo');
+
+/**
+ * @param {string} param1 description is not a sentence
+ * @constructor
+ */
+lint.errors.Foo = function(param1) {
+  var missingSemicolon = "The string to nowhere..."
+}
