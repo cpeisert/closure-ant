@@ -16,7 +16,10 @@
 
 package org.closureant.types;
 
+import com.google.common.collect.Sets;
+
 import java.util.List;
+import java.util.Set;
 
 /**
  * Data type for nested elements that have a {@code fileExtensions} attribute
@@ -46,7 +49,14 @@ public final class FileExtensionList extends StringList {
    *
    * @return a {@link List} of file extensions
    */
-  public List<String> getFileExtensions() {
-    return getListOfStrings();
+  public Set<String> getFileExtensions() {
+    List<String> fileExtensions = getListOfStrings();
+    Set<String> fileExtensionsNoDotPrefix = Sets.newHashSet();
+
+    for (String ext : fileExtensions) {
+      ext = (ext.startsWith(".")) ? ext.substring(1) : ext;
+      fileExtensionsNoDotPrefix.add(ext);
+    }
+    return fileExtensionsNoDotPrefix;
   }
 }
