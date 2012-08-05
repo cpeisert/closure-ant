@@ -8,10 +8,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="closure-stylesheets" level="project" />
-    <orderEntry type="library" name="ivy" level="project" />
-    <orderEntry type="library" name="soy-excluding-deps" level="project" />
-    <orderEntry type="library" name="ant-antunit" level="project" />
+    <orderEntry type="library" name="lib" level="project" />
   </component>
 </module>
 
