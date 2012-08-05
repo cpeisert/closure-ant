@@ -31,16 +31,16 @@ limitations under the License.
   <property name="test.lib.dir" location="${test.dir}/lib" />
   <import file="${test.lib.dir}/antunit.xml" />
 
-  <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
-  <property name="closure-ant-tasks.lib.dir" location="${closure-ant-tasks.dir}/lib" />
-  <property name="closure-ant-tasks.build.dir"
-      location="${closure-ant-tasks.dir}/build" />
+  <property name="closure-ant.dir" location="${test.dir}/.." />
+  <property name="closure-ant.lib.dir" location="${closure-ant.dir}/lib" />
+  <property name="closure-ant.build.dir"
+      location="${closure-ant.dir}/build" />
   <property name="closure-tools-config.xml"
-      location="${closure-ant-tasks.build.dir}/closure-tools-config.xml" />
+      location="${closure-ant.build.dir}/closure-tools-config.xml" />
   <import file="${closure-tools-config.xml}" />
 
   <path id="test.classpath">
-    <fileset dir="${closure-ant-tasks.lib.dir}" includes="**/*.jar" />
+    <fileset dir="${closure-ant.lib.dir}" includes="**/*.jar" />
     <fileset dir="${test.lib.dir}" includes="**/*.jar" />
   </path>
 
@@ -63,6 +63,8 @@ limitations under the License.
     <copy todir="${json-in-style.soy-output.dir}/images">
       <fileset dir="${json-in-style.dir}/images" />
     </copy>
+    <ant dir="${closure-ant.dir}" target="compile" inheritAll="false"
+        useNativeBasedir="true" />
   </target>
 
 
@@ -72,7 +74,7 @@ limitations under the License.
   =============================================================================
   -->
 
-  <target name="test_outputMode=RAW">
+  <target name="testOutputModeRAW">
     <builder-plus outputMode="raw"
         outputfile="${project101.raw.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
@@ -86,7 +88,7 @@ limitations under the License.
   </target>
 
 
-  <target name="test_keepMoochers">
+  <target name="testKeepMoochers">
     <builder-plus outputMode="raw"
         keepMoochers="true"
         outputfile="${project101.raw.output.js}">
@@ -101,7 +103,7 @@ limitations under the License.
   </target>
 
 
-  <target name="test_whitespace-compiled">
+  <target name="testWhitespaceCompiled">
     <builder-plus outputMode="compiled" forceRecompile="true"
         outputFile="${project101.whitespace-compiled.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
@@ -118,7 +120,7 @@ limitations under the License.
   </target>
 
   
-  <target name="test_simple-compiled">
+  <target name="testSimpleCompiled">
     <builder-plus outputMode="compiled" forceRecompile="true"
         outputFile="${project101.simple-compiled.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
@@ -146,7 +148,7 @@ limitations under the License.
   </target>
 
   
-  <target name="test_advanced-compiled">
+  <target name="testAdvancedCompiled">
     <builder-plus outputMode="compiled" forceRecompile="true"
         outputFile="${project101.advanced-compiled.output.js}">
       <namespacelist namespaces="${project101.namespace}" />
@@ -159,7 +161,7 @@ limitations under the License.
   </target>
 
 
-  <target name="test_outputMode=MANIFEST">
+  <target name="testOutputModeMANIFEST">
     <builder-plus outputMode="MANIFEST"
         outputManifest="${project101.outputManifest}">
       <namespacelist namespaces="${project101.namespace}" />
@@ -175,7 +177,7 @@ limitations under the License.
   </target>
   
   
-  <target name="test_outputManifest">
+  <target name="testOutputManifest">
     <property name="base.js"
         location="${closure-library.dir}/closure/goog/base.js" />
 
@@ -198,7 +200,7 @@ limitations under the License.
   </target>
 
 
-  <target name="test_skipCompilationIfOutputFileUpToDate">
+  <target name="testSkipCompilationIfOutputFileUpToDate">
     <logcapturer />
     <builder-plus outputMode="compiled"
         outputFile="${project101.whitespace-compiled.output.js}">
@@ -235,13 +237,13 @@ limitations under the License.
 
 
   <target name="testInputCssRenamingMap_CLOSURE_COMPILED">
-    <stylesheets outputFile="${json-in-style.soy-output.css}"
+    <closure-stylesheets outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}"
         outputRenamingMapFormat="CLOSURE_COMPILED"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
     <builder-plus
         cssRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}"
@@ -260,13 +262,13 @@ limitations under the License.
 
 
   <target name="testInputCssRenamingMap_CLOSURE_UNCOMPILED">
-    <stylesheets outputFile="${json-in-style.soy-output.css}"
+    <closure-stylesheets outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}"
         outputRenamingMapFormat="CLOSURE_UNCOMPILED"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
     <builder-plus
         cssRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}"
@@ -283,13 +285,13 @@ limitations under the License.
 
 
   <target name="testInputCssRenamingMap_JSON">
-    <stylesheets outputFile="${json-in-style.soy-output.css}"
+    <closure-stylesheets outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputRenamingMapFormat="JSON"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
     <builder-plus
         cssRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
@@ -308,14 +310,14 @@ limitations under the License.
 
 
   <target name="testInputCssRenamingMap_PROPERTIES">
-    <stylesheets
+    <closure-stylesheets
         outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_PROPERTIES}"
         outputRenamingMapFormat="PROPERTIES"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
     <builder-plus
         cssRenamingMapPropertiesFile="${json-in-style.soy.outputRenamingMap_PROPERTIES}"
@@ -332,13 +334,13 @@ limitations under the License.
 
 
   <target name="testOutputCssRenamingMap_CLOSURE_UNCOMPILED">
-    <stylesheets outputFile="${json-in-style.soy-output.css}"
+    <closure-stylesheets outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputRenamingMapFormat="JSON"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
     <!--
       Compilation level WHITESPACE should cause Builder Plus to produce a
@@ -359,7 +361,7 @@ limitations under the License.
         value="css_renaming_map_CLOSURE_UNCOMPILED.js" />
 
     <!-- Generate index.html for testing in browser. -->
-    <soy
+    <closure-templates
         cssHandlingScheme="goog"
         cssRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}">
       <soyfileset dir="${json-in-style.soy.dir}" includes="**/*.soy" />
@@ -374,7 +376,7 @@ limitations under the License.
           }
         </data>
       </rendertemplate>
-    </soy>
+    </closure-templates>
   </target>
 
   

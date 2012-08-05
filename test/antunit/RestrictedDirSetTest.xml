@@ -31,12 +31,12 @@ limitations under the License.
   <property name="test.lib.dir" location="${test.dir}/lib" />
   <import file="${test.lib.dir}/antunit.xml" />
 
-  <property name="closure-commons.build.dir" location="${test.dir}/../build" />
-  <property name="closure-commons.jar"
-      location="${closure-commons.build.dir}/closure-commons.jar" />
+  <property name="closure-ant.build.dir" location="${test.dir}/../build" />
+  <property name="closure-ant.jar"
+      location="${closure-ant.build.dir}/closure-ant.jar" />
   <typedef name="restricteddirset"
       classname="org.closureant.types.RestrictedDirSet"
-      classpath="${closure-commons.jar}" />
+      classpath="${closure-ant.jar}" />
   
   <!--
   =============================================================================

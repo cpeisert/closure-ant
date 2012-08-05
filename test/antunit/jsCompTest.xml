@@ -30,16 +30,16 @@ limitations under the License.
   <property name="test.lib.dir" location="${test.dir}/lib" />
   <import file="${test.lib.dir}/antunit.xml" />
 
-  <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
-  <property name="closure-ant-tasks.lib.dir" location="${closure-ant-tasks.dir}/lib" />
-  <property name="closure-ant-tasks.build.dir"
-      location="${closure-ant-tasks.dir}/build" />
+  <property name="closure-ant.dir" location="${test.dir}/.." />
+  <property name="closure-ant.lib.dir" location="${closure-ant.dir}/lib" />
+  <property name="closure-ant.build.dir"
+      location="${closure-ant.dir}/build" />
   <property name="closure-tools-config.xml"
-      location="${closure-ant-tasks.build.dir}/closure-tools-config.xml" />
+      location="${closure-ant.build.dir}/closure-tools-config.xml" />
   <import file="${closure-tools-config.xml}" />
 
   <path id="test.classpath">
-    <fileset dir="${closure-ant-tasks.lib.dir}" includes="**/*.jar" />
+    <fileset dir="${closure-ant.lib.dir}" includes="**/*.jar" />
     <fileset dir="${test.lib.dir}" includes="**/*.jar" />
   </path>
 

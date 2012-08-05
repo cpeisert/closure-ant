@@ -130,7 +130,7 @@ public final class RestrictedDirSetTest {
 
     File rootDir = new File(".").getCanonicalFile();
     restrictedDirSet.setDir(rootDir);
-    restrictedDirSet.setIncludes("**/sub*/**");
+    restrictedDirSet.setIncludes("**/baseDir*/**/sub*/**");
 
     List<File> directories = restrictedDirSet.getMatchedDirectories();
     Set<File> dirSet = ImmutableSet.copyOf(directories);

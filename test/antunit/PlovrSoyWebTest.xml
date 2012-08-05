@@ -33,9 +33,9 @@ limitations under the License.
   <property name="plovr_soyweb.dir"
       location="${test-projects.dir}/plovr_soyweb" />
 
-  <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
+  <property name="closure-ant.dir" location="${test.dir}/.." />
   <property name="closure-tools-config.xml"
-      location="${closure-ant-tasks.dir}/build/closure-tools-config.xml" />
+      location="${closure-ant.dir}/build/closure-tools-config.xml" />
   <import file="${closure-tools-config.xml}" />
 
   <!--
@@ -53,10 +53,10 @@ limitations under the License.
         unsafe="true" />
 
     <echo message="To complete the plovr-soyweb test: " />
-    <echo message="1) open: http://localhost:9999/tasks.html" />
-    <echo message="2) open: http://localhost:9999/tasks2.html" />
-    <echo message="3) open: http://localhost:9999/settings.html?accessToken=null" />
-    <echo message="4) open: http://localhost:9999/settings.html?accessToken=someToken" />
+    <echo message="1) open: http://0.0.0.0:9999/tasks.html" />
+    <echo message="2) open: http://0.0.0.0:9999/tasks2.html" />
+    <echo message="3) open: http://0.0.0.0:9999/settings.html?accessToken=null" />
+    <echo message="4) open: http://0.0.0.0:9999/settings.html?accessToken=someToken" />
   </target>
 
 

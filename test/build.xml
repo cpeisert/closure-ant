@@ -35,10 +35,6 @@ limitations under the License.
   <property name="closure-ant.jar" 
       location="${closure-ant.dir}/build/closure-ant.jar" />
 
-  <condition property="closure-ant.jar.available">
-    <available file="${closure-ant.jar}" />
-  </condition>
-
   <path id="test.classpath">
     <fileset dir="${closure-ant.lib.dir}" includes="**/*.jar" />
     <fileset dir="${test.lib.dir}" includes="**/*.jar" />
@@ -62,9 +58,12 @@ limitations under the License.
   ==============================================================================
   -->
 
-  <target name="init" description="Initialize the build directory.">
+  <target name="init" description=
+      "Initialize the build directory and compile closureant if out of date.">
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${test.classes.dir}" />
+    <ant dir="${closure-ant.dir}" target="compile" inheritAll="false"
+        useNativeBasedir="true" />
   </target>
 
 
@@ -84,9 +83,6 @@ limitations under the License.
   
   
   <target name="junit-test" depends="compile" description="Run JUnit tests.">
-    <fail unless="closure-ant.jar.available"
-        message="Tests aborted. File not found: [${closure-ant.jar}]" />
-
     <junit printsummary="on" fork="true" forkmode="once" showoutput="true">
       <classpath refid="test.classpath" />
       <classpath>
@@ -95,9 +91,7 @@ limitations under the License.
       <formatter usefile="false"
           classname="org.closureant.junit.CustomJUnitResultFormatter"/>
       <batchtest haltonfailure="true">
-        <fileset dir="${test.classes.dir}">
-          <include name="**/org/closureant/**/*Test.class" />
-        </fileset>
+        <fileset dir="${test.classes.dir}" includes="**/*Test.class" />
       </batchtest>
     </junit>
   </target>
@@ -105,9 +99,6 @@ limitations under the License.
 
   <target name="antunit-test" depends="compile"
       description="Run AntUnit tests.">
-    <fail unless="closure-ant.jar.available"
-        message="Tests aborted. File not found: [${closure-ant.jar}]" />
-    
     <antunit>
       <plainlistener loglevel="info" />
       <fileset dir="${antunit.dir}" includes="**/*Test.xml" />

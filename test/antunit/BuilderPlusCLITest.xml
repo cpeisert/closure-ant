@@ -31,23 +31,23 @@ limitations under the License.
   <property name="test.lib.dir" location="${test.dir}/lib" />
   <import file="${test.lib.dir}/antunit.xml" />
 
-  <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
-  <property name="closure-ant-tasks.lib.dir" location="${closure-ant-tasks.dir}/lib" />
-  <property name="closure-ant-tasks.build.dir"
-      location="${closure-ant-tasks.dir}/build" />
+  <property name="closure-ant.dir" location="${test.dir}/.." />
+  <property name="closure-ant.lib.dir" location="${closure-ant.dir}/lib" />
+  <property name="closure-ant.build.dir"
+      location="${closure-ant.dir}/build" />
   <property name="closure-tools-config.xml"
-      location="${closure-ant-tasks.build.dir}/closure-tools-config.xml" />
+      location="${closure-ant.build.dir}/closure-tools-config.xml" />
   <import file="${closure-tools-config.xml}" />
 
   <import file="${test.dir}/test_projects/project101/project101.xml" />
 
   <property name="builderplus.jar"
-      location="${closure-ant-tasks.build.dir}/builderplus.jar" />
+      location="${closure-ant.build.dir}/builderplus.jar" />
   <property name="flagfile.txt"
       location="${project101.output.dir}/compiler_flagfile.txt" />
 
   <path id="test.classpath">
-    <fileset dir="${closure-ant-tasks.lib.dir}" includes="**/*.jar" />
+    <fileset dir="${closure-ant.lib.dir}" includes="**/*.jar" />
     <fileset dir="${test.lib.dir}" includes="**/*.jar" />
   </path>
 
@@ -62,6 +62,8 @@ limitations under the License.
   <target name="suiteSetUp">
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${project101.output.dir}" />
+    <ant dir="${closure-ant.dir}" target="compile" inheritAll="false"
+        useNativeBasedir="true" />
   </target>
 
 
@@ -71,7 +73,7 @@ limitations under the License.
   =============================================================================
   -->
 
-  <target name="test_outputMode=RAW">
+  <target name="testOutputModeRAW">
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
       <arg value="--compiler_jar=${closure-compiler.jar}" />
       <arg value='--output_file="${project101.raw.output.js}"' />
@@ -87,7 +89,7 @@ limitations under the License.
   </target>
 
 
-  <target name="test_keepMoochers">
+  <target name="testKeepMoochers">
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
       <arg value="--compiler_jar=${closure-compiler.jar}" />
       <arg line="--keep_moochers" />
@@ -104,7 +106,7 @@ limitations under the License.
   </target>
 
 
-  <target name="test_whitespace-compiled">
+  <target name="testWhitespaceCompiled">
     <echo file="${flagfile.txt}"
         message="--compilation_level=WHITESPACE_ONLY --formatting=PRETTY_PRINT" />
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
@@ -125,7 +127,7 @@ limitations under the License.
   </target>
 
   
-  <target name="test_simple-compiled">
+  <target name="testSimpleCompiled">
     <echo file="${flagfile.txt}"
         message='--compilation_level=SIMPLE_OPTIMIZATIONS
         --formatting=PRETTY_PRINT --define goog.DEBUG=false
@@ -156,7 +158,7 @@ limitations under the License.
   </target>
 
   
-  <target name="test_advanced-compiled">
+  <target name="testAdvancedCompiled">
     <echo file="${flagfile.txt}"
         message='--compilation_level=ADVANCED_OPTIMIZATIONS' />
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
@@ -174,7 +176,7 @@ limitations under the License.
   </target>
   
 
-  <target name="test_outputMode=MANIFEST">
+  <target name="testOutputModeMANIFEST">
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
       <arg value="--compiler_jar=${closure-compiler.jar}" />
       <arg value='--output_manifest="${project101.outputManifest}"' />
@@ -191,7 +193,7 @@ limitations under the License.
   </target>
 
 
-  <target name="test_outputManifest">
+  <target name="testOutputManifest">
     <property name="base.js"
         location="${closure-library.dir}/closure/goog/base.js" />
 
@@ -216,7 +218,7 @@ limitations under the License.
   </target>
 
 
-  <target name="test_skipCompilationIfOutputFileUpToDate">
+  <target name="testSkipCompilationIfOutputFileUpToDate">
     <logcapturer />
     <echo file="${flagfile.txt}"
         message='--compilation_level=WHITESPACE_ONLY --formatting=PRETTY_PRINT' />
@@ -258,14 +260,14 @@ limitations under the License.
       location="${json-in-style.soy-output.dir}/manifest_closure_uncompiled.txt" />
 
 
-  <target name="testInputCssRenamingMap_CLOSURE_COMPILED">
-    <stylesheets outputFile="${json-in-style.soy-output.css}"
+  <target name="testInputCssRenamingMapCLOSURE_COMPILED">
+    <closure-stylesheets outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}"
         outputRenamingMapFormat="CLOSURE_COMPILED"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
       <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}" />
@@ -284,14 +286,14 @@ limitations under the License.
   </target>
 
 
-  <target name="testInputCssRenamingMap_CLOSURE_UNCOMPILED">
-    <stylesheets outputFile="${json-in-style.soy-output.css}"
+  <target name="testInputCssRenamingMapCLOSURE_UNCOMPILED">
+    <closure-stylesheets outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}"
         outputRenamingMapFormat="CLOSURE_UNCOMPILED"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
       <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}" />
@@ -310,14 +312,14 @@ limitations under the License.
   </target>
 
 
-  <target name="testInputCssRenamingMap_JSON">
-    <stylesheets outputFile="${json-in-style.soy-output.css}"
+  <target name="testInputCssRenamingMapJSON">
+    <closure-stylesheets outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputRenamingMapFormat="JSON"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
       <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_JSON}" />
@@ -336,15 +338,15 @@ limitations under the License.
   </target>
 
 
-  <target name="testInputCssRenamingMap_PROPERTIES">
-    <stylesheets
+  <target name="testInputCssRenamingMapPROPERTIES">
+    <closure-stylesheets
         outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_PROPERTIES}"
         outputRenamingMapFormat="PROPERTIES"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
       <arg value="--css_renaming_map_properties_file=${json-in-style.soy.outputRenamingMap_PROPERTIES}" />
@@ -363,23 +365,23 @@ limitations under the License.
   </target>
 
 
-  <target name="testError_CssRenamingMapSpecifiedAsPropertiesAndJSON">
-    <stylesheets
+  <target name="testErrorCssRenamingMapSpecifiedAsPropertiesAndJSON">
+    <closure-stylesheets
         outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_PROPERTIES}"
         outputRenamingMapFormat="PROPERTIES"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
-    <stylesheets outputFile="${json-in-style.soy-output.css}"
+    <closure-stylesheets outputFile="${json-in-style.soy-output.css}"
         outputRenamingMap="${json-in-style.soy.outputRenamingMap_JSON}"
         outputRenamingMapFormat="JSON"
         renamingType="CLOSURE"
         prettyPrint="true">
       <cssfileset dir="${json-in-style.dir}/gss" includes="*.gss" />
-    </stylesheets>
+    </closure-stylesheets>
 
     <expectfailure>
       <!-- May not specify both JSON and Properties file renaming maps. -->

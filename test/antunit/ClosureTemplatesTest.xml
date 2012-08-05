@@ -20,9 +20,9 @@ limitations under the License.
   AntUnit tests for ClosureTemplatesTask (task name: soy).
 ================================================================================
 -->
-<project name="SoyTaskTest" default="test">
+<project name="closure-templates-test" default="test">
 
-  <dirname property="antunit.dir" file="${ant.file.SoyTaskTest}" />
+  <dirname property="antunit.dir" file="${ant.file.closure-templates-test}" />
 
   <property name="test.dir" location="${antunit.dir}/.." />
   <property name="test-projects.dir" location="${test.dir}/test_projects" />
@@ -31,18 +31,18 @@ limitations under the License.
   <property name="test.lib.dir" location="${test.dir}/lib" />
   <import file="${test.lib.dir}/antunit.xml" />
 
-  <property name="closure-template-extensions.dir" location="${test.dir}/.." />
-  <property name="closure-template-extensions.resources.dir"
-      location="${closure-template-extensions.dir}/resources" />
-  <property name="closure-template-extensions.lib.dir"
-      location="${closure-template-extensions.dir}/lib" />
-  <property name="closure-template-extensions.build.dir"
-      location="${closure-template-extensions.dir}/build" />
+  <property name="closure-ant.dir" location="${test.dir}/.." />
+  <property name="closure-ant.resources.dir"
+      location="${closure-ant.dir}/resources" />
+  <property name="closure-ant.lib.dir"
+      location="${closure-ant.dir}/lib" />
+  <property name="closure-ant.build.dir"
+      location="${closure-ant.dir}/build" />
   <property name="closure-tools-config.xml"
-      location="${closure-template-extensions.build.dir}/closure-tools-config.xml" />
+      location="${closure-ant.build.dir}/closure-tools-config.xml" />
   <import file="${closure-tools-config.xml}" />
-  <property name="template-extensions.jar"
-      location="${closure-template-extensions.build.dir}/template-extensions.jar"/>
+  <property name="closure-ant.jar"
+      location="${closure-ant.build.dir}/closure-ant.jar"/>
 
   <!-- Test projects. -->
   <import file="${test.dir}/test_projects/soy101/soy101.xml" />
@@ -59,9 +59,9 @@ limitations under the License.
       location="${test.build.dir}/antunit/delegate-packages/helloDelegates.html"/>
 
   <path id="test.classpath">
-    <fileset dir="${closure-template-extensions.lib.dir}" includes="**/*.jar" />
+    <fileset dir="${closure-ant.lib.dir}" includes="**/*.jar" />
     <fileset dir="${test.lib.dir}" includes="**/*.jar" />
-    <pathelement location="${template-extensions.jar}" />
+    <pathelement location="${closure-ant.jar}" />
   </path>
 
   <property name="test.classes.dir" location="${test.build.dir}/classes" />
@@ -80,21 +80,10 @@ limitations under the License.
     <mkdir dir="${hello-soy.output.dir}" />
     <mkdir dir="${delegate-packages.output.dir}" />
     <copy file="${soy101.html}" todir="${soy101.output.dir}" />
-    <copy file="${closure-template-extensions.resources.dir}/soyutils.js"
+    <copy file="${closure-ant.resources.dir}/soyutils.js"
         todir="${soy101.output.dir}" />
-    <antcall target="compile" inheritAll="false" />
-  </target>
-
-
-  <target name="compile"
-      description="Compiles test sources including the plovr Soy function plugin demo.">
-    <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}"
-        classpathref="test.classpath" debug="on" deprecation="on"
-        includeantruntime="false"
-        source="1.6" target="1.6">
-      <compilerarg value="-Xlint"/>
-      <include name="org/plovr/soy/function/*" />
-    </javac>
+    <ant dir="${closure-ant.dir}" target="compile" inheritAll="false"
+        useNativeBasedir="true" />
   </target>
 
   <!--
@@ -104,11 +93,11 @@ limitations under the License.
   -->
 
   <target name="testCompileToJs_cssHandlingSchemeGOOG">
-    <soy cssHandlingScheme="goog">
+    <closure-templates cssHandlingScheme="goog">
       <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
       <compiletojs codeStyle="concat"
           outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js" />
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${soy101.output.js}" />
     <assertFileExists file="${soy101Util.output.js}" />
@@ -121,12 +110,12 @@ limitations under the License.
 
 
   <target name="testCompileToJs_shouldGenerateJsdoc">
-    <soy>
+    <closure-templates>
       <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
       <compiletojs codeStyle="STRINGBUILDER"
           outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
           shouldGenerateJsdoc="true" />
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${soy101.output.js}" />
     <assertResourceContains resource="${soy101.output.js}"
@@ -135,12 +124,12 @@ limitations under the License.
 
 
   <target name="testCompileToJs_shouldProvideRequireSoyNamespaces">
-    <soy>
+    <closure-templates>
       <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
       <compiletojs codeStyle="STRINGBUILDER"
           outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
           shouldProvideRequireSoyNamespaces="true" />
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${soy101.output.js}" />
     <assertResourceContains resource="${soy101.output.js}"
@@ -150,38 +139,38 @@ limitations under the License.
 
   <target name="testCompileToJs_ErrorForShouldGenerateGoogMsgDefs_without_bidiGlobalDir_or_useGoogIsRtlForBidiGlobalDir">
     <expectfailure>
-      <soy>
+      <closure-templates>
         <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
         <compiletojs codeStyle="STRINGBUILDER"
             outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
             shouldGenerateGoogMsgDefs="true"
             useGoogIsRtlForBidiGlobalDir="false" />
-      </soy>
+      </closure-templates>
     </expectfailure>
   </target>
 
 
   <target name="testCompileToJs_ErrorForUseGoogIsRtlForBidiGlobalDir_without_shouldGenerateGoogMsgDefs_and_shouldProvideRequireSoyNamespaces">
     <expectfailure>
-      <soy>
+      <closure-templates>
         <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
         <compiletojs codeStyle="STRINGBUILDER"
             outputPathFormat="${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
             shouldGenerateGoogMsgDefs="false"
             shouldProvideRequireSoyNamespaces="false"
             useGoogIsRtlForBidiGlobalDir="true" />
-      </soy>
+      </closure-templates>
     </expectfailure>
   </target>
 
 
   <target name="testCompileToJs_delegateTemplate">
-    <soy cssHandlingScheme="goog">
-      <soyfileset dir="soy-delegate-packages" includes="**/*.soy" />
+    <closure-templates cssHandlingScheme="goog">
+      <soyfileset dir="${delegate-packages.dir}" includes="**/*.soy" />
       <compiletimeglobal name="globalEventName" value="'Soy Congress'" />
       <compiletojs codeStyle="concat"
           outputPathFormat="${delegate-packages.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js" />
-    </soy>
+    </closure-templates>
 
     <assertFileExists
         file="${delegate-packages.output.dir}/default-greeting.js" />
@@ -195,13 +184,13 @@ limitations under the License.
   -->
 
   <target name="testExtractMsgs_targetLocales">
-    <soy>
+    <closure-templates>
       <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
       <translation extractedMessagesSourceLocale="en"
           extractedMessagesOutputFile="${soy101.output.dir}/soy101_msgs_{LOCALE}.xlf">
         <extractedmessagestargetlocales locales="en, de" />
       </translation>
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${soy101.output.dir}/soy101_msgs_en.xlf" />
     <assertFileExists file="${soy101.output.dir}/soy101_msgs_de.xlf" />
@@ -211,7 +200,7 @@ limitations under the License.
 
 
   <target name="testCompileToLocalizedJs">
-    <soy>
+    <closure-templates>
       <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
       <translation>
         <translationfileset dir="${soy101.dir}" includes="**/*.xlf" />
@@ -219,7 +208,7 @@ limitations under the License.
       <compiletojs codeStyle="STRINGBUILDER" outputPathFormat=
           "${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}_{LOCALE}.js"
           shouldGenerateJsdoc="true" />
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${soy101.output.dir}/soy101_de.js" />
   </target>
@@ -227,7 +216,7 @@ limitations under the License.
 
   <target name="testCompileToLocalizedJs_errorDueToNonUniqueOutputPath">
     <expectfailure>
-      <soy>
+      <closure-templates>
         <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
         <translation>
           <translationfileset dir="${soy101.dir}" includes="**/*.xlf" />
@@ -235,20 +224,20 @@ limitations under the License.
         <compiletojs codeStyle="STRINGBUILDER" outputPathFormat=
             "${soy101.output.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
             shouldGenerateJsdoc="true" />
-      </soy>
+      </closure-templates>
     </expectfailure>
   </target>
 
 
   <target name="testRenderLocalizedContent">
-    <soy>
+    <closure-templates>
       <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
       <translation>
         <translationfileset dir="${soy101.dir}" includes="**/*.xlf" />
       </translation>
       <rendertemplate templateName="soy101.executeAll"
           outputPathFormat="${soy101.output.dir}/{TEMPLATE_NAME}_{LOCALE}.html"/>
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${soy101.output.dir}/executeAll_en.html" />
     <assertFileExists file="${soy101.output.dir}/executeAll_de.html" />
@@ -264,11 +253,11 @@ limitations under the License.
   -->
 
   <target name="testJavaParseInfo">
-    <soy>
+    <closure-templates>
       <soyfileset dir="${hello-soy.dir}" includes="*.soy" />
       <javaparseinfo outputDirectory="${hello-soy.output.dir}"
            sourceOfClassnames="filename" outputJavaPackage="hellosoy" />
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${hello-soy.output.dir}/HelloworldSoyInfo.java" />
   </target>
@@ -281,11 +270,11 @@ limitations under the License.
   -->
 
   <target name="testRenderTemplate_HTMLFragment">
-    <soy cssHandlingScheme="goog">
+    <closure-templates cssHandlingScheme="goog">
       <soyfileset dir="${soy101.dir}" includes="**/*.soy" />
       <rendertemplate templateName="soy101.executeAll"
           outputPathFormat="${soy101.executeAll.rendered.html}"/>
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${soy101.executeAll.rendered.html}" />
     <assertResourceContains resource="${soy101.executeAll.rendered.html}"
@@ -294,13 +283,13 @@ limitations under the License.
 
 
   <target name="testRenderTemplateWithParameters">
-    <soy cssHandlingScheme="goog">
+    <closure-templates cssHandlingScheme="goog">
       <soyfileset dir="${hello-soy.dir}" includes="*.soy" />
       <rendertemplate templateName="examples.helloName"
           outputPathFormat="${hello-soy.output.dir}/helloName_rendered.txt">
         <data json="{'name': 'Billy Bob', 'greetingWord': 'Bonjour'}" />
       </rendertemplate>
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${hello-soy.output.dir}/helloName_rendered.txt" />
     <assertResourceContains
@@ -310,13 +299,13 @@ limitations under the License.
 
 
   <target name="testRender_delegatePackageWithGlobalVariable">
-    <soy>
-      <soyfileset dir="soy-delegate-packages"
+    <closure-templates>
+      <soyfileset dir="${delegate-packages.dir}"
           includes="default-greeting.soy" />
       <compiletimeglobal name="globalEventName" value="'Soy Congress'" />
       <rendertemplate templateName="delegate.test.hello"
           outputPathFormat="${helloDelegates.output.html}" />
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${helloDelegates.output.html}" />
     <assertResourceContains resource="${helloDelegates.output.html}"
@@ -325,13 +314,13 @@ limitations under the License.
 
 
   <target name="testRender_delegatePackageWithNonDefaultImplementation">
-    <soy>
-      <soyfileset dir="soy-delegate-packages" includes="**/*.soy" />
+    <closure-templates>
+      <soyfileset dir="${delegate-packages.dir}" includes="**/*.soy" />
       <compiletimeglobal name="globalEventName" value="'Soy Congress'" />
       <activedelegatepackagelist packages="specialGreeting" />
       <rendertemplate templateName="delegate.test.hello"
           outputPathFormat="${helloDelegates.output.html}" />
-    </soy>
+    </closure-templates>
 
     <assertFileExists file="${helloDelegates.output.html}" />
     <assertResourceContains resource="${helloDelegates.output.html}"
@@ -355,13 +344,13 @@ limitations under the License.
 {/template}
     </echo>
 
-    <soy soyPluginClasspath="${test.classes.dir}">
+    <closure-templates soyPluginClasspath="${test.classes.dir}">
       <pluginmodules classNames="org.plovr.soy.function.PlovrModule" />
       <soyfileset dir="${soy101.dir}" includes="substring_test.soy" />
       <compiletojs codeStyle="STRINGBUILDER"
           outputPathFormat="${soy101.output.dir}/soySubstringTest.js"
           shouldProvideRequireSoyNamespaces="true" />
-    </soy>
+    </closure-templates>
 
     <delete file="${soy101.dir}/substring_test.soy" />
     <assertFileExists file="${soy101.output.dir}/soySubstringTest.js" />
@@ -374,19 +363,16 @@ limitations under the License.
     java.lang.OutOfMemoryError: PermGen space
 
     This error results from AntUnit spawning sub-projects for each test-task
-    being executed, each with its own classloader. Hence, each nested <soy>
-    task call creates a new ClosureTemplatesTask instance along with a new Guice injector
-    and associated SoyModule. Since these classloaders are not released for
-    garbage collection until after AntUnit has finished running the entire test
-    suite, memory usage grows rapidly. For less memory-intensive tasks, the
-    class-loading redundancy does not result PermGen memory errors unless the
-    test suite contains a very large number of AntUnit tests. Hence, AntUnit
-    is still used for integration testing for all of the other Closure Ant
-    Tasks.
+    being executed, each with its own classloader. Hence, each nested
+    <closure-templates> task call creates a new ClosureTemplatesTask instance
+    along with a new Guice injector and associated SoyModule. Since these
+    classloaders are not released for garbage collection until after AntUnit
+    has finished running the entire test suite, memory usage grows rapidly. For
+    less memory-intensive tasks, the class-loading redundancy does not result
+    PermGen memory errors unless the test suite contains a very large number of
+    AntUnit tests. Hence, AntUnit is still used for integration testing for all
+    of the other Closure Ant Tasks.
   -->
-
-
-  <target name="test-setup" depends="suiteSetUp, compile" />
 
   <target name="unit-tests" depends="
   testCompileToJs_cssHandlingSchemeGOOG,
@@ -406,6 +392,6 @@ limitations under the License.
   testRender_delegatePackageWithNonDefaultImplementation,
   testPluginModules" />
 
-  <target name="test" depends="test-setup, unit-tests" />
+  <target name="test" depends="suiteSetUp, unit-tests" />
 
 </project>

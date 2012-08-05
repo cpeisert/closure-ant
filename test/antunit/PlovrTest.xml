@@ -37,9 +37,9 @@ limitations under the License.
   <property name="plovr_inherits.build.dir"
       location="${test.build.dir}/antunit/plovr_inherits" />
 
-  <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
+  <property name="closure-ant.dir" location="${test.dir}/.." />
   <property name="closure-tools-config.xml"
-      location="${closure-ant-tasks.dir}/build/closure-tools-config.xml" />
+      location="${closure-ant.dir}/build/closure-tools-config.xml" />
   <import file="${closure-tools-config.xml}" />
 
   <import file="${test.dir}/test_projects/project101/project101.xml" />
@@ -55,6 +55,8 @@ limitations under the License.
   <target name="suiteSetUp">
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${project101.output.dir}" />
+    <ant dir="${closure-ant.dir}" target="compile" inheritAll="false"
+        useNativeBasedir="true" />
   </target>
 
   <!--
