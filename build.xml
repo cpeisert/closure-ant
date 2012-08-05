@@ -34,6 +34,10 @@ limitations under the License.
     <fileset dir="${test.dir}/lib" includes="*antunit*.jar" />
   </path>
 
+  <!-- Import Apache Ivy Ant tasks. -->
+  <taskdef resource="org/apache/ivy/ant/antlib.xml"
+      classpath="${lib.dir}/ivy-2.2.0.jar" />
+
 
   <!--
   ==============================================================================
@@ -43,7 +47,7 @@ limitations under the License.
 
   <property name="build.dir" location="${basedir}/build" />
   <property name="classes.dir" location="${build.dir}/classes" />
-  <property name="closure-ant.jar" 
+  <property name="closure-ant.jar"
       location="${build.dir}/closure-ant.jar" />
    <property name="closure-ant-no-ant-deps.jar"
        location="${build.dir}/closure-ant-no-ant-deps.jar" />
@@ -73,6 +77,9 @@ limitations under the License.
   -->
 
   <target name="init" description="Initialize the build directory.">
+    <!-- Use Apache Ivy to retrieve dependencies. -->
+    <retrieve />
+
     <mkdir dir="${build.dir}" />
     <mkdir dir="${classes.dir}" />
     <copy file="${closure-tools-config.xml}" todir="${build.dir}" />
@@ -81,16 +88,16 @@ limitations under the License.
       <format property="DATE_TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
     </tstamp>
     <manifest file="${build.dir}/MANIFEST.MF">
-      <attribute name="Built-By" value="${user.name}"/>
-      <attribute name="Built-Date" value="${DATE_TODAY}"/>
-      <attribute name="Release" value="${release.stamp}"/>
+      <attribute name="Built-By" value="${user.name}" />
+      <attribute name="Built-Date" value="${DATE_TODAY}" />
+      <attribute name="Release" value="${release.stamp}" />
     </manifest>
     <manifest file="${build.dir}/BUILDER_PLUS_MANIFEST.MF">
-      <attribute name="Built-By" value="${user.name}"/>
-      <attribute name="Built-Date" value="${DATE_TODAY}"/>
+      <attribute name="Built-By" value="${user.name}" />
+      <attribute name="Built-Date" value="${DATE_TODAY}" />
       <attribute name="Main-Class"
           value="org.closureant.builderplus.cli.Main" />
-      <attribute name="Release" value="${release.stamp}"/>
+      <attribute name="Release" value="${release.stamp}" />
     </manifest>
   </target>
 
@@ -107,7 +114,7 @@ limitations under the License.
         includeantruntime="false"
         source="1.6"
         target="1.6">
-      <compilerarg value="-Xlint"/>
+      <compilerarg value="-Xlint" />
     </javac>
   </target>
 
@@ -115,7 +122,7 @@ limitations under the License.
   <target name="jar"
       description="Do not execute this target directly. Run the 'build' target
 instead. Creates a standalone closure-ant.jar.&#13;&#10;">
-    <jar destfile="${closure-ant.jar}" basedir="${classes.dir}" 
+    <jar destfile="${closure-ant.jar}" basedir="${classes.dir}"
         update="true" manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
 
       <zipfileset includes="task-definitions.xml" dir="${resources.dir}" />
@@ -128,13 +135,14 @@ instead. Creates a standalone closure-ant.jar.&#13;&#10;">
       <zipfileset includes="**/*.class" src="${test.dir}/lib/ant-antunit.jar" />
 
       <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
-      <zipfileset includes="**/*.class" src="${lib.dir}/closure-stylesheets-no-deps.jar" />
+      <zipfileset includes="**/*.class"
+          src="${lib.dir}/closure-stylesheets-no-deps.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/guava-12.0.jar" />
 
       <zipfileset src="${lib.dir}/jsr305-1.3.9.jar">
         <include name="javax/annotation/Nullable.class" />
-      </zipfileset>      
+      </zipfileset>
       <!--
         Ant dependencies.
       -->
@@ -145,7 +153,8 @@ instead. Creates a standalone closure-ant.jar.&#13;&#10;">
         <exclude name="org/apache/tools/ant/input/*" />
         <exclude name="org/apache/tools/ant/listener/*" />
       </zipfileset>
-      <zipfileset includes="**/*.class" src="${lib.dir}/ant-launcher-1.8.2.jar" />
+      <zipfileset includes="**/*.class"
+          src="${lib.dir}/ant-launcher-1.8.2.jar" />
     </jar>
   </target>
 
@@ -170,7 +179,8 @@ newer]).&#13;&#10;">
       <zipfileset includes="**/*.class" src="${test.dir}/lib/ant-antunit.jar" />
 
       <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
-      <zipfileset includes="**/*.class" src="${lib.dir}/closure-stylesheets-no-deps.jar" />
+      <zipfileset includes="**/*.class"
+          src="${lib.dir}/closure-stylesheets-no-deps.jar" />
       <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
 
       <zipfileset includes="**/*.class" src="${lib.dir}/guava-12.0.jar">
@@ -210,7 +220,8 @@ instead. Creates a standalone executable builderplus.jar.&#13;&#10;">
       </zipfileset>
 
       <zipfileset src="${lib.dir}/ant-1.8.2.jar" />
-      <zipfileset includes="**/*.class" src="${lib.dir}/ant-launcher-1.8.2.jar" />
+      <zipfileset includes="**/*.class"
+          src="${lib.dir}/ant-launcher-1.8.2.jar" />
     </jar>
   </target>
 
@@ -251,7 +262,8 @@ builderplus.jar." />
         classpathref="classpath"
         doctitle="Ant Closure Tools">
       <link href="http://docs.oracle.com/javase/7/docs/api/" />
-      <link href="http://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/" />
+      <link
+          href="http://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/" />
       <link href="http://docs.guava-libraries.googlecode.com/git/javadoc/" />
       <link href="http://evgeny-goldin.org/javadoc/ant/api/" />
       <!-- TODO(cpeisert): Add link to closure-template-extensions once API docs published -->
@@ -266,7 +278,7 @@ builderplus.jar." />
   </target>
 
   
-  <target name="release" 
+  <target name="release"
       depends="compile, jar, builder-plus-jar, javadoc"
       description="Creates standalone closure-ant-&lt;release.stamp>.jar,
 executable builderplus-&lt;release.stamp>.jar, and generates JavaDoc.&#13;&#10;">

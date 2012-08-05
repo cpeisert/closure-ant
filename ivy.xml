@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<ivy-module version="2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+  <info organisation="org.closureant" module="closure-ant">
+    <repository name="closure-ant"
+        url="https://github.com/cpeisert/closure-ant" />
+  </info>
+  <dependencies>
+    <!-- Core dependencies. -->
+    <dependency org="args4j" name="args4j" rev="2.0.16" />
+    <dependency org="org.apache.ant" name="ant-launcher" rev="1.8.4" />
+    <dependency org="org.apache.ant" name="ant" rev="1.8.4" />
+    <dependency org="com.google.code.gson" name="gson" rev="2.2.2" />
+    <dependency org="com.google.guava" name="guava" rev="12.0.1" />
+    <dependency org="net.sourceforge.findbugs" name="jsr305" rev="1.3.9" />
+
+    <!-- Closure Template specific dependencies. -->
+    <dependency org="aopalliance" name="aopalliance" rev="1.0"/>
+    <dependency org="com.google.inject" name="guice" rev="3.0"/>
+    <dependency org="com.google.inject.extensions" name="guice-assistedinject"
+        rev="3.0"/>
+    <dependency org="com.google.inject.extensions" name="guice-multibindings"
+        rev="3.0"/>
+    <dependency org="com.ibm.icu" name="icu4j" rev="4.6.1.1"/>
+    <dependency org="javax.inject" name="javax.inject" rev="1"/>
+
+    <!--
+      Dependencies for JUnit and AntUnit testing. Note: ant-antunit is
+      intentionally excluded. See the notes in test/lib/antunit.xml.
+    -->
+    <dependency org="junit" name="junit" rev="4.10" />
+    <dependency org="org.apache.ant" name="ant-junit" rev="1.8.4" />
+
+    <exclude type="source" ext="*" />
+    <exclude type="javadoc" ext="*" />
+
+  </dependencies>
+</ivy-module>
