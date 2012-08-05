@@ -17,6 +17,7 @@
 package org.closureant;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -96,9 +97,6 @@ public final class ClosureLinterTask extends Task {
 
   // Attributes
 
-  // Corresponds to flag --beep defined in gjslint.py.
-  private Boolean beep;
-
   // Corresponds to flag --check_html defined in gjslint.py.
   private Boolean checkJavaScriptInHtmlFiles;
 
@@ -120,9 +118,6 @@ public final class ClosureLinterTask extends Task {
   private String pythonExecutable;
   private boolean showCommandLine;
 
-  // Corresponds to flag --summary defined in gjslint.py.
-  private Boolean showSummary;
-
   // Corresponds to flag --time defined in gjslint.py.
   private Boolean timingStats;
 
@@ -133,21 +128,19 @@ public final class ClosureLinterTask extends Task {
   // Nested elements
 
   // Corresponds to flag --additional_extensions defined in gjslint.py.
-  private final List<String> additionalJSFileExtensions;
+  private final Set<String> additionalJSFileExtensions;
 
   private ClosureLinterErrors closureLinterErrors;
 
   // Corresponds to flag --custom_jsdoc_tags defined in ecmalintrules.py.
   private final List<String> customJsDocTags;
 
-  // Corresponds to flag --ignored_extra_namespaces defined in checker.py.
-  private final List<String> extraNamespacesToIgnore;
-
-  // Serves same purpose as flag --closurized_namespaces defined in checker.py.
+  // Serves same purpose as flag --closurized_namespaces defined in checker.py
+  // and also passes the specified sources to the linter.
   private final List<FileSet> mainSources; // Program entry points
 
   // Corresponds to flag --closurized_namespaces defined in checker.py.
-  private final List<String> namespaces;
+  private final Set<String> namespaces;
 
   // Serves sames purpose as flag --recurse defined in simplefileflags.py.
   private final List<RestrictedDirSet> roots;
@@ -165,7 +158,6 @@ public final class ClosureLinterTask extends Task {
    */
   public ClosureLinterTask() {
     // Attributes
-    this.beep = null;
     this.checkJavaScriptInHtmlFiles = null;
     this.debugTokens = null;
     this.disableIndentationFixing = null;
@@ -177,17 +169,15 @@ public final class ClosureLinterTask extends Task {
     this.multiProcess = null;
     this.pythonExecutable = null;
     this.showCommandLine = false;
-    this.showSummary = null;
     this.timingStats = null;
     this.unixMode = null;
 
     // Nested elements
-    this.additionalJSFileExtensions = Lists.newArrayList();
+    this.additionalJSFileExtensions = Sets.newHashSet();
     this.closureLinterErrors = null;
     this.customJsDocTags = Lists.newArrayList();
-    this.extraNamespacesToIgnore = Lists.newArrayList();
     this.mainSources = Lists.newArrayList();
-    this.namespaces = Lists.newArrayList();
+    this.namespaces = Sets.newHashSet();
     this.roots = Lists.newArrayList();
     this.sources = Lists.newArrayList();
     this.sourcesWithRelaxedDocumentationChecks = Lists.newArrayList();
@@ -195,16 +185,6 @@ public final class ClosureLinterTask extends Task {
 
 
   // Attribute setters
-
-  /**
-   * Sets whether an audible beep should be emitted when errors are found;
-   * only applicable in {@code LINT} mode.
-   *
-   * @param beep {@code true} to enable beeps. Defaults to {@code true}.
-   */
-  public void setBeep(boolean beep) {
-    this.beep = beep;
-  }
 
   /**
    * Sets whether to check JavaScript in HTML files; only applicable in
@@ -341,17 +321,6 @@ public final class ClosureLinterTask extends Task {
   }
 
   /**
-   * Whether to show an error count summary; only applicable in {@code LINT}
-   * mode.
-   *
-   * @param showSummary {@code true} to show an error count summary. Defaults
-   *     to {@code false}.
-   */
-  public void setShowSummary(boolean showSummary) {
-    this.showSummary = showSummary;
-  }
-
-  /**
    * Whether to emit timing statistics. The timing stats are only shown if
    * there are no errors and the linter mode is set to {@code LINT}.
    *
@@ -378,9 +347,13 @@ public final class ClosureLinterTask extends Task {
 
   /**
    * Adds a list of additional JavaScript file extensions (other than "js")
-   * separated by whitespace and/or commas. These additional file extensions
-   * are only used if root directories are specified with the {@literal
-   * <roots>} nested element.
+   * separated by whitespace and/or commas. If linting JavaScript files
+   * that do not have a "js" file extension, the additional extensions
+   * must be specified if the {@literal <roots>} element is used to specify
+   * directories to be recursively searched. Sources specified with either
+   * {@literal <mainsources>} or {@literal <sources>} will automatically have
+   * their file extensions passed to Closure Linter to ensure that they are
+   * checked.
    *
    * @param fileExtensionList a list of additional JavaScript file extensions
    */
@@ -417,20 +390,11 @@ public final class ClosureLinterTask extends Task {
   }
 
   /**
-   * Adds a list of fully qualified namespaces that should not be reported as
-   * extra by the linter regardless of whether they are actually used. The
-   * namespaces may be separated by whitespace and/or commas.
-   *
-   * @param ignoredExtraNamespaces a list of custom JavaScript doc tags
-   */
-  public void addConfiguredIgnoredExtraNamespacesList(
-      NamespaceList ignoredExtraNamespaces) {
-    this.extraNamespacesToIgnore.addAll(ignoredExtraNamespaces.getNamespaces());
-  }
-
-  /**
    * Adds "main" sources (that is, program entry points) for which transitive
-   * dependencies will be calculated.
+   * dependencies will be calculated. Each {@code goog.provided} namespace
+   * in the main sources will be passed to Closure Linter as a "closurized"
+   * namespace. See {@link
+   * #addConfiguredNamespaceList(org.closureant.types.NamespaceList)}.
    *
    * @param mainSources program entry points
    */
@@ -440,7 +404,9 @@ public final class ClosureLinterTask extends Task {
 
   /**
    * A list of namespaces separated by whitespace and/or commas that represent
-   * program entry points for which transitive dependencies will be calculated.
+   * program entry points for which transitive dependencies will be
+   * calculated. These "closurized" namespaces will be checked for dependency
+   * information.
    *
    * @param namespaces a list of Closure namespaces
    */
@@ -663,11 +629,6 @@ public final class ClosureLinterTask extends Task {
 
     // Attributes
 
-    if(Boolean.TRUE.equals(this.beep)) {
-      cmdline.argument("--beep");
-    } else if (Boolean.FALSE.equals(this.beep)) {
-      cmdline.argument("--nobeep");
-    }
     if(Boolean.TRUE.equals(this.checkJavaScriptInHtmlFiles)) {
       cmdline.argument("--check_html");
     } else if (Boolean.FALSE.equals(this.checkJavaScriptInHtmlFiles)) {
@@ -688,11 +649,6 @@ public final class ClosureLinterTask extends Task {
     } else if (Boolean.FALSE.equals(this.multiProcess)) {
       cmdline.argument("--nomultiprocess");
     }
-    if(Boolean.TRUE.equals(this.showSummary)) {
-      cmdline.argument("--summary");
-    } else if (Boolean.FALSE.equals(this.showSummary)) {
-      cmdline.argument("--nosummary");
-    }
     if(Boolean.TRUE.equals(this.timingStats)) {
       cmdline.argument("--time");
     } else if (Boolean.FALSE.equals(this.timingStats)) {
@@ -706,18 +662,15 @@ public final class ClosureLinterTask extends Task {
 
     // Nested elements
 
-    cmdline.flagAndArguments("--additional_extensions",
-        this.additionalJSFileExtensions);
-
     if (this.closureLinterErrors != null) {
       cmdline.commandLineBuilder(this.closureLinterErrors
           .getCommandLineForErrorFlags());
     }
 
-    cmdline.flagAndArguments("--custom_jsdoc_tags", this.customJsDocTags);
-    cmdline.flagAndArguments("--ignored_extra_namespaces",
-        this.extraNamespacesToIgnore);
-    cmdline.flagAndArguments("--closurized_namespaces", this.namespaces);
+    if (!this.customJsDocTags.isEmpty()) {
+      cmdline.flagAndArgument("--custom_jsdoc_tags",
+          Joiner.on(',').join(this.customJsDocTags));
+    }
 
     // Get the goog.provided namespaces from the main sources and pass to
     // Closure Linter with flag --closurized_namespaces.
@@ -727,7 +680,12 @@ public final class ClosureLinterTask extends Task {
     for (String mainSourcePath : mainSourcePaths) {
       JsClosureSourceFile jsFile = SourceFileFactory
           .newJsClosureSourceFile(new File(mainSourcePath));
-      cmdline.flagAndArguments("--closurized_namespaces", jsFile.getProvides());
+      this.namespaces.addAll(jsFile.getProvides());
+    }
+
+    if (!this.namespaces.isEmpty()) {
+      cmdline.flagAndArgument("--closurized_namespaces",
+          Joiner.on(',').join(this.namespaces));
     }
 
     // Process <roots> nested elements.
@@ -740,8 +698,10 @@ public final class ClosureLinterTask extends Task {
     List<String> sourcePathsRelaxedDocChecks = AntUtil
         .getFilePathsFromCollectionOfFileSet(
             getProject(), this.sourcesWithRelaxedDocumentationChecks);
-    cmdline.flagAndArguments("--limited_doc_files",
-        sourcePathsRelaxedDocChecks);
+    if (!sourcePathsRelaxedDocChecks.isEmpty()) {
+      cmdline.flagAndArgument("--limited_doc_files",
+          Joiner.on(',').join(sourcePathsRelaxedDocChecks));
+    }
 
     List<String> sourcePaths = AntUtil.getFilePathsFromCollectionOfFileSet(
         getProject(), this.sources);
@@ -751,6 +711,21 @@ public final class ClosureLinterTask extends Task {
     allSourcesExcludingRootDirs.addAll(mainSourcePaths);
     allSourcesExcludingRootDirs.addAll(sourcePaths);
     allSourcesExcludingRootDirs.addAll(sourcePathsRelaxedDocChecks);
+
+    for (String path : allSourcesExcludingRootDirs) {
+      this.additionalJSFileExtensions.add(getFileExt(path));
+    }
+    this.additionalJSFileExtensions.remove("js"); // Already included by default.
+    if (Boolean.FALSE.equals(this.checkJavaScriptInHtmlFiles)) {
+      this.additionalJSFileExtensions.remove("html");
+      this.additionalJSFileExtensions.remove("htm");
+    }
+
+    if (!this.additionalJSFileExtensions.isEmpty()) {
+      cmdline.flagAndArgument("--additional_extensions",
+          Joiner.on(',').join(this.additionalJSFileExtensions));
+    }
+
     cmdline.arguments(allSourcesExcludingRootDirs);
 
     return cmdline;
@@ -842,5 +817,16 @@ public final class ClosureLinterTask extends Task {
       throw new BuildException(e);
     }
     return exitCode;
+  }
+
+  /**
+   * Get the file extension from a file name (that is, all text following the
+   * last period '.' in the file name).
+   *
+   * @param filename the file name
+   * @return the file extension
+   */
+  private String getFileExt(String filename) {
+    return filename.split("\\.(?=[^\\.]+$)")[1];
   }
 }
