@@ -17,6 +17,7 @@
 
 package org.closureant.builderplus.cli;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import com.google.common.collect.Sets;
@@ -44,6 +45,19 @@ import org.kohsuke.args4j.spi.Setter;
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class CommandLineOptions {
+
+  // This field was added due to CmdLineException deprecating constructors that
+  // do not include a CmdLineParser.
+  private CmdLineParser cmdLineParser;
+
+  /**
+   * Setter for the command line parser. See {@link Main}.
+   *
+   * @param cmdLineParser command line parser
+   */
+  public void setCmdLineParser(CmdLineParser cmdLineParser) {
+    this.cmdLineParser = cmdLineParser;
+  }
 
   @Option(name = "--css_renaming_map", usage = ""
       + "A file containing a JSON object\n"
@@ -172,8 +186,9 @@ public final class CommandLineOptions {
   public CssRenamingMap getCssRenamingMap() throws CmdLineException {
     if (this.cssRenamingMapFile != null
         && this.cssRenamingMapPropertiesFile != null) {
-      throw new CmdLineException("Only one of --css_renaming_map and "
-          + "--css_renaming_map_properties_file may be specified.");
+      throw new CmdLineException(this.cmdLineParser, "Only one of "
+          + "--css_renaming_map and --css_renaming_map_properties_file may "
+          + "be specified.");
     }
     if (this.cssRenamingMapFile == null
         && this.cssRenamingMapPropertiesFile == null) {
@@ -189,7 +204,7 @@ public final class CommandLineOptions {
             this.cssRenamingMapPropertiesFile);
       }
     } catch (IOException e) {
-      throw new CmdLineException(e);
+      throw new CmdLineException(this.cmdLineParser, e);
     }
 
     return renamingMap;

@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<project name="closure-ant" basedir="." default="jar">
+<project name="closure-ant" basedir="." default="build">
   
   <!--
   ==============================================================================
@@ -26,12 +26,11 @@ limitations under the License.
   <property name="lib.dir" value="${basedir}/lib" />
   <property name="resources.dir" value="${basedir}/resources" />
   <property name="test.dir" value="${basedir}/test" />
-  <property name="closure-tools-config.xml"
-      value="${resources.dir}/closure-tools-config.xml" />
+  <property name="closure-ant-config.xml"
+      value="${resources.dir}/closure-ant-config.xml" />
                              
   <path id="classpath">
-    <fileset dir="${lib.dir}" includes="**/*.jar" />
-    <fileset dir="${test.dir}/lib" includes="*antunit*.jar" />
+    <fileset dir="${basedir}" includes="**/*.jar" />
   </path>
 
   <!-- Import Apache Ivy Ant tasks. -->
@@ -47,13 +46,13 @@ limitations under the License.
 
   <property name="build.dir" location="${basedir}/build" />
   <property name="classes.dir" location="${build.dir}/classes" />
-  <property name="closure-ant.jar"
-      location="${build.dir}/closure-ant.jar" />
-   <property name="closure-ant-no-ant-deps.jar"
-       location="${build.dir}/closure-ant-no-ant-deps.jar" />
+
+  <property name="builderplus.jar" location="${build.dir}/builderplus.jar" />
+  <property name="closure-ant.jar" location="${build.dir}/closure-ant.jar" />
+  <property name="closure-ant-no-templates.jar"
+      location="${build.dir}/closure-ant-no-templates.jar" />
   <property name="closure-ant-no-deps.jar"
       location="${build.dir}/closure-ant-no-deps.jar" />
-  <property name="builderplus.jar" location="${build.dir}/builderplus.jar" />
 
   <property name="javadoc.dir" value="${build.dir}/javadoc" />
 
@@ -76,13 +75,14 @@ limitations under the License.
   ==============================================================================
   -->
 
-  <target name="init" description="Initialize the build directory.">
+  <target name="init">
     <!-- Use Apache Ivy to retrieve dependencies. -->
     <retrieve />
 
     <mkdir dir="${build.dir}" />
     <mkdir dir="${classes.dir}" />
-    <copy file="${closure-tools-config.xml}" todir="${build.dir}" />
+    <copy file="${closure-ant-config.xml}" todir="${build.dir}" />
+
     <tstamp>
       <format property="YEAR" pattern="yyyy" />
       <format property="DATE_TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
@@ -99,155 +99,153 @@ limitations under the License.
           value="org.closureant.builderplus.cli.Main" />
       <attribute name="Release" value="${release.stamp}" />
     </manifest>
+
+    <!--
+      Define properties for library dependencies after Apache Ivy retrieves
+      any missing dependencies.
+    -->
+
+    <!-- Library dependencies. -->
+    <fileset id="ant.jar.id" dir="${basedir}" includes="lib/ant-1*.jar" />
+    <property name="ant.jar" refid="ant.jar.id" />
+    <fileset id="ant-launcher.id" dir="${basedir}"
+        includes="lib/ant-launcher*.jar" />
+    <property name="ant-launcher.jar" refid="ant-launcher.id" />
+    <fileset id="args4j.jar.id" dir="${basedir}" includes="lib/args4j*.jar" />
+    <property name="args4j.jar" refid="args4j.jar.id" />
+    <fileset id="closure-stylesheets.jar.id" dir="${basedir}"
+        includes="lib/closure-stylesheets*.jar" />
+    <property name="closure-stylesheets.jar" refid="closure-stylesheets.jar.id" />
+    <fileset id="gson.jar.id" dir="${basedir}" includes="lib/gson*.jar" />
+    <property name="gson.jar" refid="gson.jar.id" />
+    <fileset id="guava.jar.id" dir="${basedir}" includes="lib/guava*.jar" />
+    <property name="guava.jar" refid="guava.jar.id" />
+    <fileset id="jsr305.jar.id" dir="${basedir}" includes="lib/jsr305*.jar" />
+    <property name="jsr305.jar" refid="jsr305.jar.id" />
+
+      <!-- Library dependencies for Closure Templates. -->
+    <fileset id="aopalliance.jar.id" dir="${basedir}"
+        includes="lib/aopalliance*.jar" />
+    <property name="aopalliance.jar" refid="aopalliance.jar.id" />
+    <fileset id="guice.jar.id" dir="${basedir}" includes="lib/guice-3*.jar" />
+    <property name="guice.jar" refid="guice.jar.id" />
+    <fileset id="guice-assistedinject.jar.id" dir="${basedir}"
+        includes="lib/guice-assistedinject*.jar" />
+    <property name="guice-assistedinject.jar" refid="guice-assistedinject.jar.id"/>
+    <fileset id="guice-multibindings.jar.id" dir="${basedir}"
+        includes="lib/guice-multibindings*.jar" />
+    <property name="guice-multibindings.jar" refid="guice-multibindings.jar.id" />
+    <fileset id="icu4j.jar.id" dir="${basedir}" includes="lib/icu4j*.jar" />
+    <property name="icu4j.jar" refid="icu4j.jar.id" />
+    <fileset id="javax.inject.jar.id" dir="${basedir}"
+        includes="lib/javax.inject*.jar" />
+    <property name="javax.inject.jar" refid="javax.inject.jar.id" />
+    <fileset id="soy.jar.id" dir="${basedir}"
+        includes="lib/soy-excluding-deps*.jar" />
+    <property name="soy.jar" refid="soy.jar.id" />
   </target>
 
 
-  <target name="clean" description="Delete all files created by this script.">
+  <target name="clean" description="Deletes all files created by this script.">
     <delete dir="${build.dir}" />
   </target>
 
 
-  <target name="compile" depends="init"
-      description="Compiles the Java sources.">
+  <target name="compile" depends="init" description="Compiles the Java source.">
     <javac srcdir="${src.dir}" destdir="${classes.dir}"
         classpathref="classpath" debug="on" deprecation="on"
         includeantruntime="false"
-        source="1.6"
-        target="1.6">
+        source="1.6" target="1.6">
       <compilerarg value="-Xlint" />
     </javac>
   </target>
 
-  
-  <target name="jar"
-      description="Do not execute this target directly. Run the 'build' target
-instead. Creates a standalone closure-ant.jar.&#13;&#10;">
+
+  <target name="jar" depends="compile" description=
+      "Creates a standalone jar of all Java class files and dependencies.">
     <jar destfile="${closure-ant.jar}" basedir="${classes.dir}"
-        update="true" manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
+        update="true" manifest="${build.dir}/MANIFEST.MF">
 
-      <zipfileset includes="task-definitions.xml" dir="${resources.dir}" />
+      <fileset dir="${resources.dir}">
+        <include name="soyutils.js" />
+        <include name="task-definitions.xml" />
+      </fileset>
 
-      <zipfileset includes="**/*.class"
-          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
-      <zipfileset includes="resources/*soy*"
-          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
+      <zipfileset includes="**/*" src="${ant.jar}" />
+      <zipfileset includes="**/*" src="${ant-launcher.jar}" />
+      <zipfileset includes="**/*.class" src="${args4j.jar}" />
+      <zipfileset includes="**/*.class" src="${closure-stylesheets.jar}" />
+      <zipfileset includes="**/*.class" src="${gson.jar}" />
+      <zipfileset includes="**/*.class" src="${guava.jar}" />
+      <zipfileset includes="**/*.class" src="${jsr305.jar}" />
 
-      <zipfileset includes="**/*.class" src="${test.dir}/lib/ant-antunit.jar" />
-
-      <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
-      <zipfileset includes="**/*.class"
-          src="${lib.dir}/closure-stylesheets-no-deps.jar" />
-      <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
-      <zipfileset includes="**/*.class" src="${lib.dir}/guava-12.0.jar" />
-
-      <zipfileset src="${lib.dir}/jsr305-1.3.9.jar">
-        <include name="javax/annotation/Nullable.class" />
-      </zipfileset>
-      <!--
-        Ant dependencies.
-      -->
-      <zipfileset src="${lib.dir}/ant-1.8.2.jar">
-        <exclude name="org/apache/tools/zip/*" />
-        <exclude name="org/apache/tools/ant/dispatch/*" />
-        <exclude name="org/apache/tools/ant/filters/*" />
-        <exclude name="org/apache/tools/ant/input/*" />
-        <exclude name="org/apache/tools/ant/listener/*" />
-      </zipfileset>
-      <zipfileset includes="**/*.class"
-          src="${lib.dir}/ant-launcher-1.8.2.jar" />
+      <!-- Library dependencies for Closure Templates. -->
+      <zipfileset includes="**/*.class" src="${aopalliance.jar}" />
+      <zipfileset includes="**/*.class" src="${guice.jar}" />
+      <zipfileset includes="**/*.class" src="${guice-assistedinject.jar}" />
+      <zipfileset includes="**/*.class" src="${guice-multibindings.jar}" />
+      <zipfileset includes="**/*.class" src="${icu4j.jar}" />
+      <zipfileset includes="**/*.class" src="${javax.inject.jar}" />
+      <zipfileset includes="**/*.class" src="${soy.jar}" />
     </jar>
   </target>
 
 
-  <target name="jar-no-ant-deps" depends="compile"
-      description="Creates a closure-ant.jar excluding ant dependencies
-(i.e. the jar relies on the local ant installation [recommend Ant 1.8.0 or
-newer]).&#13;&#10;">
-    <jar destfile="${closure-ant-no-ant-deps.jar}"
-        basedir="${classes.dir}" update="true"
-        manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
-
-      <zipfileset includes="task-definitions.xml" dir="${resources.dir}" />
-
-      <zipfileset includes="**/*.class"
-          src="${lib.dir}/closure-commons-no-deps.jar" />
-      <zipfileset includes="**/*.class"
-          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
-      <zipfileset includes="resources/*soy*"
-          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
-
-      <zipfileset includes="**/*.class" src="${test.dir}/lib/ant-antunit.jar" />
-
-      <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
-      <zipfileset includes="**/*.class"
-          src="${lib.dir}/closure-stylesheets-no-deps.jar" />
-      <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
-
-      <zipfileset includes="**/*.class" src="${lib.dir}/guava-12.0.jar">
-        <exclude name="com/google/common/annotations/*" />
-        <exclude name="com/google/common/cache/*" />
-        <exclude name="com/google/common/eventbus/*" />
-        <exclude name="com/google/common/hash/*" />
-        <exclude name="com/google/common/math/*" />
-        <exclude name="com/google/common/net/*" />
-        <exclude name="com/google/common/util/*" />
-      </zipfileset>
-
-      <zipfileset src="${lib.dir}/jsr305-1.3.9.jar">
-        <include name="javax/annotation/Nullable.class" />
-      </zipfileset>
-    </jar>
-  </target>
-
-
-  <target name="builder-plus-jar"
-      description="Do not execute this target directly. Run the 'build' target
-instead. Creates a standalone executable builderplus.jar.&#13;&#10;">
-    <jar destfile="${builderplus.jar}" basedir="${classes.dir}" update="true"
-        manifest="${build.dir}/BUILDER_PLUS_MANIFEST.MF" duplicate="preserve">
-
-      <zipfileset includes="**/*.class" src="${lib.dir}/gson-2.1.jar" />
-      <zipfileset includes="**/*.class" src="${lib.dir}/args4j-2.0.9.jar" />
-
-      <zipfileset includes="**/*.class" src="${lib.dir}/guava-12.0.jar">
-        <exclude name="com/google/common/annotations/*" />
-        <exclude name="com/google/common/cache/*" />
-        <exclude name="com/google/common/eventbus/*" />
-        <exclude name="com/google/common/hash/*" />
-        <exclude name="com/google/common/math/*" />
-        <exclude name="com/google/common/net/*" />
-        <exclude name="com/google/common/util/*" />
-      </zipfileset>
-
-      <zipfileset src="${lib.dir}/ant-1.8.2.jar" />
-      <zipfileset includes="**/*.class"
-          src="${lib.dir}/ant-launcher-1.8.2.jar" />
+  <target name="jar-no-templates" depends="compile"
+      description="Creates a standalone jar excluding Java class files and
+dependencies related to Closure Templates.&#13;&#10;">
+    <jar destfile="${closure-ant-no-templates.jar}" basedir="${classes.dir}"
+        update="true" manifest="${build.dir}/MANIFEST.MF">
+      <fileset dir="${resources.dir}">
+        <include name="task-definitions.xml" />
+      </fileset>
+      <zipfileset includes="**/*" src="${ant.jar}" />
+      <zipfileset includes="**/*" src="${ant-launcher.jar}" />
+      <zipfileset includes="**/*.class" src="${args4j.jar}" />
+      <zipfileset includes="**/*.class" src="${closure-stylesheets.jar}" />
+      <zipfileset includes="**/*.class" src="${gson.jar}" />
+      <zipfileset includes="**/*.class" src="${guava.jar}" />
+      <zipfileset includes="**/*.class" src="${jsr305.jar}" />
     </jar>
   </target>
 
 
   <target name="jar-no-deps" depends="compile"
-      description="Creates a non-standalone closure-ant.jar excluding
-dependencies (i.e. no ant, gson, or guava classes). However, all dependencies
-in the package org.closureant are included.&#13;&#10;">
+      description="Creates a non-standalone jar excluding dependencies (i.e.
+no Ant, Closure Stylesheets, Closure Templates, Gson, or Guava classes).
+&#13;&#10;">
     <jar destfile="${closure-ant-no-deps.jar}" basedir="${classes.dir}"
-        update="false" manifest="${build.dir}/MANIFEST.MF" duplicate="preserve">
-      
-      <zipfileset includes="task-definitions.xml" dir="${resources.dir}" />
+        update="false" manifest="${build.dir}/MANIFEST.MF">
+      <fileset dir="${resources.dir}">
+        <include name="soyutils.js" />
+        <include name="task-definitions.xml" />
+      </fileset>
+    </jar>
+  </target>
 
-      <zipfileset includes="org/closureextensions/**/*.class"
-          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
-      <zipfileset includes="resources/*soy*"
-          src="${lib.dir}/template-extensions-for-closure-ant-tasks.jar" />
 
-      <zipfileset includes="**/*.class" src="${test.dir}/lib/ant-antunit.jar" />
+  <target name="builder-plus-jar" depends="compile"
+      description="Creates a standalone executable builderplus.jar">
+    <jar destfile="${builderplus.jar}" basedir="${classes.dir}" update="true"
+        manifest="${build.dir}/BUILDER_PLUS_MANIFEST.MF">
+      <zipfileset includes="**/*" src="${ant.jar}" />
+      <zipfileset includes="**/*" src="${ant-launcher.jar}" />
+      <zipfileset includes="**/*.class" src="${args4j.jar}" />
+      <zipfileset includes="**/*.class" src="${gson.jar}" />
+      <zipfileset includes="**/*.class" src="${guava.jar}" />
+      <zipfileset includes="**/*.class" src="${jsr305.jar}" />
+      <zipfileset includes="**/*.class" src="${soy.jar}" />
     </jar>
   </target>
   
   
-  <target name="build" depends="compile, jar, builder-plus-jar"
-      description="Creates standalone closure-ant.jar and executable
-builderplus.jar." />
+  <target name="build" depends="jar, builder-plus-jar"
+      description="Creates standalone closure-ant.jar and builderplus.jar." />
+
+
+  <target name="build-all"
+      depends="jar, jar-no-templates, jar-no-deps, builder-plus-jar"
+      description="Creates all jar files defined in this script." />
   
 
   <target name="javadoc"
@@ -258,15 +256,14 @@ builderplus.jar." />
         additionalparam="-notimestamp"
         destdir="${javadoc.dir}"
         author="false"
-        windowtitle="Ant Closure Tools"
+        windowtitle="Closure Ant"
         classpathref="classpath"
-        doctitle="Ant Closure Tools">
+        doctitle="Closure Ant">
       <link href="http://docs.oracle.com/javase/7/docs/api/" />
-      <link
-          href="http://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/" />
+      <link href=
+          "http://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/" />
       <link href="http://docs.guava-libraries.googlecode.com/git/javadoc/" />
       <link href="http://evgeny-goldin.org/javadoc/ant/api/" />
-      <!-- TODO(cpeisert): Add link to closure-template-extensions once API docs published -->
       <bottom>
         <![CDATA[
         <div id="copyright" style="float:left">
@@ -278,10 +275,9 @@ builderplus.jar." />
   </target>
 
   
-  <target name="release"
-      depends="compile, jar, builder-plus-jar, javadoc"
-      description="Creates standalone closure-ant-&lt;release.stamp>.jar,
-executable builderplus-&lt;release.stamp>.jar, and generates JavaDoc.&#13;&#10;">
+  <target name="release" depends="jar, javadoc"
+      description="Creates standalone closure-ant-&lt;release.stamp>.jar and
+generates JavaDoc.">
     <move file="${closure-ant.jar}"
         tofile="${build.dir}/closure-ant-${release.stamp}.jar" />
     <move file="${builderplus.jar}"
@@ -290,7 +286,7 @@ executable builderplus-&lt;release.stamp>.jar, and generates JavaDoc.&#13;&#10;"
   
   
   <target name="test" depends="build"
-      description="Run all JUnit and AntUnit tests.">
+      description="Runs all the JUnit and AntUnit tests.">
     <ant dir="${test.dir}" target="clean" inheritAll="false" />
     <ant dir="${test.dir}" target="test" inheritAll="false" />
   </target>

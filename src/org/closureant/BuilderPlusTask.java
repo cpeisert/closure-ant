@@ -56,12 +56,12 @@ import org.closureant.util.FileUtil;
  * "task-definitions.xml".
  *
  * <p>The location of the Closure Compiler is defined in
- * "closure-tools-config.xml", which should be included in your build file as
+ * "closure-ant-config.xml", which should be included in your build file as
  * follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-ant-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-tools-config.xml" are correct
+ * <p><i>Verify that the paths defined in "closure-ant-config.xml" are correct
  * for your local configuration.</i></p>
  *
  * <p>For more information about Closure Builder, see
@@ -558,7 +558,7 @@ public final class BuilderPlusTask extends Task {
       } else {
         throw new BuildException("\"compilerJar\" is not set. The Closure "
             + "Compiler is required for output mode COMPILED. Verify "
-            + "that your build file imports \"closure-tools-config.xml\" and "
+            + "that your build file imports \"closure-ant-config.xml\" and "
             + "that the property locations are correct for your machine.");
       }
     }

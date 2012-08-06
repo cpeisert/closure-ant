@@ -52,12 +52,12 @@ import org.closureant.util.StringUtil;
  * as defined in "task-definitions.xml".
  *
  * <p>The location of the Compiler jar file is also defined in
- * "closure-tools-config.xml", which should be included in your build file as
+ * "closure-ant-config.xml", which should be included in your build file as
  * follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-ant-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-tools-config.xml" are
+ * <p><i>Verify that the paths defined in "closure-ant-config.xml" are
  * correct for your local configuration.</i></p>
  *
  * <p>The options "mainSources", "sources", and "sourceList" take the place of
@@ -619,7 +619,7 @@ public final class ClosureCompilerTask extends Task
         this.compilerJar = new File(closureCompilerPath);
       } else {
         throw new BuildException("\"compilerJar\" is not set. Verify "
-            + "that your build file imports \"closure-tools-config.xml\" and "
+            + "that your build file imports \"closure-ant-config.xml\" and "
             + "that the property locations are correct for your machine.");
       }
     }

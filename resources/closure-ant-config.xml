@@ -2,14 +2,14 @@
 <!--
   Config file to specify the location of the Google Closure Tools on your
   machine. It also loads the Closure Ant task definitions from
-  closure-ant-tasks.jar.
+  closure-ant.jar.
 
-  To use the Ant tasks, add the following line to your build file:
+  Add the following line to your build file:
 
-  <import file="closure-tools-config.xml" />
+  <import file="closure-ant-config.xml" />
 -->
-<project name="closure-tools-config" basedir=".">
-  <dirname property="config.basedir" file="${ant.file.closure-tools-config}"/>
+<project name="closure-ant-config" basedir=".">
+  <dirname property="config.basedir" file="${ant.file.closure-ant-config}"/>
 
   <!--
     Change the location of closure-ant-tasks.jar to point to your local copy.

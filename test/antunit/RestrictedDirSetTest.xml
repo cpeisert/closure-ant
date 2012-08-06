@@ -28,10 +28,13 @@ limitations under the License.
   <property name="test.build.dir" location="${test.dir}/build" />
   <property name="restricteddirset.root.dir"
       location="${test.build.dir}/restricteddirset" />
-  <property name="test.lib.dir" location="${test.dir}/lib" />
-  <import file="${test.lib.dir}/antunit.xml" />
 
-  <property name="closure-ant.build.dir" location="${test.dir}/../build" />
+  <property name="closure-ant.dir" location="${test.dir}/.." />
+  <property name="closure-ant.lib.dir" location="${closure-ant.dir}/lib" />
+  <property name="closure-ant.build.dir" location="${closure-ant.dir}/build" />
+
+  <import file="${closure-ant.lib.dir}/antunit.xml" />
+
   <property name="closure-ant.jar"
       location="${closure-ant.build.dir}/closure-ant.jar" />
   <typedef name="restricteddirset"
@@ -54,8 +57,7 @@ limitations under the License.
 
     <mkdir dir="${restricteddirset.root.dir}/home/joe/project/src" />
     <mkdir
-        dir="${restricteddirset.root.dir}/home/joe/project/src/subproject/src"
-    />
+        dir="${restricteddirset.root.dir}/home/joe/project/src/subproject/src" />
   </target>
 
 

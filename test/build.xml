@@ -23,21 +23,20 @@ limitations under the License.
   -->
 
   <property name="test.src.dir" location="${basedir}/src" />
-  <property name="test.lib.dir" location="${basedir}/lib" />
-  <import file="${test.lib.dir}/antunit.xml" />
   <property name="antunit.dir" location="${basedir}/antunit" />
 
   <property name="closure-ant.dir" location="${basedir}/.." />
   <property name="closure-ant.lib.dir" location="${closure-ant.dir}/lib" />
-  <property name="closure-tools-config.xml"
-      location="${closure-ant.dir}/build/closure-tools-config.xml" />
-  <import file="${closure-tools-config.xml}" />
+  <property name="closure-ant-config.xml"
+      location="${closure-ant.dir}/build/closure-ant-config.xml" />
+
+  <import file="${closure-ant.lib.dir}/antunit.xml" />
+  <import file="${closure-ant-config.xml}" />
   <property name="closure-ant.jar" 
       location="${closure-ant.dir}/build/closure-ant.jar" />
 
   <path id="test.classpath">
     <fileset dir="${closure-ant.lib.dir}" includes="**/*.jar" />
-    <fileset dir="${test.lib.dir}" includes="**/*.jar" />
     <pathelement location="${closure-ant.jar}" />
   </path>
 
@@ -101,8 +100,15 @@ limitations under the License.
       description="Run AntUnit tests.">
     <antunit>
       <plainlistener loglevel="info" />
-      <fileset dir="${antunit.dir}" includes="**/*Test.xml" />
+      <fileset dir="${antunit.dir}" includes="**/*Test.xml"
+          excludes="**/ClosureTemplatesTest.xml" />
     </antunit>
+    <!--
+      Run ClosureTemplatesTest.xml separately to avoid PermGen out of memory
+      error.
+    -->
+    <ant dir="${antunit.dir}" antfile="ClosureTemplatesTest.xml" target="test"
+        inheritall="false" inheritrefs="false" />
   </target>
   
   <target name="test" depends="junit-test, antunit-test" />

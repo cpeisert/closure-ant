@@ -61,12 +61,12 @@ import javax.annotation.Nullable;
  * as defined in "task-definitions.xml".
  *
  * <p>The location of the Closure Stylesheets jar file is defined in
- * "closure-tools-config.xml", which should be included in your build file as
+ * "closure-ant-config.xml", which should be included in your build file as
  * follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-ant-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-tools-config.xml" are
+ * <p><i>Verify that the paths defined in "closure-ant-config.xml" are
  * correct for your local configuration.</i></p>
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)

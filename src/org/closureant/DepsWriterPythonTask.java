@@ -42,12 +42,12 @@ import org.closureant.util.StringUtil;
  * task name is {@code deps-writer-python} as defined in "task-definitions.xml".
  *
  * <p>The locations of the Closure Library and DepsWriter Python script
- * are defined in "closure-tools-config.xml", which should be included in your
+ * are defined in "closure-ant-config.xml", which should be included in your
  * build file as follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-ant-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-tools-config.xml" are
+ * <p><i>Verify that the paths defined in "closure-ant-config.xml" are
  * correct for your local configuration.</i></p>
  *
  * <p>For more information about DepsWriter, see
@@ -148,7 +148,7 @@ public final class DepsWriterPythonTask extends Task {
       } else {
         throw new BuildException("\"depsWriterPythonScript\" is "
             + "not set. Verify that your build file imports "
-            + "\"closure-tools-config.xml\" and that the property paths are "
+            + "\"closure-ant-config.xml\" and that the property paths are "
             + "correct for your machine.");
       }
     }

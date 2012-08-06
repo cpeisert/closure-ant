@@ -208,7 +208,7 @@ public final class BuilderPlusRunner {
     if (this.compilerJar == null) {
       throw new IllegalStateException("\"compilerJar\" is not set. The Closure "
           + "Compiler is required for output mode COMPILED. Verify "
-          + "that your build file imports \"closure-tools-config.xml\" and "
+          + "that your build file imports \"closure-ant-config.xml\" and "
           + "that the property locations are correct for your machine.");
     }
 

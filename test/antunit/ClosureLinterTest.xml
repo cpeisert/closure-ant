@@ -27,8 +27,6 @@ limitations under the License.
   <property name="test.dir" location="${antunit.dir}/.." />
   <property name="test-projects.dir" location="${test.dir}/test_projects" />
   <property name="test.build.dir" location="${test.dir}/build" />
-  <property name="test.lib.dir" location="${test.dir}/lib" />
-  <import file="${test.lib.dir}/antunit.xml" />
   <property name="linter_test.dir" location="${test-projects.dir}/linter_test" />
 
   <property name="closure-ant.dir" location="${test.dir}/.." />
@@ -36,9 +34,11 @@ limitations under the License.
       location="${closure-ant.dir}/lib" />
   <property name="closure-ant.build.dir"
       location="${closure-ant.dir}/build" />
-  <property name="closure-tools-config.xml"
-      location="${closure-ant.build.dir}/closure-tools-config.xml" />
-  <import file="${closure-tools-config.xml}" />
+  <property name="closure-ant-config.xml"
+      location="${closure-ant.build.dir}/closure-ant-config.xml" />
+
+  <import file="${closure-ant.lib.dir}/antunit.xml" />
+  <import file="${closure-ant-config.xml}" />
 
   <import file="${test-projects.dir}/project101/project101.xml" />
 
@@ -54,8 +54,6 @@ limitations under the License.
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${test.build.dir}/antunit" />
     <mkdir dir="${project101.output.dir}" />
-    <ant dir="${closure-ant.dir}" target="compile" inheritAll="false"
-        useNativeBasedir="true" />
   </target>
 
 

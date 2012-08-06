@@ -46,12 +46,12 @@ import org.closureant.util.AntUtil;
  * name is {@code closure-builder} as defined in "task-definitions.xml".
  *
  * <p>The locations of the Closure Library and Closure Builder Python script
- * are defined in "closure-tools-config.xml", which should be included in your
+ * are defined in "closure-ant-config.xml", which should be included in your
  * build file as follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-ant-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-tools-config.xml" are
+ * <p><i>Verify that the paths defined in "closure-ant-config.xml" are
  * correct for your local configuration.</i></p>
  *
  * <p>For more information about Closure Builder, see
@@ -365,7 +365,7 @@ public final class ClosureBuilderPythonTask extends Task {
       } else {
         throw new BuildException("\"closureBuilderPythonScript\" is "
             + "not set. Verify that your build file imports "
-            + "\"closure-tools-config.xml\" and that the property paths are "
+            + "\"closure-ant-config.xml\" and that the property paths are "
             + "correct for your machine.");
       }
     }
@@ -429,7 +429,7 @@ public final class ClosureBuilderPythonTask extends Task {
       } else {
         throw new BuildException("\"compilerJar\" is not set. The Closure "
             + "Compiler is required for output mode \"compiled\". Verify "
-            + "that your build file imports \"closure-tools-config.xml\" and "
+            + "that your build file imports \"closure-ant-config.xml\" and "
             + "that the property locations are correct for your machine.");
       }
     }

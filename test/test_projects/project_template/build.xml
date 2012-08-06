@@ -37,9 +37,9 @@ limitations under the License.
   <property name="closure-ant-tasks.lib.dir" location="${closure-ant-tasks.dir}/lib" />
   <property name="closure-ant-tasks.build.dir"
       location="${closure-ant-tasks.dir}/build" />
-  <property name="closure-tools-config.xml"
-      location="${closure-ant-tasks.build.dir}/closure-tools-config.xml" />
-  <import file="${closure-tools-config.xml}" />
+  <property name="closure-ant-config.xml"
+      location="${closure-ant-tasks.build.dir}/closure-ant-config.xml" />
+  <import file="${closure-ant-config.xml}" />
 
 
   <target name="init">

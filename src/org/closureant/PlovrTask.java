@@ -68,12 +68,12 @@ import org.closureant.util.FileUtil;
  * "task-definitions.xml".
  *
  * <p>The location of the plovr jar file is also defined in
- * "closure-tools-config.xml", which should be included in your build file as
+ * "closure-ant-config.xml", which should be included in your build file as
  * follows:</p>
  *
- * <p>{@literal <import file="your/path/to/closure-tools-config.xml" />}</p>
+ * <p>{@literal <import file="your/path/to/closure-ant-config.xml" />}</p>
  *
- * <p><i>Verify that the paths defined in "closure-tools-config.xml" are
+ * <p><i>Verify that the paths defined in "closure-ant-config.xml" are
  * correct for your local configuration.</i></p>
  *
  * <p>For more information about {@code plovr}, visit
@@ -769,7 +769,7 @@ public final class PlovrTask extends Task {
           throw new BuildException("Required attribute \"plovrJar\" is not "
               + "set. The plovr jar file is required for plovr modes "
               + "\"build\", \"jsdoc\", and \"serve\". Verify that your build "
-              + "file imports \"closure-tools-config.xml\" and that the "
+              + "file imports \"closure-ant-config.xml\" and that the "
               + "property locations are correct for your machine.");
         }
       }

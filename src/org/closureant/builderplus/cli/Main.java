@@ -44,6 +44,7 @@ public final class Main {
     try {
       options = new CommandLineOptions();
       parser = new CmdLineParser(options);
+      options.setCmdLineParser(parser);
       parser.parseArgument(processedArgs.toArray(new String[] {}));
     } catch (CmdLineException e) {
       System.err.println(e.getMessage());
