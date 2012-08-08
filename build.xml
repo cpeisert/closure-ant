@@ -151,6 +151,13 @@ limitations under the License.
   </target>
 
 
+  <target name="deep-clean" depends="clean"
+      description="Deletes all files created by this script and clears the
+Apache Ivy cache.">
+    <cleancache />
+  </target>
+
+
   <target name="compile" depends="init" description="Compiles the Java source.">
     <javac srcdir="${src.dir}" destdir="${classes.dir}"
         classpathref="classpath" debug="on" deprecation="on"
