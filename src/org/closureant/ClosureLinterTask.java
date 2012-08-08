@@ -460,6 +460,7 @@ public final class ClosureLinterTask extends Task {
    *
    * @throws org.apache.tools.ant.BuildException on error.
    */
+  @Override
   public void execute() {
 
     CommandLineBuilder cmdline = null;

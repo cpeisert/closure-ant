@@ -136,6 +136,7 @@ public final class DepsWriterPythonTask extends Task {
    *
    * @throws BuildException on error.
    */
+  @Override
   public void execute() {
 
     // Verify task preconditions

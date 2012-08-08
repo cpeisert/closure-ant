@@ -489,6 +489,7 @@ bar=b
    *
    * @throws BuildException on error.
    */
+  @Override
   public void execute() {
 
     List<String> cssCurrentSources = getAllSources();

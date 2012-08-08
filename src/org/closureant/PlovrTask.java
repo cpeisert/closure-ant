@@ -756,6 +756,7 @@ public final class PlovrTask extends Task {
    *
    * @throws org.apache.tools.ant.BuildException on error
    */
+  @Override
   public void execute() {
 
     // Verify task preconditions

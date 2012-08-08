@@ -426,6 +426,7 @@ public final class ClosureTemplatesTask extends Task {
    *
    * @throws org.apache.tools.ant.BuildException on error.
    */
+  @Override
   public void execute() {
     List<String> rawSoySources = getAllSoySourcesAbsolutePaths();
 

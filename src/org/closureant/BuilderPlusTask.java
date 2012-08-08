@@ -487,6 +487,7 @@ public final class BuilderPlusTask extends Task {
    *
    * @throws BuildException on error.
    */
+  @Override
   public void execute() {
     try {// execute() cannot throw checked IOException due to parent definition
       File manifestFile;

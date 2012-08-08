@@ -356,6 +356,7 @@ public final class ClosureBuilderPythonTask extends Task {
    *
    * @throws BuildException on error.
    */
+  @Override
   public void execute() {
     if (this.closureBuilderPythonScript == null) {
       String closureBuilderScriptPath =

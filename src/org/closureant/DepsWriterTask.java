@@ -115,6 +115,7 @@ public final class DepsWriterTask extends Task {
    *
    * @throws BuildException on error.
    */
+  @Override
   public void execute() {
 
     Map<String, JsClosureSourceFile> pathToJsInput = createPathToJsInputMap();

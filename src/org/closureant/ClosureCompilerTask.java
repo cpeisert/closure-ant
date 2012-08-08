@@ -608,6 +608,7 @@ public final class ClosureCompilerTask extends Task
    *
    * @throws BuildException on error.
    */
+  @Override
   public void execute() {
 
     // Verify task preconditions
