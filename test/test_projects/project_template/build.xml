@@ -25,51 +25,75 @@ limitations under the License.
   <dirname property="template.dir" file="${ant.file.template}" />
 
   <property name="build.dir" location="${template.dir}/build" />
+  <property name="compiled-soy.dir" location="${build.dir}/compiled-soy" />
   <property name="template.js.dir" location="${template.dir}/js" />
   <property name="template.html.dir" location="${template.dir}/html" />
   <property name="template.index.html"
       location="${template.html.dir}/index.html" />
   <property name="template.compiled.js"
       location="${build.dir}/template.compiled.js" />
+  
+  <property name="template.css.dir" location="${template.dir}/css" />
+  <property name="template.soy.dir" location="${template.dir}/soy" />
 
   <property name="test.dir" location="${template.dir}/../.." />
-  <property name="closure-ant-tasks.dir" location="${test.dir}/.." />
-  <property name="closure-ant-tasks.lib.dir" location="${closure-ant-tasks.dir}/lib" />
-  <property name="closure-ant-tasks.build.dir"
-      location="${closure-ant-tasks.dir}/build" />
+  <property name="closure-ant.dir" location="${test.dir}/.." />
+  <property name="closure-ant.resources.dir"
+      location="${closure-ant.dir}/resources" />
+  <property name="closure-ant.lib.dir" location="${closure-ant.dir}/lib" />
+  <property name="closure-ant.build.dir" location="${closure-ant.dir}/build" />
   <property name="closure-ant-config.xml"
-      location="${closure-ant-tasks.build.dir}/closure-ant-config.xml" />
+      location="${closure-ant.build.dir}/closure-ant-config.xml" />
   <import file="${closure-ant-config.xml}" />
 
 
   <target name="init">
     <mkdir dir="${build.dir}" />
     <copy todir="${build.dir}">
+      <fileset dir="${template.css.dir}" includes="**/*.css" />
       <fileset dir="${template.html.dir}" includes="**/*.html" />
     </copy>
+    <mkdir dir="${compiled-soy.dir}" />
+  </target>
+  
+  
+  <target name="compile-templates" depends="init">
+    <closure-templates>
+      <soyfileset dir="${template.soy.dir}" includes="**/*.soy" />
+      <compiletojs codeStyle="STRINGBUILDER"
+          outputPathFormat="${compiled-soy.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
+          shouldGenerateJsdoc="true"
+          shouldProvideRequireSoyNamespaces="true" />
+    </closure-templates>
   </target>
 
 
-  <target name="raw" depends="init">
+  <target name="raw" depends="init, compile-templates">
     <builder-plus outputMode="raw" outputfile="${template.compiled.js}">
       <mainsources dir="${template.js.dir}" includes="**/*.js" />
+      <mainsources dir="${compiled-soy.dir}" includes="**/*.js" />
+      <sources dir="${closure-ant.resources.dir}" includes="*usegoog.js" />
       <roots dir="${closure-library.dir}" />
     </builder-plus>
   </target>
 
 
-  <target name="whitespace" depends="init">
+  <target name="whitespace" depends="init, compile-templates">
     <builder-plus outputMode="compiled" outputfile="${template.compiled.js}">
       <mainsources dir="${template.js.dir}" includes="**/*.js" />
+      <mainsources dir="${compiled-soy.dir}" includes="**/*.js" />
+      <sources dir="${closure-ant.resources.dir}" includes="*usegoog.js" />
       <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
     </builder-plus>
   </target>
 
   
-  <target name="simple" depends="init">
+  <target name="simple" depends="init, compile-templates">
     <builder-plus outputMode="compiled" outputfile="${template.compiled.js}">
       <mainsources dir="${template.js.dir}" includes="**/*.js" />
+      <mainsources dir="${compiled-soy.dir}" includes="**/*.js" />
+      <sources dir="${closure-ant.resources.dir}" includes="*usegoog.js" />
       <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="SIMPLE" prettyPrint="true"
           warninglevel="VERBOSE" />
@@ -77,20 +101,23 @@ limitations under the License.
   </target>
 
 
-  <target name="advanced" depends="init">
+  <target name="advanced" depends="init, compile-templates">
     <builder-plus outputMode="compiled" outputfile="${template.compiled.js}">
       <mainsources dir="${template.js.dir}" includes="**/*.js" />
+      <mainsources dir="${compiled-soy.dir}" includes="**/*.js" />
+      <sources dir="${closure-ant.resources.dir}" includes="*usegoog.js" />
       <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="ADVANCED" warninglevel="VERBOSE" />
     </builder-plus>
   </target>
 
 
-  <target name="plovr-advanced" depends="init">
+  <target name="plovr-advanced" depends="init, compile-templates">
     <plovr plovrMode="build" forceRecompile="true"
         configID="myapp"
         outputfile="${template.compiled.js}">
       <inputs dir="${template.js.dir}" includes="**/*.js" />
+      <sources dir="${compiled-soy.dir}" includes="**/*.js" />
       <compiler compilationMode="advanced" warninglevel="VERBOSE">
         <compilercheck name="checkVars" value="WARNING" />
       </compiler>

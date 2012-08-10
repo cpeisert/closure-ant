@@ -17,6 +17,8 @@
 goog.provide('ns');
 
 goog.require('goog.dom');
+goog.require('ns.soy');
+goog.require('soy');
 
 
 /**
@@ -27,5 +29,10 @@ goog.require('goog.dom');
 ns.displayMessage = function(message) {
   alert(message);
 };
+
+var list = document.querySelectorAll('link');
+
+soy.renderElement(document.querySelector('#mainContent'),
+    ns.soy.filterLinkList, {linkList: list, relType: 'stylesheet'});
 
 ns.displayMessage('No dead code elimination here!');
