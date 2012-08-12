@@ -32,7 +32,7 @@ import org.closureant.util.FileUtil;
  * A file-based cache to temporarily store settings related to a build
  * process, such as the command line and source files. The build settings are
  * stored relative to an executing Ant task using the task's name and its
- * owning target to uniquely identify it. A directory named ".closure-ant-tasks"
+ * owning target to uniquely identify it. A directory named ".closure-ant"
  * is created in the current Ant project's base directory to store the settings.
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
@@ -40,7 +40,7 @@ import org.closureant.util.FileUtil;
 public final class BuildCache {
 
   private static final String antClosureToolsMetaDirectory =
-      ".closure-ant-tasks";
+      ".closure-ant";
   private static final String fileNamePattern = "task[%s]__target[%s].ser";
   private static final int CACHE_EXPIRATION_DAYS = 2;
 

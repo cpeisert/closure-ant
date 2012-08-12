@@ -499,7 +499,7 @@ public final class BuilderPlus extends Task {
         Files.write(manifestString, this.outputManifest, Charsets.UTF_8);
         manifestFile = this.outputManifest;
       } else {
-        // Save a copy of the manifest in directory '.closure-ant-tasks'.
+        // Save a copy of the manifest in directory '.closure-ant'.
         BuildCache cache = new BuildCache(this);
         manifestFile = cache.createTempFile("manifest_for_target["
             + getOwningTarget().getName() + "].txt");
