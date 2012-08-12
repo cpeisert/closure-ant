@@ -47,6 +47,9 @@ limitations under the License.
     <dependency org="junit" name="junit" rev="4.10" />
     <dependency org="org.apache.ant" name="ant-junit" rev="1.8.4" />
 
+    <!-- Dependency for Ant's ClassFileSet (used to build jar) -->
+    <dependency org="org.apache.bcel" name="bcel" rev="5.2"/>
+
     <exclude type="source" ext="*" />
     <exclude type="javadoc" ext="*" />
 
