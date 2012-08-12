@@ -17,22 +17,46 @@
 goog.provide('ns');
 
 goog.require('goog.dom');
+goog.require('goog.events');
 goog.require('ns.soy');
 goog.require('soy');
 
+// goog.require('goog.soy');
+
 
 /**
- * Shares a message with the world.
+ * Print strings separated by commas or whitespace as an unordered list.
  *
- * @param {string} message The message for the world.
+ * @param {string} items The strings separated by commas or whitespace.
  */
-ns.displayMessage = function(message) {
-  alert(message);
+ns.printStringAsUnorderedList = function(items) {
+  var itemArray = items.split(/\s+|,/);
+  soy.renderElement(document.querySelector('#listOutput'),
+      ns.soy.printListAsUL, {'list': itemArray});
+
+  /*goog.soy.renderElement(document.querySelector('#listOutput'),
+  ns.soy.printListAsUL, {'list': itemArray});*/
 };
 
-var list = document.querySelectorAll('link');
 
-soy.renderElement(document.querySelector('#mainContent'),
-    ns.soy.filterLinkList, {linkList: list, relType: 'stylesheet'});
+/**
+ * Handler for itemsInput change event.
+ */
+ns.onInputChange = function() {
+  var itemsInputEl = document.querySelector('#itemsInput');
+  ns.printStringAsUnorderedList(itemsInputEl.value);
+};
 
-ns.displayMessage('No dead code elimination here!');
+
+/**
+ * Entry point for app.
+ */
+ns.main = function() {
+  var itemsInputEl = document.querySelector('#itemsInput');
+  goog.events.listen(
+      itemsInputEl,
+      goog.events.EventType.CHANGE,
+      ns.onInputChange);
+};
+
+ns.main();

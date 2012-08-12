@@ -1,14 +1,13 @@
 {namespace ns.soy autoescape="contextual"}
 
 /**
- * Filter a list of 'link' elements based on the specified relationship type.
- * @param linkList A list of link elements.
- * @param relType The link relationship type.
+ * Print a list of items as an unordered list.
+ * @param list A list of items to print.
  */
-{template .filterLinkList}
-  {foreach $link in $linkList}
-    {if $link.rel == $relType}
-      <link href="{$link.href|noAutoescape}" rel="{$link.rel}" type="{$link.type}">
-    {/if}
+{template .printListAsUL}
+  <ul>
+  {foreach $item in $list}
+    <li>{$item}</li>
   {/foreach}
+  </ul>
 {/template}
