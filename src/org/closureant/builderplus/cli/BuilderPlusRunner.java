@@ -31,7 +31,7 @@ import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 
-import org.closureant.ClosureCompilerTask;
+import org.closureant.ClosureCompiler;
 import org.closureant.base.JsClosureSourceFile;
 import org.closureant.base.SourceFileFactory;
 import org.closureant.builderplus.BuilderPlusUtil;
@@ -131,7 +131,7 @@ public final class BuilderPlusRunner {
    *     #createManifest(org.closureant.types.CompilationLevel, File)} is {@code null}
    */
   public void execute() throws IOException {
-    ClosureCompilerTask compilerTask = null;
+    ClosureCompiler compilerTask = null;
     CompilationLevel compilationLevel;
 
     if (OutputMode.COMPILED == this.outputMode) {
@@ -196,15 +196,15 @@ public final class BuilderPlusRunner {
   }
 
   /**
-   * Creates a new {@link ClosureCompilerTask} for internal execution.
+   * Creates a new {@link org.closureant.ClosureCompiler} for internal execution.
    *
    * <p><b>Note:</b> the input manifest is not set by this method and must
-   * be set on the returned {@link ClosureCompilerTask}.</p>
+   * be set on the returned {@link org.closureant.ClosureCompiler}.</p>
    *
    * @throws IllegalStateException if the Closure Compiler jar file is null or
    *     does not exist
    */
-  private ClosureCompilerTask newClosureCompilerTask() {
+  private ClosureCompiler newClosureCompilerTask() {
     if (this.compilerJar == null) {
       throw new IllegalStateException("\"compilerJar\" is not set. The Closure "
           + "Compiler is required for output mode COMPILED. Verify "
@@ -223,7 +223,7 @@ public final class BuilderPlusRunner {
     Target builderPlusTarget = new Target();
     builderPlusTarget.setProject(project);
     builderPlusTarget.setName("_internal-builder-plus-target");
-    ClosureCompilerTask compilerTask = new ClosureCompilerTask();
+    ClosureCompiler compilerTask = new ClosureCompiler();
     compilerTask.setTaskName("closure-compiler");
     compilerTask.setProject(project);
     compilerTask.setOwningTarget(builderPlusTarget);
@@ -258,7 +258,7 @@ public final class BuilderPlusRunner {
    *
    * <p>If a CSS renaming map is specified, it will be written to a temporary
    * file and added to the manifest. See {@link
-   * org.closureant.BuilderPlusTask#setCssRenamingMap(String)}.</p>
+   * org.closureant.BuilderPlus#setCssRenamingMap(String)}.</p>
    *
    * @param compilationLevel the Closure Compiler compilation level
    * @param outputDirectory directory to write temporary files, such as CSS

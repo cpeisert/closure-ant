@@ -165,7 +165,7 @@ import org.closureant.util.AntUtil;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class ClosureBuilderPythonTask extends Task {
+public final class ClosureBuilderPython extends Task {
 
   /**
    * Output modes supported by Closure Builder. Unlike the closurebuilder.py
@@ -206,7 +206,7 @@ public final class ClosureBuilderPythonTask extends Task {
   /**
    * Constructs a new Ant task for Closure Builder.
    */
-  public ClosureBuilderPythonTask() {
+  public ClosureBuilderPython() {
     // Attributes
     this.closureBuilderPythonScript = null;
     this.compilerJar = null;
@@ -435,7 +435,7 @@ public final class ClosureBuilderPythonTask extends Task {
       }
     }
 
-    ClosureCompilerTask compilerTask = new ClosureCompilerTask(this);
+    ClosureCompiler compilerTask = new ClosureCompiler(this);
     if (this.compilerOptions != null) {
       compilerTask.protectedSetCompilerOptions(this.compilerOptions);
     }

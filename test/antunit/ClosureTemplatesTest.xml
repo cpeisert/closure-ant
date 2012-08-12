@@ -17,7 +17,7 @@ limitations under the License.
 
 <!--
 ================================================================================
-  AntUnit tests for ClosureTemplatesTask (task name: soy).
+  AntUnit tests for ClosureTemplates (task name: soy).
 ================================================================================
 -->
 <project name="closure-templates-test" default="test">
@@ -363,7 +363,7 @@ limitations under the License.
 
     This error results from AntUnit spawning sub-projects for each test-task
     being executed, each with its own classloader. Hence, each nested
-    <closure-templates> task call creates a new ClosureTemplatesTask instance
+    <closure-templates> task call creates a new ClosureTemplates instance
     along with a new Guice injector and associated SoyModule. Since these
     classloaders are not released for garbage collection until after AntUnit
     has finished running the entire test suite, memory usage grows rapidly. For

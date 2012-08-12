@@ -175,7 +175,7 @@ import org.closureant.util.FileUtil;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class BuilderPlusTask extends Task {
+public final class BuilderPlus extends Task {
 
   // Attributes
   private File compilerJar;
@@ -200,7 +200,7 @@ public final class BuilderPlusTask extends Task {
   /**
    * Constructs a new Ant task for Closure Builder.
    */
-  public BuilderPlusTask() {
+  public BuilderPlus() {
     // Attributes
     this.compilerJar = null;
     this.cssRenamingMap =null;
@@ -545,7 +545,7 @@ public final class BuilderPlusTask extends Task {
   }
 
   /**
-   * Run the Closure Compiler with the help of the {@link ClosureCompilerTask}.
+   * Run the Closure Compiler with the help of the {@link ClosureCompiler}.
    *
    * @param manifest a manifest file listing all of the sources for the build
    * @throws BuildException if the manifest file is {@code null}
@@ -564,7 +564,7 @@ public final class BuilderPlusTask extends Task {
       }
     }
 
-    ClosureCompilerTask compilerTask = new ClosureCompilerTask(this);
+    ClosureCompiler compilerTask = new ClosureCompiler(this);
     if (this.compilerOptions != null) {
       compilerTask.protectedSetCompilerOptions(this.compilerOptions);
     }

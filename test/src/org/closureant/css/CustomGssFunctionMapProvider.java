@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * Custom GSS function map provider for testing
- * {@link org.closureant.ClosureStylesheetsTask}.
+ * {@link org.closureant.ClosureStylesheets}.
  *
  * <p>See <a target="_blank" href="http://code.google.com/p/closure-stylesheets/#Functions">
  * Closure Stylesheets: Functions</a>.</p>

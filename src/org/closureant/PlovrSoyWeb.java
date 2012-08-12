@@ -105,7 +105,7 @@ import org.closureant.util.StringUtil;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class PlovrSoyWebTask extends Task {
+public final class PlovrSoyWeb extends Task {
 
   // Attributes
 
@@ -122,7 +122,7 @@ public final class PlovrSoyWebTask extends Task {
   /**
    * Constructs a new Ant task for plovr SoyWeb.
    */
-  public PlovrSoyWebTask() {
+  public PlovrSoyWeb() {
 
     // Attributes
 

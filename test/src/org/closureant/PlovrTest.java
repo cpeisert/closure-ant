@@ -23,17 +23,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
 /**
- * Tests for {@link PlovrTask}.
+ * Tests for {@link Plovr}.
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 @RunWith(BlockJUnit4ClassRunner.class)
-public final class PlovrTaskTest {
+public final class PlovrTest {
 
-  private PlovrTask plovrTask;
+  private Plovr plovrTask;
 
   @Before public void setUp() {
-    this.plovrTask = new PlovrTask();
+    this.plovrTask = new Plovr();
   }
 
   @Test public void setPlovrModeValidOptions() {

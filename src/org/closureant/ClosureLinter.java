@@ -75,7 +75,7 @@ import org.closureant.util.FileUtil;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class ClosureLinterTask extends Task {
+public final class ClosureLinter extends Task {
 
   /** Execution modes supported by the Closure Linter task. Defaults to LINT. */
   public static enum ClosureLinterMode {
@@ -156,7 +156,7 @@ public final class ClosureLinterTask extends Task {
   /**
    * Constructs a new Closure Linter Ant task.
    */
-  public ClosureLinterTask() {
+  public ClosureLinter() {
     // Attributes
     this.checkJavaScriptInHtmlFiles = null;
     this.debugTokens = null;

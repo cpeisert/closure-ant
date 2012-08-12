@@ -71,7 +71,7 @@ import javax.annotation.Nullable;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class ClosureStylesheetsTask extends Task {
+public final class ClosureStylesheets extends Task {
 
   // Attributes
   private boolean allowUnrecognizedFunctions;
@@ -97,15 +97,15 @@ public final class ClosureStylesheetsTask extends Task {
   /**
    * Constructs a new Closure Stylesheets Ant task.
    */
-  public ClosureStylesheetsTask() {
+  public ClosureStylesheets() {
     this(null);
   }
 
   /**
    * Constructs a new bound Closure Stylesheets Ant task. This is useful when
-   * using the {@link ClosureStylesheetsTask} within another task.
+   * using the {@link ClosureStylesheets} within another task.
    */
-  public ClosureStylesheetsTask(Task owner) {
+  public ClosureStylesheets(Task owner) {
     super();
     if (owner != null) {
       bindToOwner(owner);
@@ -650,7 +650,7 @@ bar=b
 
   /**
    * Create a {@link JobDescription} for the Closure Stylesheets compiler
-   * initialized with data set for the {@link ClosureStylesheetsTask}.
+   * initialized with data set for the {@link ClosureStylesheets}.
    *
    * @param cssSources file paths for CSS sources to be compiled
    * @return a job description for a run of the Closure Stylesheets compiler

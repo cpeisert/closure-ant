@@ -20,12 +20,11 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.Parameter;
 
 import org.closureant.base.PlovrConfig;
-import org.closureant.types.StringNestedElement;
 
 /**
  * Closure Compiler object providing compiler options for nested
  * {@literal <compiler>} elements within the {@link
- * org.closureant.PlovrTask} Ant task.
+ * org.closureant.Plovr} Ant task.
  *
  * <ul class="blockList">
  * <li class="blockList">

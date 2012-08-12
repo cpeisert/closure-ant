@@ -28,7 +28,7 @@ import org.closureant.util.AntUtil;
 
 /**
  * Data type for {@literal <module>} nested element of the
- * {@link org.closureant.PlovrTask}.
+ * {@link org.closureant.Plovr}.
  *
  * <ul class="blockList">
  * <li class="blockList">

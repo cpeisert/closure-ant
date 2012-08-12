@@ -19,7 +19,6 @@ package org.closureant.types;
 import com.google.gson.JsonPrimitive;
 
 import org.closureant.base.CommandLineBuilder;
-import org.closureant.types.NameValuePair;
 import org.closureant.util.StringUtil;
 
 import org.apache.tools.ant.BuildException;
@@ -213,7 +212,7 @@ public class ClosureCompiler extends AbstractClosureCompiler {
 
   /**
    * Constructs a new {@literal <compiler>} nested element for use with the 
-   * {@link org.closureant.ClosureBuilderPythonTask}.
+   * {@link org.closureant.ClosureBuilderPython}.
    */
   public ClosureCompiler() {
     super();

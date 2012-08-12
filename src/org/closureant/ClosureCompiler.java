@@ -232,7 +232,7 @@ import org.closureant.util.StringUtil;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class ClosureCompilerTask extends Task
+public final class ClosureCompiler extends Task
     implements CompilerOptionsComplete {
 
   private CompilerOptionsComplete compilerOptions;
@@ -256,19 +256,19 @@ public final class ClosureCompilerTask extends Task
   /**
    * Constructs a new Closure Compiler Ant task.
    */
-  public ClosureCompilerTask() {
+  public ClosureCompiler() {
     this(null);
   }
 
   /**
    * Constructs a new bound Closure Compiler Ant task. This is useful when
-   * using the {@link ClosureCompilerTask} within another task as follows:
+   * using the {@link ClosureCompiler} within another task as follows:
    *
    * <p><pre>{@code
-   * ClosureCompilerTask compilerTask = ClosureCompilerTask(this);
+   * ClosureCompiler compilerTask = ClosureCompiler(this);
    * }</pre></p>
    */
-  public ClosureCompilerTask(Task owner) {
+  public ClosureCompiler(Task owner) {
     super();
     if (owner != null) {
       bindToOwner(owner);
@@ -292,7 +292,7 @@ public final class ClosureCompilerTask extends Task
     this.sources = Lists.newArrayList();
   }
 
-  // Backdoor setter for tasks that wrap/compose the ClosureCompilerTask.
+  // Backdoor setter for tasks that wrap/compose the ClosureCompiler.
   public void protectedSetCompilerOptions(CompilerOptionsComplete options) {
     this.compilerOptions = options;
   }

@@ -47,7 +47,7 @@ public final class BuilderPlusUtil {
    * Creates a temporary CSS renaming map file in the specified output
    * directory using either the Closure Stylesheets renaming map format
    * CLOSURE_COMPILED or CLOSURE_UNCOMPILED. See {@link
-   * org.closureant.BuilderPlusTask#setCssRenamingMap(String)}.
+   * org.closureant.BuilderPlus#setCssRenamingMap(String)}.
    *
    * <p>The temporary renaming map file is then added to the manifest list
    * either immediately before or after Closure's base.js (CLOSURE_COMPILED

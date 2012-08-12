@@ -57,7 +57,7 @@ import org.closureant.util.StringUtil;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class DepsWriterPythonTask extends Task {
+public final class DepsWriterPython extends Task {
 
   // Attributes
   private File depsWriterPythonScript;
@@ -72,7 +72,7 @@ public final class DepsWriterPythonTask extends Task {
   /**
    * Constructs a new Ant task for Deps Writer.
    */
-  public DepsWriterPythonTask() {
+  public DepsWriterPython() {
     // Attributes
     this.depsWriterPythonScript = null;
     this.outputFile = null;

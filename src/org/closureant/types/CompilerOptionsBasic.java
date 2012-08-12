@@ -21,7 +21,6 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Parameter;
 
 import org.closureant.base.CommandLineBuilder;
-import org.closureant.types.NameValuePair;
 
 import java.util.Set;
 
@@ -38,9 +37,9 @@ import java.util.Set;
  * dependencies such as {@code --js}, {@code --manage_closure_dependencies},
  * and {@code --closure_entry_point}. Functionality for specifying JavaScript
  * inputs and their dependencies should be implemented by Ant tasks that wrap
- * the Closure Compiler. See {@link org.closureant.ClosureCompilerTask},
- * {@link org.closureant.ClosureBuilderPythonTask}, and
- * {@link org.closureant.PlovrTask}.</p>
+ * the Closure Compiler. See {@link org.closureant.ClosureCompiler},
+ * {@link org.closureant.ClosureBuilderPython}, and
+ * {@link org.closureant.Plovr}.</p>
  *
  * <p>The provided options are as follows:</p>
  *

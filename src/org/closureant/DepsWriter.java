@@ -44,7 +44,7 @@ import org.closureant.util.FileUtil;
  * deps files rather than the original Python script "depswriter.py" (located
  * in  closure-library/closure/bin/build). The default task name is {@code
  * deps-writer} as defined in "task-definitions.xml". To use the original
- * depswriter python script, see {@link DepsWriterPythonTask}.
+ * depswriter python script, see {@link DepsWriterPython}.
  *
  * <p>For more information about DepsWriter, see
  * <a target="_blank"
@@ -53,7 +53,7 @@ import org.closureant.util.FileUtil;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class DepsWriterTask extends Task {
+public final class DepsWriter extends Task {
 
   // Attributes
   private File outputFile;
@@ -65,7 +65,7 @@ public final class DepsWriterTask extends Task {
   /**
    * Constructs a new Ant task for Deps Writer.
    */
-  public DepsWriterTask() {
+  public DepsWriter() {
     // Attributes
     this.outputFile = null;
 

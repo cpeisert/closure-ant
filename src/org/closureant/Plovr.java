@@ -272,14 +272,14 @@ import org.closureant.util.FileUtil;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class PlovrTask extends Task {
+public final class Plovr extends Task {
 
   private static final String PLOVR_SERVER_ADDRESS = "0";
   private static final int PLOVR_SERVER_PORT = 9810;
 
   /** 
    * Execution modes supported by plovr. Note: "soyweb" is available as the
-   * standalone Ant task {@link PlovrSoyWebTask}.
+   * standalone Ant task {@link PlovrSoyWeb}.
    */
   public static enum PlovrMode {
     /**
@@ -352,7 +352,7 @@ public final class PlovrTask extends Task {
   /**
    * Constructs a new Ant task for plovr.
    */
-  public PlovrTask() {
+  public Plovr() {
 
     // Attributes
     this.closureLibrary = null;
@@ -602,7 +602,7 @@ public final class PlovrTask extends Task {
    * @param plovrMode the plovr execution mode. Options: "build", "config",
    *     "jsdoc", "serve"
    *
-   * @see PlovrTask.PlovrMode
+   * @see Plovr.PlovrMode
    */
   public void setPlovrMode(String plovrMode) {
     String mode = plovrMode.toLowerCase();

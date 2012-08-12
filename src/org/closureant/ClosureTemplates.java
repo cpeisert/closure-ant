@@ -62,7 +62,7 @@ import org.closureant.soy.SoyHelper;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class ClosureTemplatesTask extends Task {
+public final class ClosureTemplates extends Task {
 
   private final SoyHelper.Builder soyHelperBuilder;
 
@@ -82,19 +82,19 @@ public final class ClosureTemplatesTask extends Task {
   /**
    * Constructs a new SoyToJsSrcCompiler Ant task.
    */
-  public ClosureTemplatesTask() {
+  public ClosureTemplates() {
     this(null);
   }
 
   /**
    * Constructs a new bound SoyToJsSrcCompiler Ant task. This is useful when
-   * wrapping the {@link ClosureTemplatesTask} within another task as follows:
+   * wrapping the {@link ClosureTemplates} within another task as follows:
    *
    * <p><pre>{@code
    * SoyToJsSrcCompilerTask soyToJsTask = SoyToJsSrcCompilerTask(this);
    * }</pre></p>
    */
-  public ClosureTemplatesTask(Task owner) {
+  public ClosureTemplates(Task owner) {
     super();
     if (owner != null) {
       bindToOwner(owner);

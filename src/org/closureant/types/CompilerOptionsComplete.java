@@ -16,9 +16,6 @@
 
 package org.closureant.types;
 
-import org.closureant.types.NameValuePair;
-import org.closureant.types.StringNestedElement;
-
 import java.io.File;
 
 /**
@@ -47,7 +44,7 @@ import java.io.File;
  *
  * <p><ul>
  * <li>The option may be implemented at the Ant-task level (for example, see
- * {@link org.closureant.ClosureCompilerTask}, which supports specifying
+ * {@link org.closureant.ClosureCompiler}, which supports specifying
  * JavaScript sources, a JavaScript output file, and an output manifest).
  * The decision to reserve certain options for Ant tasks to implement is
  * to reduce redundancy in cases where the task may provide an API better

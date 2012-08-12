@@ -36,7 +36,7 @@ import org.closureant.util.AntUtil;
  *
  * Closure Compiler object providing common compiler options for nested
  * {@literal <compiler>} elements within the
- * {@link org.closureant.PlovrTask} Ant task.
+ * {@link org.closureant.Plovr} Ant task.
  *
  * <ul class="blockList">
  * <li class="blockList">
@@ -316,7 +316,7 @@ public final class PlovrClosureCompiler extends AbstractClosureCompiler {
 
   /**
    * Constructs a new {@literal <compiler>} nested element for use with the
-   * {@link org.closureant.PlovrTask}.
+   * {@link org.closureant.Plovr}.
    */
   public PlovrClosureCompiler() {
     super();
