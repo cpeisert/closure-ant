@@ -16,10 +16,6 @@
 
 package org.closureant.types;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-
 import java.util.List;
 
 /**
@@ -29,12 +25,10 @@ import java.util.List;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class SoyActiveDelegatePackageList {
-
-  private List<String> packages;
+public final class SoyActiveDelegatePackageList extends StringList {
 
   public SoyActiveDelegatePackageList() {
-    this.packages = Lists.newArrayList();
+    super();
   }
 
   /**
@@ -42,16 +36,15 @@ public final class SoyActiveDelegatePackageList {
    *     whitespace and/or commas
    */
   public void setPackages(String packageNames) {
-    CharMatcher matcher = CharMatcher.WHITESPACE.or(CharMatcher.anyOf(","));
-    Iterable<String> splitPackageNames = Splitter
-        .on(matcher).omitEmptyStrings().trimResults().split(packageNames);
-
-    for (String packageName : splitPackageNames) {
-      this.packages.add(packageName.trim());
-    }
+    setListOfStrings(packageNames);
   }
 
+  /**
+   * Gets the list of delegate package names.
+   *
+   * @return a {@link List} of delegate package names
+   */
   public List<String> getPackages() {
-    return this.packages;
+    return getListOfStrings();
   }
 }
