@@ -123,7 +123,7 @@ limitations under the License.
     <fileset id="jsr305.jar.id" dir="${basedir}" includes="lib/jsr305*.jar" />
     <property name="jsr305.jar" refid="jsr305.jar.id" />
 
-      <!-- Library dependencies for Closure Templates. -->
+    <!-- Library dependencies for Closure Templates. -->
     <fileset id="aopalliance.jar.id" dir="${basedir}"
         includes="lib/aopalliance*.jar" />
     <property name="aopalliance.jar" refid="aopalliance.jar.id" />
@@ -143,6 +143,50 @@ limitations under the License.
     <fileset id="soy.jar.id" dir="${basedir}"
         includes="lib/soy-excluding-deps*.jar" />
     <property name="soy.jar" refid="soy.jar.id" />
+
+    <!--
+      Extract library jars into the classes directory so that ClassFileSet can
+      select only the required class files from each library.
+    -->
+    <unjar dest="${classes.dir}" src="${ant.jar}" failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${ant-launcher.jar}"
+        failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${args4j.jar}" failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${closure-stylesheets.jar}"
+        failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${gson.jar}" failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${guava.jar}" failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${jsr305.jar}" failonemptyarchive="true" />
+
+    <!-- Library dependencies for Closure Templates. -->
+    <unjar dest="${classes.dir}" src="${aopalliance.jar}"
+        failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${guice.jar}"
+        failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${guice-assistedinject.jar}"
+        failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${guice-multibindings.jar}"
+        failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${icu4j.jar}" failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${javax.inject.jar}"
+        failonemptyarchive="true" />
+    <unjar dest="${classes.dir}" src="${soy.jar}" failonemptyarchive="true" />
+
+    <!--
+      To use Ant's ClassFileSet, copy the jakarta-BCEL library to the current
+      user's home directory under ".ant/lib".
+    -->
+    <mkdir dir="${user.home}/.ant/lib" />
+    <fileset id="bcel.jar.id" dir="${basedir}" includes="lib/bcel*.jar" />
+    <property name="bcel.jar" refid="bcel.jar.id" />
+    <available file="${user.home}/.ant/${bcel.jar}"
+        property="bcel.lib.present" />
+    <copy file="${bcel.jar}" todir="${user.home}/.ant/lib" />
+    <fail unless="${bcel.lib.present}"
+        message="The Jakarta-BCEL library (which is required to create the
+Closure Ant jar file) was just copied to your home directory under .ant/lib.
+Try running Ant again now that the BCEL library is included in the Ant runtime
+classpath." />
   </target>
 
 
@@ -168,51 +212,54 @@ Apache Ivy cache.">
   </target>
 
 
+  <classfileset id="closureant-dependencies" dir="${classes.dir}">
+    <rootfileset dir="${classes.dir}" includes="org/closureant/*.class" />
+    <!-- Include all Guice classes. -->
+    <rootfileset dir="${classes.dir}"
+        includes="com/google/inject/**/*.class" />
+  </classfileset>
+
+
   <target name="jar" depends="compile" description=
       "Creates a standalone jar of all Java class files and dependencies.">
-    <jar destfile="${closure-ant.jar}" basedir="${classes.dir}"
-        update="true" manifest="${build.dir}/MANIFEST.MF">
-
+    <jar destfile="${closure-ant.jar}" update="true"
+        manifest="${build.dir}/MANIFEST.MF">
+      <fileset refid="closureant-dependencies" />
+      <fileset dir="${classes.dir}">
+        <include name="**/*.properties" />
+        <include name="**/*.txt" />
+        <include name="**/*.xml" />
+      </fileset>
       <fileset dir="${resources.dir}">
-        <include name="soyutils.js" />
+        <include name="soyutils*.js" />
         <include name="task-definitions.xml" />
       </fileset>
-
-      <zipfileset includes="**/*" src="${ant.jar}" />
-      <zipfileset includes="**/*" src="${ant-launcher.jar}" />
-      <zipfileset includes="**/*.class" src="${args4j.jar}" />
-      <zipfileset includes="**/*.class" src="${closure-stylesheets.jar}" />
-      <zipfileset includes="**/*.class" src="${gson.jar}" />
-      <zipfileset includes="**/*.class" src="${guava.jar}" />
-      <zipfileset includes="**/*.class" src="${jsr305.jar}" />
-
-      <!-- Library dependencies for Closure Templates. -->
-      <zipfileset includes="**/*.class" src="${aopalliance.jar}" />
-      <zipfileset includes="**/*.class" src="${guice.jar}" />
-      <zipfileset includes="**/*.class" src="${guice-assistedinject.jar}" />
-      <zipfileset includes="**/*.class" src="${guice-multibindings.jar}" />
-      <zipfileset includes="**/*.class" src="${icu4j.jar}" />
-      <zipfileset includes="**/*.class" src="${javax.inject.jar}" />
-      <zipfileset includes="**/*.class" src="${soy.jar}" />
     </jar>
   </target>
+
+
+  <classfileset id="closureant-deps-no-templates" dir="${classes.dir}">
+    <rootfileset dir="${classes.dir}" includes="org/closureant/*.class"
+        excludes="org/closureant/ClosureTemplates.class" />
+  </classfileset>
 
 
   <target name="jar-no-templates" depends="compile"
       description="Creates a standalone jar excluding Java class files and
 dependencies related to Closure Templates.&#13;&#10;">
-    <jar destfile="${closure-ant-no-templates.jar}" basedir="${classes.dir}"
-        update="true" manifest="${build.dir}/MANIFEST.MF">
-      <fileset dir="${resources.dir}">
+    <copy file="${resources.dir}/task-definitions-no-templates.xml"
+        tofile="${build.dir}/task-definitions.xml" />
+    <jar destfile="${closure-ant-no-templates.jar}" update="true"
+        manifest="${build.dir}/MANIFEST.MF">
+      <fileset refid="closureant-deps-no-templates" />
+      <fileset dir="${classes.dir}">
+        <include name="**/*.properties" />
+        <include name="**/*.txt" />
+        <include name="**/*.xml" />
+      </fileset>
+      <fileset dir="${build.dir}">
         <include name="task-definitions.xml" />
       </fileset>
-      <zipfileset includes="**/*" src="${ant.jar}" />
-      <zipfileset includes="**/*" src="${ant-launcher.jar}" />
-      <zipfileset includes="**/*.class" src="${args4j.jar}" />
-      <zipfileset includes="**/*.class" src="${closure-stylesheets.jar}" />
-      <zipfileset includes="**/*.class" src="${gson.jar}" />
-      <zipfileset includes="**/*.class" src="${guava.jar}" />
-      <zipfileset includes="**/*.class" src="${jsr305.jar}" />
     </jar>
   </target>
 
@@ -221,27 +268,34 @@ dependencies related to Closure Templates.&#13;&#10;">
       description="Creates a non-standalone jar excluding dependencies (i.e.
 no Ant, Closure Stylesheets, Closure Templates, Gson, or Guava classes).
 &#13;&#10;">
-    <jar destfile="${closure-ant-no-deps.jar}" basedir="${classes.dir}"
+    <jar destfile="${closure-ant-no-deps.jar}"
         update="false" manifest="${build.dir}/MANIFEST.MF">
+      <fileset dir="${classes.dir}" includes="org/closureant/**/*.class" />
       <fileset dir="${resources.dir}">
-        <include name="soyutils.js" />
         <include name="task-definitions.xml" />
       </fileset>
     </jar>
   </target>
 
 
+  <classfileset id="builderplus-dependencies" dir="${classes.dir}">
+    <rootfileset dir="${classes.dir}"
+        includes="org/closureant/BuilderPlus.class" />
+    <rootfileset dir="${classes.dir}"
+        includes="org/closureant/builderplus/cli/*.class" />
+  </classfileset>
+
+
   <target name="builder-plus-jar" depends="compile"
       description="Creates a standalone executable builderplus.jar">
-    <jar destfile="${builderplus.jar}" basedir="${classes.dir}" update="true"
+    <jar destfile="${builderplus.jar}" update="true"
         manifest="${build.dir}/BUILDER_PLUS_MANIFEST.MF">
-      <zipfileset includes="**/*" src="${ant.jar}" />
-      <zipfileset includes="**/*" src="${ant-launcher.jar}" />
-      <zipfileset includes="**/*.class" src="${args4j.jar}" />
-      <zipfileset includes="**/*.class" src="${gson.jar}" />
-      <zipfileset includes="**/*.class" src="${guava.jar}" />
-      <zipfileset includes="**/*.class" src="${jsr305.jar}" />
-      <zipfileset includes="**/*.class" src="${soy.jar}" />
+      <fileset refid="builderplus-dependencies" />
+      <fileset dir="${classes.dir}">
+        <include name="**/*.properties" />
+        <include name="**/*.txt" />
+        <include name="**/*.xml" />
+      </fileset>
     </jar>
   </target>
   
