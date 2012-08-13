@@ -72,7 +72,6 @@ limitations under the License.
     <builder-plus outputMode="raw" outputfile="${template.compiled.js}">
       <mainsources dir="${template.js.dir}" includes="**/*.js" />
       <mainsources dir="${compiled-soy.dir}" includes="**/*.js" />
-      <sources dir="${closure-ant.resources.dir}" includes="*usegoog.js" />
       <roots dir="${closure-library.dir}" />
     </builder-plus>
   </target>
@@ -82,7 +81,6 @@ limitations under the License.
     <builder-plus outputMode="compiled" outputfile="${template.compiled.js}">
       <mainsources dir="${template.js.dir}" includes="**/*.js" />
       <mainsources dir="${compiled-soy.dir}" includes="**/*.js" />
-      <sources dir="${closure-ant.resources.dir}" includes="*usegoog.js" />
       <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="WHITESPACE" prettyPrint="true" />
     </builder-plus>
@@ -93,7 +91,6 @@ limitations under the License.
     <builder-plus outputMode="compiled" outputfile="${template.compiled.js}">
       <mainsources dir="${template.js.dir}" includes="**/*.js" />
       <mainsources dir="${compiled-soy.dir}" includes="**/*.js" />
-      <sources dir="${closure-ant.resources.dir}" includes="*usegoog.js" />
       <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="SIMPLE" prettyPrint="true"
           warninglevel="VERBOSE" />
@@ -105,7 +102,6 @@ limitations under the License.
     <builder-plus outputMode="compiled" outputfile="${template.compiled.js}">
       <mainsources dir="${template.js.dir}" includes="**/*.js" />
       <mainsources dir="${compiled-soy.dir}" includes="**/*.js" />
-      <sources dir="${closure-ant.resources.dir}" includes="*usegoog.js" />
       <roots dir="${closure-library.dir}" />
       <compiler compilationLevel="ADVANCED" warninglevel="VERBOSE" />
     </builder-plus>

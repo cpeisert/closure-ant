@@ -40,6 +40,7 @@ limitations under the License.
   <import file="${closure-ant-config.xml}" />
 
   <import file="${test.dir}/test_projects/project101/project101.xml" />
+  <import file="${test.dir}/test_projects/project_template/project_template.xml" />
 
   <property name="builderplus.jar"
       location="${closure-ant.build.dir}/builderplus.jar" />
@@ -61,6 +62,19 @@ limitations under the License.
   <target name="suiteSetUp">
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${project101.output.dir}" />
+
+    <mkdir dir="${json-in-style.soy-output.dir}" />
+    <mkdir dir="${json-in-style.soy-output.dir}/images" />
+    <copy todir="${json-in-style.soy-output.dir}/images">
+      <fileset dir="${json-in-style.dir}/images" />
+    </copy>
+
+    <mkdir dir="${template.output.dir}" />
+    <copy todir="${template.output.dir}">
+      <fileset dir="${template.css.dir}" includes="**/*.css" />
+      <fileset dir="${template.html.dir}" includes="**/*.html" />
+    </copy>
+    <mkdir dir="${template.compiled-soy.dir}" />
   </target>
 
 
@@ -241,6 +255,31 @@ limitations under the License.
     </java>
 
     <assertLogContains text="Output file up-to-date. Compilation skipped." />
+  </target>
+
+
+  <target name="testAutoInclude_soyutils_usegoog">
+    <closure-templates>
+      <soyfileset dir="${template.soy.dir}" includes="**/*.soy" />
+      <compiletojs codeStyle="STRINGBUILDER"
+          outputPathFormat="${template.compiled-soy.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
+          shouldGenerateJsdoc="true"
+          shouldProvideRequireSoyNamespaces="true" />
+    </closure-templates>
+
+    <echo file="${flagfile.txt}"
+        message='--compilation_level=SIMPLE_OPTIMIZATIONS
+        --formatting=PRETTY_PRINT --warning_level=VERBOSE' />
+    <java jar="${builderplus.jar}" fork="true" failonerror="true">
+      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg value="--force_recompile" />
+      <arg value='--output_file="${template.compiled.js}"' />
+      <arg line="--output_mode=compiled" />
+      <arg line='--main_source="${template.js.dir}/template.js"' />
+      <arg line='--main_source="${template.compiled-soy.dir}/soy-template.js"' />
+      <arg line='--root "${closure-library.dir}"' />
+      <arg line='--flagfile "${flagfile.txt}"' />
+    </java>
   </target>
 
 

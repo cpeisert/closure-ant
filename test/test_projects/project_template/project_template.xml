@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+================================================================================
+  Properties and configuration settings for "project101" project.
+================================================================================
+-->
+<project name="project_template">
+
+  <dirname property="template.dir" file="${ant.file.project_template}" />
+  <property name="test.dir" location="${template.dir}/../.." />
+  <property name="antunit.dir" location="${test.dir}/antunit" />
+  <property name="antunit.build.dir" location="${test.dir}/build/antunit" />
+  <property name="template.output.dir"
+      location="${antunit.build.dir}/project_template" />
+  <property name="template.compiled-soy.dir"
+      location="${template.output.dir}/compiled-soy" />
+  <property name="template.css.dir" location="${template.dir}/css" />
+  <property name="template.html.dir" location="${template.dir}/html" />
+  <property name="template.js.dir" location="${template.dir}/js" />
+  <property name="template.soy.dir" location="${template.dir}/soy" />
+  <property name="template.index.html"
+      location="${template.html.dir}/index.html" />
+  <property name="template.compiled.js"
+      location="${template.output.dir}/template.compiled.js" />
+
+</project>

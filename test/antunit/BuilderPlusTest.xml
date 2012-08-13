@@ -44,6 +44,7 @@ limitations under the License.
   </path>
 
   <import file="${test.dir}/test_projects/project101/project101.xml" />
+  <import file="${test.dir}/test_projects/project_template/project_template.xml" />
 
   
   <!--
@@ -62,6 +63,13 @@ limitations under the License.
     <copy todir="${json-in-style.soy-output.dir}/images">
       <fileset dir="${json-in-style.dir}/images" />
     </copy>
+
+    <mkdir dir="${template.output.dir}" />
+    <copy todir="${template.output.dir}">
+      <fileset dir="${template.css.dir}" includes="**/*.css" />
+      <fileset dir="${template.html.dir}" includes="**/*.html" />
+    </copy>
+    <mkdir dir="${template.compiled-soy.dir}" />
   </target>
 
 
@@ -217,6 +225,25 @@ limitations under the License.
     </builder-plus>
 
     <assertLogContains text="Output file up-to-date. Compilation skipped." />
+  </target>
+
+
+  <target name="testAutoInclude_soyutils_usegoog">
+    <closure-templates>
+      <soyfileset dir="${template.soy.dir}" includes="**/*.soy" />
+      <compiletojs codeStyle="STRINGBUILDER"
+          outputPathFormat="${template.compiled-soy.dir}/{INPUT_FILE_NAME_NO_EXT}.js"
+          shouldGenerateJsdoc="true"
+          shouldProvideRequireSoyNamespaces="true" />
+    </closure-templates>
+
+    <builder-plus outputMode="compiled" outputfile="${template.compiled.js}">
+      <mainsources dir="${template.js.dir}" includes="**/*.js" />
+      <mainsources dir="${template.compiled-soy.dir}" includes="**/*.js" />
+      <roots dir="${closure-library.dir}" />
+      <compiler compilationLevel="SIMPLE" prettyPrint="true"
+          warninglevel="VERBOSE" />
+    </builder-plus>
   </target>
 
 

@@ -19,6 +19,7 @@ package org.closureant.builderplus.cli;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
@@ -27,11 +28,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.common.io.Resources;
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 
 import org.closureant.ClosureCompiler;
+import org.closureant.base.BuildCache;
 import org.closureant.base.JsClosureSourceFile;
 import org.closureant.base.SourceFileFactory;
 import org.closureant.builderplus.BuilderPlusUtil;
@@ -256,6 +260,10 @@ public final class BuilderPlusRunner {
    * after its dependencies, unless the flag {@link #keepOriginalOrder} is set
    * to {@code true}, in which case the sources are not sorted.
    *
+   * <p>If a {@link org.closureant.deps.MissingProvideException} is thrown due
+   * to goog.required namespace "soy" not being provided, then
+   * soyutils_usegoog.js will be automatically added to the manifest.</p>
+   *
    * <p>If a CSS renaming map is specified, it will be written to a temporary
    * file and added to the manifest. See {@link
    * org.closureant.BuilderPlus#setCssRenamingMap(String)}.</p>
@@ -319,7 +327,35 @@ public final class BuilderPlusRunner {
 
     System.out.println("Building dependency tree...");
 
-    List<JsClosureSourceFile> manifestList = builder.toManifestList();
+    List<JsClosureSourceFile> manifestList = null;
+
+    try {
+      manifestList = builder.toManifestList();
+    } catch (Exception e) {
+      // If needed, at soyutils_usegoog.js to the manifest.
+      if (e.getMessage()
+          .contains("goog.required namespace \"soy\" never provided")) {
+
+        String soyutilsCode = Resources.toString(
+            Resources.getResource(getClass(), "/soyutils_usegoog.js"),
+            Charsets.UTF_8);
+        File tempSoyUtilsUseGoog = new File(outputDirectory,
+            "soyutils_usegoog.js");
+        Files.write(soyutilsCode, tempSoyUtilsUseGoog, Charsets.UTF_8);
+        System.out.println("Adding soyutils_usegoog.js to manifest... ["
+            + tempSoyUtilsUseGoog.getAbsolutePath() + "]");
+        JsClosureSourceFile soyUtilsUseGoog = SourceFileFactory
+            .newJsClosureSourceFile(tempSoyUtilsUseGoog);
+        builder.source(soyUtilsUseGoog);
+        try {
+          manifestList = builder.toManifestList();
+        } catch (Exception e2) {
+          throw Throwables.propagate(e2);
+        }
+      } else {
+        throw Throwables.propagate(e);
+      }
+    }
 
     if (this.cssRenamingMap != null && !this.cssRenamingMap.isEmpty()) {
       JsClosureSourceFile tempRenamingMap =

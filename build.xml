@@ -296,6 +296,9 @@ no Ant, Closure Stylesheets, Closure Templates, Gson, or Guava classes).
         <include name="**/*.txt" />
         <include name="**/*.xml" />
       </fileset>
+      <fileset dir="${resources.dir}">
+        <include name="soyutils*.js" />
+      </fileset>
     </jar>
   </target>
   

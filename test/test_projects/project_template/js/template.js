@@ -18,10 +18,8 @@ goog.provide('ns');
 
 goog.require('goog.dom');
 goog.require('goog.events');
+goog.require('goog.soy');
 goog.require('ns.soy');
-goog.require('soy');
-
-// goog.require('goog.soy');
 
 
 /**
@@ -31,11 +29,9 @@ goog.require('soy');
  */
 ns.printStringAsUnorderedList = function(items) {
   var itemArray = items.split(/\s+|,/);
-  soy.renderElement(document.querySelector('#listOutput'),
-      ns.soy.printListAsUL, {'list': itemArray});
 
-  /*goog.soy.renderElement(document.querySelector('#listOutput'),
-  ns.soy.printListAsUL, {'list': itemArray});*/
+  goog.soy.renderElement(document.querySelector('#listOutput'),
+      ns.soy.printListAsUL, {'list': itemArray});
 };
 
 
@@ -52,9 +48,8 @@ ns.onInputChange = function() {
  * Entry point for app.
  */
 ns.main = function() {
-  var itemsInputEl = document.querySelector('#itemsInput');
   goog.events.listen(
-      itemsInputEl,
+      document.querySelector('#itemsInput'),
       goog.events.EventType.CHANGE,
       ns.onInputChange);
 };
