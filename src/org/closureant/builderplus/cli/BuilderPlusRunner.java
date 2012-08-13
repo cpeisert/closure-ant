@@ -23,19 +23,17 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+import com.google.common.io.Resources;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.google.common.io.Resources;
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 
 import org.closureant.ClosureCompiler;
-import org.closureant.base.BuildCache;
 import org.closureant.base.JsClosureSourceFile;
 import org.closureant.base.SourceFileFactory;
 import org.closureant.builderplus.BuilderPlusUtil;
