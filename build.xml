@@ -315,6 +315,9 @@ no Ant, Closure Stylesheets, Closure Templates, Gson, or Guava classes).
   <target name="javadoc"
       description="Generates complete javadoc.">
     <mkdir dir="${javadoc.dir}" />
+    <tstamp>
+      <format property="YEAR" pattern="yyyy" />
+    </tstamp>
     <javadoc
         sourcepath="${src.dir}"
         additionalparam="-notimestamp"
