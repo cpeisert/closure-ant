@@ -108,14 +108,14 @@ limitations under the License.
   </target>
 
 
-  <target name="plovr-advanced" depends="init, compile-templates">
+  <target name="plovr-advanced" depends="init">
     <plovr plovrMode="build" forceRecompile="true"
         configID="myapp"
         outputfile="${template.compiled.js}">
       <!--<externsfileset dir="${template.dir}/externs" includes="*.js" />
       <externslist externs="//chrome_extensions.js" />-->
       <inputs dir="${template.js.dir}" includes="**/*.js" />
-      <sources dir="${compiled-soy.dir}" includes="**/*.js" />
+      <paths dir="${template.soy.dir}" />
       <compiler compilationMode="advanced" warninglevel="VERBOSE">
         <compilercheck name="checkVars" value="WARNING" />
       </compiler>
