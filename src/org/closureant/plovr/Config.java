@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.base;
+package org.closureant.plovr;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.closureant.types.CompileTimeDefines;
 import org.closureant.types.ExperimentalCompilerOptions;
-import org.closureant.types.PlovrOutputModuleCollection;
 
 /**
  * TODO(cpeisert): add support for test-drivers config option
@@ -40,7 +39,7 @@ import org.closureant.types.PlovrOutputModuleCollection;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class PlovrConfig {
+public final class Config {
   
   public String id;
   
@@ -84,7 +83,7 @@ public final class PlovrConfig {
 
   public Boolean fingerprint;
 
-  public PlovrOutputModuleCollection modules;
+  public ModuleCollection modules;
 
   @SerializedName("module-output-path")
   public String moduleOutputPath;
@@ -154,9 +153,9 @@ public final class PlovrConfig {
   public List<String> testExcludes;
 
   /**
-   * Constructs a PlovrConfig object.
+   * Constructs a Config object.
    */
-  public PlovrConfig() {
+  public Config() {
     this.id = null;
     this.inputs = Lists.newArrayList();
     this.paths = Lists.newArrayList();
@@ -174,7 +173,7 @@ public final class PlovrConfig {
     this.outputWrapper = Lists.newArrayList();
     this.outputCharset = null;
     this.fingerprint = null;
-    this.modules = new PlovrOutputModuleCollection();
+    this.modules = new ModuleCollection();
     this.moduleOutputPath = null;
     this.moduleProductionURI = null;
     this.moduleInfoPath = null;

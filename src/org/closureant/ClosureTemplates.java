@@ -40,15 +40,15 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
 
-import org.closureant.types.SoyActiveDelegatePackageList;
-import org.closureant.types.SoyJavaParseInfo;
-import org.closureant.types.SoyJsSrcOptionsAntType;
+import org.closureant.soy.ActiveDelegatePackageList;
+import org.closureant.soy.JavaParseInfo;
+import org.closureant.soy.SoyJsSrcOptionsAntType;
 import org.closureant.soy.SoySourceFile;
+import org.closureant.soy.TemplateRenderOptions;
+import org.closureant.soy.TranslationOptions;
 import org.closureant.util.AntUtil;
 import org.closureant.types.ClassNameList;
 import org.closureant.types.NameValuePair;
-import org.closureant.types.SoyTemplateRenderOptions;
-import org.closureant.types.SoyTranslationOptions;
 import org.closureant.css.CssRenamingMap;
 import org.closureant.soy.SoyHelper;
 
@@ -72,12 +72,12 @@ public final class ClosureTemplates extends Task {
 
   // Nested elements
   private final Set<String> activeDelegatePackageNames;
-  private SoyJavaParseInfo soyJavaParseInfo;
+  private JavaParseInfo javaParseInfo;
   private SoyJsSrcOptions jsSrcOptions;
   private final List<String> pluginModules;
   private final List<FileSet> soyFileSets;
-  private final List<SoyTemplateRenderOptions> templatesToBeRendered;
-  private SoyTranslationOptions translationOptions;
+  private final List<TemplateRenderOptions> templatesToBeRendered;
+  private TranslationOptions translationOptions;
 
   /**
    * Constructs a new SoyToJsSrcCompiler Ant task.
@@ -108,7 +108,7 @@ public final class ClosureTemplates extends Task {
 
     // Nested elements
     this.activeDelegatePackageNames = Sets.newHashSet();
-    this.soyJavaParseInfo = null;
+    this.javaParseInfo = null;
     this.jsSrcOptions = null;
     this.pluginModules = Lists.newArrayList();
     this.soyFileSets = Lists.newArrayList();
@@ -269,12 +269,12 @@ public final class ClosureTemplates extends Task {
    * href="https://developers.google.com/closure/templates/docs/commands#deltemplate">
    * deltemplate, delcall, delpackage</a>.
    *
-   * @param soyActiveDelegatePackageList list of the active delegate packages
+   * @param activeDelegatePackageList list of the active delegate packages
    */
   public void addConfiguredActiveDelegatePackageList(
-      SoyActiveDelegatePackageList soyActiveDelegatePackageList) {
+      ActiveDelegatePackageList activeDelegatePackageList) {
     this.activeDelegatePackageNames.addAll(
-        soyActiveDelegatePackageList.getPackages());
+        activeDelegatePackageList.getPackages());
   }
 
   /**
@@ -318,11 +318,11 @@ public final class ClosureTemplates extends Task {
    * error-prone process of manually typing template and parameter names as
    * strings. There will be one Java class per Soy file.
    *
-   * @param soyJavaParseInfo the settings for generating Java parse info classes
+   * @param javaParseInfo the settings for generating Java parse info classes
    */
-  public void addConfiguredJavaParseInfo(SoyJavaParseInfo soyJavaParseInfo) {
-    if (this.soyJavaParseInfo == null) {
-      this.soyJavaParseInfo = soyJavaParseInfo;
+  public void addConfiguredJavaParseInfo(JavaParseInfo javaParseInfo) {
+    if (this.javaParseInfo == null) {
+      this.javaParseInfo = javaParseInfo;
     } else {
       throw new BuildException("nested element javaParseInfo may only "
           + " be used once per <" + getTaskName() + "> task");
@@ -331,7 +331,7 @@ public final class ClosureTemplates extends Task {
 
   /**
    * Options for compiling Soy templates to JavaScript. See {@link
-   * org.closureant.types.SoyJsSrcOptionsAntType}.
+   * org.closureant.soy.SoyJsSrcOptionsAntType}.
    *
    * @param soyToJsCompileOptions the JavaScript source options
    * @throws BuildException if the outputPathFormat attribute is {@code null}
@@ -383,10 +383,9 @@ public final class ClosureTemplates extends Task {
   }
 
   /**
-   * An set of Soy files. A {@code soyfiles} nested element is an Ant
-   * {@link org.apache.tools.ant.types.FileSet}, hence it supports the same
-   * attributes and nested elements as {@link
-   * org.apache.tools.ant.types.FileSet}.
+   * Adds a set of Soy files. A {@literal <soyfileset>} nested element is an
+   * Ant {@link org.apache.tools.ant.types.FileSet}, hence it supports the same
+   * parameters as {@link org.apache.tools.ant.types.FileSet}.
    *
    * @param soyFiles a {@link org.apache.tools.ant.types.FileSet} containing
    *     Soy files
@@ -402,17 +401,17 @@ public final class ClosureTemplates extends Task {
    * @param templateRenderOptions the options for rendering a Soy template
    */
   public void addConfiguredRenderTemplate(
-      SoyTemplateRenderOptions templateRenderOptions) {
+      TemplateRenderOptions templateRenderOptions) {
     this.templatesToBeRendered.add(templateRenderOptions);
   }
 
   /**
-   * Soy options for i18n. See {@link SoyTranslationOptions}.
+   * Soy options for i18n. See {@link org.closureant.soy.TranslationOptions}.
    *
    * @param translationOptions the i18n options
    */
   public void addConfiguredTranslation(
-      SoyTranslationOptions translationOptions) {
+      TranslationOptions translationOptions) {
     if (this.translationOptions == null) {
       this.translationOptions = translationOptions;
     } else {
@@ -437,10 +436,10 @@ public final class ClosureTemplates extends Task {
     this.soyHelperBuilder.activeDelegatePackageNames(
         this.activeDelegatePackageNames);
 
-    if (this.soyJavaParseInfo != null) {
+    if (this.javaParseInfo != null) {
       this.soyHelperBuilder.javaParseInfo(
-          this.soyJavaParseInfo.getOutputJavaPackage(),
-          this.soyJavaParseInfo.getSourceOfClassnames());
+          this.javaParseInfo.getOutputJavaPackage(),
+          this.javaParseInfo.getSourceOfClassnames());
     }
     if (this.jsSrcOptions != null) {
       this.soyHelperBuilder.soyJsSrcOptions(this.jsSrcOptions);
@@ -571,14 +570,14 @@ public final class ClosureTemplates extends Task {
 
     // Generate Java parse info.
 
-    if (this.soyJavaParseInfo != null) {
-      if (this.soyJavaParseInfo.getOutputDirectory() == null) {
+    if (this.javaParseInfo != null) {
+      if (this.javaParseInfo.getOutputDirectory() == null) {
         throw new BuildException("<javaParseInfo> specified but the "
             + "outputDirectory attribute was not set");
       }
       log("Generating Java parse information files...");
 
-      File outputDir = this.soyJavaParseInfo.getOutputDirectory();
+      File outputDir = this.javaParseInfo.getOutputDirectory();
 
       Map<String, String> fileNameToParseInfo = soyHelper.generateParseInfo();
       for (Map.Entry<String, String> entry : fileNameToParseInfo.entrySet()) {
@@ -600,7 +599,7 @@ public final class ClosureTemplates extends Task {
       log("Rendering " + this.templatesToBeRendered.size() + " Soy "
           + templateOrTemplates + "...");
 
-      for (SoyTemplateRenderOptions template : this.templatesToBeRendered) {
+      for (TemplateRenderOptions template : this.templatesToBeRendered) {
         if (template.getOutputPathFormat() == null) {
           throw new BuildException("<rendertemplate> specified for "
               + "template " + template.getFullTemplateName() + " but the "
@@ -693,7 +692,7 @@ public final class ClosureTemplates extends Task {
    * @return the new output path
    */
   private String replaceRenderedOutputPathPlaceholders(String outputPathFormat,
-      SoyTemplateRenderOptions template, String locale) {
+      TemplateRenderOptions template, String locale) {
     String newPath = outputPathFormat;
 
     newPath = newPath.replaceAll("(?i)\\{TEMPLATE_NAME\\}",

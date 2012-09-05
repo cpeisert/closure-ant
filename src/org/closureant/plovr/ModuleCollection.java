@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.plovr;
 
 import com.google.common.collect.Lists;
 
@@ -27,7 +27,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * An object to store {@link PlovrOutputModule} objects to be serialized to a
+ * An object to store {@link Module} objects to be serialized to a
  * plovr JSON config files.
  *
  * <p>This object provides a custom Gson serializer to ensure that the
@@ -35,14 +35,14 @@ import java.util.List;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class PlovrOutputModuleCollection {
+public final class ModuleCollection {
 
-  private final List<PlovrOutputModule> modules;
+  private final List<Module> modules;
 
   /**
    * Constructs a new object to store modules.
    */
-  public PlovrOutputModuleCollection() {
+  public ModuleCollection() {
     this.modules = Lists.newArrayList();
   }
 
@@ -58,14 +58,14 @@ public final class PlovrOutputModuleCollection {
    *
    * @param module a Closure JavaScript module
    */
-  public void add(PlovrOutputModule module) {
+  public void add(Module module) {
     modules.add(module);
   }
 
   /**
    * @return the list of modules
    */
-  public List<PlovrOutputModule> getModules() {
+  public List<Module> getModules() {
     return modules;
   }
 
@@ -74,13 +74,13 @@ public final class PlovrOutputModuleCollection {
    * modules conforms to the plovr config-file specification.
    */
   public class Serializer
-      implements JsonSerializer<PlovrOutputModuleCollection> {
-    public JsonElement serialize(PlovrOutputModuleCollection src,
+      implements JsonSerializer<ModuleCollection> {
+    public JsonElement serialize(ModuleCollection src,
                                  Type typeOfSrc,
                                  JsonSerializationContext context) {
       JsonObject mapOfModules = new JsonObject();
       
-      for (PlovrOutputModule module : modules) {
+      for (Module module : modules) {
         JsonObject jsonModule = new JsonObject();
 
         jsonModule.add("inputs", context.serialize(module.getInputs()));

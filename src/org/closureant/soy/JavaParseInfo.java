@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.soy;
 
 import java.io.File;
 
@@ -29,13 +29,13 @@ import org.apache.tools.ant.BuildException;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class SoyJavaParseInfo {
+public final class JavaParseInfo {
 
   private File outputDirectory;
   private String outputJavaPackage;
   private String sourceOfClassnames;
 
-  public SoyJavaParseInfo() {
+  public JavaParseInfo() {
     this.outputDirectory = null;
     this.sourceOfClassnames = null;
     this.outputJavaPackage = null;

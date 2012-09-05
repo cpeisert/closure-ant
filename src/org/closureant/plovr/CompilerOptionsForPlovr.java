@@ -14,12 +14,14 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.plovr;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.Parameter;
 
-import org.closureant.base.PlovrConfig;
+import org.closureant.types.CompilerOptionsBasic;
+import org.closureant.types.IdGenerator;
+import org.closureant.types.StringNestedElement;
 
 /**
  * Closure Compiler object providing compiler options for nested
@@ -511,12 +513,12 @@ public interface CompilerOptionsForPlovr extends CompilerOptionsBasic {
   void addTypePrefixToStrip(StringNestedElement typePrefix);
 
   /**
-   * Creates a {@link org.closureant.base.PlovrConfig} object with the compiler
+   * Creates a {@link Config} object with the compiler
    * options set based on the field values of this object.
    *
    * @param project the Ant project
    * @return a plovr config file object
    * @throws org.apache.tools.ant.BuildException on error
    */
-  PlovrConfig toPlovrConfig(Project project);
+  Config toPlovrConfig(Project project);
 }

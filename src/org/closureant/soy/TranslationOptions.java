@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.closureant.types;
+package org.closureant.soy;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class SoyTranslationOptions {
+public final class TranslationOptions {
 
   // Attributes
   private String extractedMessagesOutputFile;
@@ -53,7 +53,7 @@ public final class SoyTranslationOptions {
   /**
    * Constructs a new Ant type to store Soy translation related preferences.
    */
-  public SoyTranslationOptions() {
+  public TranslationOptions() {
     this.extractedMessagesOutputFile = null;
     this.messagePluginClasspath = null;
     this.messagePluginModule = null;

@@ -112,6 +112,8 @@ limitations under the License.
     <plovr plovrMode="build" forceRecompile="true"
         configID="myapp"
         outputfile="${template.compiled.js}">
+      <!--<externsfileset dir="${template.dir}/externs" includes="*.js" />
+      <externslist externs="//chrome_extensions.js" />-->
       <inputs dir="${template.js.dir}" includes="**/*.js" />
       <sources dir="${compiled-soy.dir}" includes="**/*.js" />
       <compiler compilationMode="advanced" warninglevel="VERBOSE">

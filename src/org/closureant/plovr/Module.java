@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.plovr;
 
 import com.google.common.collect.Lists;
 
@@ -27,8 +27,7 @@ import org.apache.tools.ant.types.FileSet;
 import org.closureant.util.AntUtil;
 
 /**
- * Data type for {@literal <module>} nested element of the
- * {@link org.closureant.Plovr}.
+ * Data type for {@literal <module>} nested element of {@link org.closureant.Plovr} Ant task.
  *
  * <ul class="blockList">
  * <li class="blockList">
@@ -121,7 +120,7 @@ import org.closureant.util.AntUtil;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class PlovrOutputModule extends DataType {
+public final class Module extends DataType {
 
   // Attributes
 
@@ -129,10 +128,10 @@ public final class PlovrOutputModule extends DataType {
   
   // Nested Elements
 
-  private final List<PlovrOutputModuleDep> deps;
+  private final List<ModuleDep> deps;
   private final List<FileSet> inputs;
 
-  public PlovrOutputModule() {
+  public Module() {
     this.deps = Lists.newArrayList();
     this.inputs = Lists.newArrayList();    
   }
@@ -156,7 +155,7 @@ public final class PlovrOutputModule extends DataType {
    *
    * @param dep a module dependency
    */
-  public void addDep(PlovrOutputModuleDep dep) {
+  public void addDep(ModuleDep dep) {
     this.deps.add(dep);
   }
 
@@ -192,7 +191,7 @@ public final class PlovrOutputModule extends DataType {
   public List<String> getDeps() {
     List<String> depList = Lists.newArrayList();
 
-    for (PlovrOutputModuleDep dep : deps) {
+    for (ModuleDep dep : deps) {
       depList.add(dep.getModule());
     }
     return depList;

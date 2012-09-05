@@ -16,28 +16,38 @@
 
 package org.closureant.types;
 
+import java.util.List;
+
 /**
- * Data type for simple nested elements that represent the name of a module
- * dependency for the plovr task nested element {@literal <module>}.
+ * Data type for nested elements that have an {@code externs} attribute
+ * that accepts a list of externs file names separated by whitespace and/or
+ * commas.
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class PlovrOutputModuleDep {
+public final class ExternsList extends StringList {
 
-  private String module;
-
-  public PlovrOutputModuleDep() {
-    this.module = "";
+  public ExternsList() {
+    super();
   }
 
   /**
-   * @param module the module dependency name
+   * Sets the externs files, where each file may be delimited by whitespace
+   * and/or commas.
+   *
+   * @param externs list of externs files delimited by whitespace and/or
+   *     commas
    */
-  public void setModule(String module) {
-    this.module = module;
+  public void setExterns(String externs) {
+    setListOfStrings(externs);
   }
 
-  public String getModule() {
-    return this.module;
+  /**
+   * Gets the list of externs files.
+   *
+   * @return a {@link java.util.List} of externs
+   */
+  public List<String> getExterns() {
+    return getListOfStrings();
   }
 }

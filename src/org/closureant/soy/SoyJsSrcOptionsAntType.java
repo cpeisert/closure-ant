@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.closureant.types;
+package org.closureant.soy;
 
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import org.apache.tools.ant.BuildException;

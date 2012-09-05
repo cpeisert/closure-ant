@@ -14,7 +14,9 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.soy;
+
+import org.closureant.types.StringList;
 
 import java.util.List;
 
@@ -25,9 +27,9 @@ import java.util.List;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class SoyActiveDelegatePackageList extends StringList {
+public final class ActiveDelegatePackageList extends StringList {
 
-  public SoyActiveDelegatePackageList() {
+  public ActiveDelegatePackageList() {
     super();
   }
 

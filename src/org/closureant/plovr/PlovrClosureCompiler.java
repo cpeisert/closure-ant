@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.plovr;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -28,7 +28,11 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Parameter;
 
-import org.closureant.base.PlovrConfig;
+import org.closureant.types.AbstractClosureCompiler;
+import org.closureant.types.ExperimentalCompilerOptions;
+import org.closureant.types.IdGenerator;
+import org.closureant.types.NameValuePair;
+import org.closureant.types.StringNestedElement;
 import org.closureant.util.AntUtil;
 
 /**
@@ -616,63 +620,63 @@ public final class PlovrClosureCompiler extends AbstractClosureCompiler {
   }
 
   /**
-   * Creates a {@link PlovrConfig} object with the compiler options set based
+   * Creates a {@link Config} object with the compiler options set based
    * on the field values of this {@literal <compiler>} nested element.
    *
    * @return a plovr config file object
    * @throws org.apache.tools.ant.BuildException on error
    */
-  public PlovrConfig toPlovrConfig() {
-    PlovrConfig plovrConfig = new PlovrConfig();
+  public Config toPlovrConfig() {
+    Config config = new Config();
 
     // Attributes inherited from AbstractClosureCompiler
 
     if (this.customExternsOnly != null) {
-      plovrConfig.customExternsOnly = this.customExternsOnly;
+      config.customExternsOnly = this.customExternsOnly;
     }
     if (this.debug != null) {
-      plovrConfig.debug = this.debug;
+      config.debug = this.debug;
     }
     if (!this.languageIn.isEmpty()) {
-      plovrConfig.experimentalCompilerOptions.put("languageIn",
+      config.experimentalCompilerOptions.put("languageIn",
           new JsonPrimitive(this.languageIn));
     }
     if (!this.outputWrapper.isEmpty()) {
-      plovrConfig.outputWrapper.add(this.outputWrapper);
+      config.outputWrapper.add(this.outputWrapper);
     }
     for (StringNestedElement outputWrapperElement :
         this.outputWrapperNestedElement) {
-      plovrConfig.outputWrapper.add(outputWrapperElement.getValue());
+      config.outputWrapper.add(outputWrapperElement.getValue());
     }
     if (this.prettyPrint != null) {
-      plovrConfig.prettyPrint = this.prettyPrint;
+      config.prettyPrint = this.prettyPrint;
     }
     if (this.printInputDelimiter != null) {
-      plovrConfig.printInputDelimiter = this.printInputDelimiter;
+      config.printInputDelimiter = this.printInputDelimiter;
     }
-    plovrConfig.propertyMapInputFile = 
+    config.propertyMapInputFile =
         Strings.emptyToNull(this.propertyMapInputFile);
-    plovrConfig.propertyMapOutputFile =
+    config.propertyMapOutputFile =
         Strings.emptyToNull(this.propertyMapOutputFile);
-    plovrConfig.variableMapInputFile =
+    config.variableMapInputFile =
         Strings.emptyToNull(this.variableMapInputFile);
-    plovrConfig.variableMapOutputFile =
+    config.variableMapOutputFile =
         Strings.emptyToNull(this.variableMapOutputFile);
-    plovrConfig.level = Strings.emptyToNull(this.warningLevel);
+    config.level = Strings.emptyToNull(this.warningLevel);
 
 
     // Attributes implemented in PlovrClosureCompiler
 
     if (this.ambiguateProperties != null) {
-      plovrConfig.ambiguateProperties = this.ambiguateProperties;
+      config.ambiguateProperties = this.ambiguateProperties;
     }
-    plovrConfig.mode = this.compilationLevel.toString();
+    config.mode = this.compilationLevel.toString();
     if (this.disambiguateProperties != null) {
-      plovrConfig.disambiguateProperties = this.disambiguateProperties;
+      config.disambiguateProperties = this.disambiguateProperties;
     }
-    plovrConfig.outputCharset = this.outputCharset;
+    config.outputCharset = this.outputCharset;
     if (this.sourceMapFormat != null) {
-      plovrConfig.experimentalCompilerOptions.put("sourceMapFormat",
+      config.experimentalCompilerOptions.put("sourceMapFormat",
           new JsonPrimitive(this.sourceMapFormat));
     }
 
@@ -680,7 +684,7 @@ public final class PlovrClosureCompiler extends AbstractClosureCompiler {
     // command line option --create_source_map
 
     if (this.treatWarningsAsErrors != null) {
-      plovrConfig.treatWarningsAsErrors = this.treatWarningsAsErrors;
+      config.treatWarningsAsErrors = this.treatWarningsAsErrors;
     }
 
 
@@ -691,7 +695,7 @@ public final class PlovrClosureCompiler extends AbstractClosureCompiler {
       if ("OFF".equals(checkLevelUpperCase)
           || "WARNING".equals(checkLevelUpperCase)
           || "ERROR".equals(checkLevelUpperCase)) {
-        plovrConfig.checks.put(pair.getName(), checkLevelUpperCase);
+        config.checks.put(pair.getName(), checkLevelUpperCase);
       } else {
         throw new BuildException("compiler check level expected to be one of "
             + "\"OFF\", \"WARNING\", or \"ERROR\" but was \""
@@ -700,14 +704,14 @@ public final class PlovrClosureCompiler extends AbstractClosureCompiler {
     }
 
     for (Map.Entry<String, JsonPrimitive> define : this.defines.entrySet()) {
-      plovrConfig.define.put(define.getKey(), define.getValue());
+      config.define.put(define.getKey(), define.getValue());
     }
     
     for (FileSet externFiles : externs) {
       List<File> listOfExterns = 
           AntUtil.getListOfFilesFromAntFileSet(getProject(), externFiles);
       for (File extern : listOfExterns) {
-        plovrConfig.externs.add(extern.getAbsolutePath());
+        config.externs.add(extern.getAbsolutePath());
       }
     }
 
@@ -716,25 +720,25 @@ public final class PlovrClosureCompiler extends AbstractClosureCompiler {
 
     for (Map.Entry<String, JsonPrimitive> compilerOption :
         this.experimentalCompilerOptions.entrySet()) {
-      plovrConfig.experimentalCompilerOptions.put(compilerOption.getKey(),
+      config.experimentalCompilerOptions.put(compilerOption.getKey(),
           compilerOption.getValue());
     }
 
     for (IdGenerator idGenerator : this.idGenerators) {
-      plovrConfig.idGenerators.add(idGenerator.getIdGenerator());
+      config.idGenerators.add(idGenerator.getIdGenerator());
     }
 
     for (StringNestedElement nameSuffixToStrip : this.nameSuffixesToStrip) {
-      plovrConfig.nameSuffixesToStrip.add(nameSuffixToStrip.getValue());
+      config.nameSuffixesToStrip.add(nameSuffixToStrip.getValue());
     }
 
     // Note: outputWrapperNestedElement already handled above with
     // {@code this.outputWrapper}
 
     for (StringNestedElement typePrefixToStrip : this.typePrefixesToStrip) {
-      plovrConfig.typePrefixesToStrip.add(typePrefixToStrip.getValue());
+      config.typePrefixesToStrip.add(typePrefixToStrip.getValue());
     }
 
-    return plovrConfig;
+    return config;
   }
 }

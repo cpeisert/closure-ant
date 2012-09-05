@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.closureant.types;
+package org.closureant.soy;
 
 import com.google.template.soy.data.SoyMapData;
 
@@ -30,7 +30,7 @@ import org.closureant.types.JsonText;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public final class SoyTemplateRenderOptions {
+public final class TemplateRenderOptions {
 
   // Attributes
   private String outputPathFormat;
@@ -45,7 +45,7 @@ public final class SoyTemplateRenderOptions {
    * Constructs a new Ant type to set options related to rendering Soy
    * templates.
    */
-  public SoyTemplateRenderOptions() {
+  public TemplateRenderOptions() {
     // Attributes
     this.outputPathFormat = null;
     this.templateName = null;
