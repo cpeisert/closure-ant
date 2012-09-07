@@ -126,8 +126,11 @@ limitations under the License.
 
 
   <target name="testCustomGssFunctionMapProvider">
-    <!-- Make sure the test sources have been compiled. -->
-    <ant dir="${test.dir}" target="compile" />
+    <condition property="test.src.compiled">
+      <available file="${test.build.dir}/classes/org/closureant" type="dir" />
+    </condition>
+    <fail unless="test.src.compiled"
+          message="The test sources are not compiled. Execute target 'compile' in test/build.xml." />
 
     <closure-stylesheets
         classpath="${test.build.dir}/classes"
