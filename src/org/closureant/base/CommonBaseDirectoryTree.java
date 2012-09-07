@@ -90,8 +90,10 @@ public final class CommonBaseDirectoryTree {
    * passed to the constructor.
    *
    * @return the common base directories
+   * @throws IOException if the canonical path for a directory cannot be
+   *     obtained
    */
-  public List<File> getCommonBaseDirectories() {
+  public List<File> getCommonBaseDirectories() throws IOException {
     List<File> baseDirectories = Lists.newArrayList();
 
     for (DirectoryNode child : this.root.getChildren()) {
@@ -110,12 +112,14 @@ public final class CommonBaseDirectoryTree {
    * @param currentPath the current director path for the branch level being
    *     traversed
    * @param baseDirectories list of common base directories being generated
+   * @throws IOException if the canonical path for a directory cannot be
+   *     obtained
    */
   private void getCommonBaseDirectoryPaths(DirectoryNode currentNode,
-      File currentPath, List<File> baseDirectories) {
+      File currentPath, List<File> baseDirectories) throws IOException {
 
     if (currentNode.isLeafNode()) {
-      baseDirectories.add(currentPath);
+      baseDirectories.add(currentPath.getCanonicalFile());
       return;
     }
 
