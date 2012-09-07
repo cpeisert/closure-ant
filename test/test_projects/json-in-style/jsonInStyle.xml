@@ -45,25 +45,67 @@ limitations under the License.
   <property name="json-in-style.soy.dir" location="${json-in-style.dir}/soy" />
   <property name="json-in-style.soy-output.dir"
       location="${antunit.build.dir}/json-in-style-soy" />
-  <property name="json-in-style.soy.compiled.js"
+
+  <property name="json-in-style.soy.compiled.js_UNSANITIZED"
       location="${json-in-style.soy-output.dir}/main.compiled.js" />
-  <property name="json-in-style.soy.raw.js"
+  <property name="json-in-style.soy.raw.js_UNSANITIZED"
       location="${json-in-style.soy-output.dir}/main.raw.js" />
-  <property name="json-in-style.soy-output.css"
+  <property name="json-in-style.soy-output.css_UNSANITIZED"
       location="${json-in-style.soy-output.dir}/stylesheet.compiled.css" />
-  <property name="json-in-style.soy.css-renaming-map.json"
+  <property name="json-in-style.soy.css-renaming-map.json_UNSANITIZED"
       location="${json-in-style.soy-output.dir}/css-renaming-map.json" />
-  <property name="json-in-style.soy-output.html"
+  <property name="json-in-style.soy-output.html_UNSANITIZED"
       location="${json-in-style.soy-output.dir}/index.html" />
 
-  <property name="json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED"
+  <property name="json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED_UNSANITIZED"
       location="${json-in-style.soy-output.dir}/renaming_CLOSURE_COMPILED.js" />
-  <property name="json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED"
+  <property name="json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED_UNSANITIZED"
       location="${json-in-style.soy-output.dir}/renaming_CLOSURE_UNCOMPILED.js" />
-  <property name="json-in-style.soy.outputRenamingMap_JSON"
+  <property name="json-in-style.soy.outputRenamingMap_JSON_UNSANITIZED"
       location="${json-in-style.soy-output.dir}/renaming.json" />
-  <property name="json-in-style.soy.outputRenamingMap_PROPERTIES"
+  <property name="json-in-style.soy.outputRenamingMap_PROPERTIES_UNSANITIZED"
       location="${json-in-style.soy-output.dir}/renaming.properties" />
+
+  <!--
+    On Windows, the JavaScript escape character '\' is used a file separator.
+    In order to keep the file paths intact when passed as JSON, ensure that
+    '/' is used as the file separator irrespective of platform. In addition,
+    the Closure Template URI sanitizer does not recognize standard file URIs
+    such as "file:///c:/Users/smith". However, on windows a file path such
+    as "/Users/smith" will be recognized as "C:\Users\smith". If using
+    Windows, it is recommended to keep project files on the C drive.
+  -->
+  <macrodef name="sanitize-path">
+    <attribute name="property" />
+    <attribute name="path-property" />
+
+    <sequential>
+      <pathconvert property="@{property}" dirsep="/">
+        <propertyresource name="@{path-property}" />
+        <regexpmapper from="^[cC]:(.*)" to="\1" />
+      </pathconvert>
+    </sequential>
+  </macrodef>
+
+  <sanitize-path property="json-in-style.soy.compiled.js"
+                 path-property="json-in-style.soy.compiled.js_UNSANITIZED" />
+  <sanitize-path property="json-in-style.soy.raw.js"
+                 path-property="json-in-style.soy.raw.js_UNSANITIZED" />
+  <sanitize-path property="json-in-style.soy-output.css"
+                 path-property="json-in-style.soy-output.css_UNSANITIZED" />
+  <sanitize-path property="json-in-style.soy.css-renaming-map.json"
+                 path-property="json-in-style.soy.css-renaming-map.json_UNSANITIZED" />
+  <sanitize-path property="json-in-style.soy-output.html"
+                 path-property="json-in-style.soy-output.html_UNSANITIZED" />
+
+  <sanitize-path property="json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED"
+                 path-property="json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED_UNSANITIZED" />
+  <sanitize-path property="json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED"
+                 path-property="json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED_UNSANITIZED" />
+  <sanitize-path property="json-in-style.soy.outputRenamingMap_JSON"
+                 path-property="json-in-style.soy.outputRenamingMap_JSON_UNSANITIZED" />
+  <sanitize-path property="json-in-style.soy.outputRenamingMap_PROPERTIES"
+                 path-property="json-in-style.soy.outputRenamingMap_PROPERTIES_UNSANITIZED" />
 
   <property name="copyright">/*
  * Copyright (C) 2012 Christopher Peisert. All Rights Reserved.
