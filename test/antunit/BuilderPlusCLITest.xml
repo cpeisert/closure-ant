@@ -86,8 +86,8 @@ limitations under the License.
 
   <target name="testOutputModeRAW">
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value='--output_file="${project101.raw.output.js}"' />
+      <arg line="--compiler_jar=${closure-compiler.jar}" />
+      <arg line='--output_file="${project101.raw.output.js}"' />
       <arg line="--output_mode 'raw'" />
       <arg line="--namespace '${project101.namespace}'" />
       <arg line='--root "${project101.js.dir}"' />
@@ -102,9 +102,9 @@ limitations under the License.
 
   <target name="testKeepMoochers">
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
+      <arg line="--compiler_jar=${closure-compiler.jar}" />
       <arg line="--keep_moochers" />
-      <arg value='--output_file="${project101.raw.output.js}"' />
+      <arg line='--output_file="${project101.raw.output.js}"' />
       <arg line="--output_mode 'raw'" />
       <arg line="--namespace '${project101.namespace}'" />
       <arg line='--root "${project101.js.dir}"' />
@@ -121,9 +121,9 @@ limitations under the License.
     <echo file="${flagfile.txt}"
         message="--compilation_level=WHITESPACE_ONLY --formatting=PRETTY_PRINT" />
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value="--force_recompile" />
-      <arg value='--output_file="${project101.whitespace-compiled.output.js}"' />
+      <arg line="--compiler_jar=${closure-compiler.jar}" />
+      <arg line="--force_recompile" />
+      <arg line='--output_file="${project101.whitespace-compiled.output.js}"' />
       <arg line="--output_mode 'compiled'" />
       <arg line="--namespace '${project101.namespace}'" />
       <arg line='--root "${project101.js.dir}"' />
@@ -145,9 +145,9 @@ limitations under the License.
         --define goog.LOCALE="de" --jscomp_warning=checkVars
         --logging_level=INFO' />
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value="--force_recompile" />
-      <arg value='--output_file="${project101.simple-compiled.output.js}"' />
+      <arg line="--compiler_jar=${closure-compiler.jar}" />
+      <arg line="--force_recompile" />
+      <arg line='--output_file="${project101.simple-compiled.output.js}"' />
       <arg line="--output_mode=compiled" />
       <arg line="--namespace '${project101.namespace}'" />
       <arg line='--root "${project101.js.dir}"' />
@@ -173,9 +173,9 @@ limitations under the License.
     <echo file="${flagfile.txt}"
         message='--compilation_level=ADVANCED_OPTIMIZATIONS' />
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value="--force_recompile" />
-      <arg value='--output_file="${project101.advanced-compiled.output.js}"' />
+      <arg line="--compiler_jar=${closure-compiler.jar}" />
+      <arg line="--force_recompile" />
+      <arg line='--output_file="${project101.advanced-compiled.output.js}"' />
       <arg line="--output_mode=compiled" />
       <arg line="--namespace '${project101.namespace}'" />
       <arg line='--root "${project101.js.dir}"' />
@@ -189,8 +189,8 @@ limitations under the License.
 
   <target name="testOutputModeMANIFEST">
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value='--output_manifest="${project101.outputManifest}"' />
+      <arg line="--compiler_jar=${closure-compiler.jar}" />
+      <arg line='--output_manifest="${project101.outputManifest}"' />
       <arg line="--output_mode 'MANIFEST'" />
       <arg line="--main_source '${project101.js.dir}/project101.js'" />
       <arg line='--root "${closure-library.dir}"' />
@@ -209,9 +209,9 @@ limitations under the License.
         location="${closure-library.dir}/closure/goog/base.js" />
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value='--output_manifest="${project101.outputManifest}"' />
-      <arg value='--output_file="${project101.raw.output.js}"' />
+      <arg line="--compiler_jar=${closure-compiler.jar}" />
+      <arg line='--output_manifest="${project101.outputManifest}"' />
+      <arg line='--output_file="${project101.raw.output.js}"' />
       <arg line="--output_mode 'raw'" />
       <arg line="--main_source '${project101.js.dir}/project101.js'" />
       <arg line='--root "${closure-library.dir}"' />
@@ -234,8 +234,8 @@ limitations under the License.
     <echo file="${flagfile.txt}"
         message='--compilation_level=WHITESPACE_ONLY --formatting=PRETTY_PRINT' />
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value='--output_file="${project101.whitespace-compiled.output.js}"' />
+      <arg line="--compiler_jar=${closure-compiler.jar}" />
+      <arg line='--output_file="${project101.whitespace-compiled.output.js}"' />
       <arg line="--output_mode=compiled" />
       <arg line="--namespace '${project101.namespace}'" />
       <arg line='--root "${project101.js.dir}"' />
@@ -245,8 +245,8 @@ limitations under the License.
 
     <!-- Compilation should be skipped. -->
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value='--output_file="${project101.whitespace-compiled.output.js}"' />
+      <arg line="--compiler_jar=${closure-compiler.jar}" />
+      <arg line='--output_file="${project101.whitespace-compiled.output.js}"' />
       <arg line="--output_mode=compiled" />
       <arg line="--namespace '${project101.namespace}'" />
       <arg line='--root "${project101.js.dir}"' />
@@ -271,9 +271,9 @@ limitations under the License.
         message='--compilation_level=SIMPLE_OPTIMIZATIONS
         --formatting=PRETTY_PRINT --warning_level=VERBOSE' />
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value="--force_recompile" />
-      <arg value='--output_file="${template.compiled.js}"' />
+      <arg line="--compiler_jar=${closure-compiler.jar}" />
+      <arg line="--force_recompile" />
+      <arg line='--output_file="${template.compiled.js}"' />
       <arg line="--output_mode=compiled" />
       <arg line='--main_source="${template.js.dir}/template.js"' />
       <arg line='--main_source="${template.compiled-soy.dir}/soy-template.js"' />
@@ -306,13 +306,13 @@ limitations under the License.
     </closure-stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}" />
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
-      <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
+      <arg line='--css_renaming_map="${json-in-style.soy.outputRenamingMap_CLOSURE_COMPILED}"' />
+      <arg line='--compiler_jar="${closure-compiler.jar}"' />
+      <arg line='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
+      <arg line='--output_file="${json-in-style.soy.compiled.js}"' />
       <arg line="--output_mode MANIFEST" />
-      <arg line="--main_source '${json-in-style.js.dir}/jsonstylemanager.js'" />
-      <arg line="--main_source '${json-in-style.js.dir}/main.js'" />
+      <arg line='--main_source "${json-in-style.js.dir}/jsonstylemanager.js"' />
+      <arg line='--main_source "${json-in-style.js.dir}/main.js"' />
       <arg line='--root "${closure-library.dir}"' />
     </java>
 
@@ -332,13 +332,13 @@ limitations under the License.
     </closure-stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}" />
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
-      <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
+      <arg line='--css_renaming_map="${json-in-style.soy.outputRenamingMap_CLOSURE_UNCOMPILED}"' />
+      <arg line='--compiler_jar="${closure-compiler.jar}"' />
+      <arg line='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
+      <arg line='--output_file="${json-in-style.soy.compiled.js}"' />
       <arg line="--output_mode MANIFEST" />
-      <arg line="--main_source '${json-in-style.js.dir}/jsonstylemanager.js'" />
-      <arg line="--main_source '${json-in-style.js.dir}/main.js'" />
+      <arg line='--main_source "${json-in-style.js.dir}/jsonstylemanager.js"' />
+      <arg line='--main_source "${json-in-style.js.dir}/main.js"' />
       <arg line='--root "${closure-library.dir}"' />
     </java>
 
@@ -358,13 +358,13 @@ limitations under the License.
     </closure-stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_JSON}" />
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
-      <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
+      <arg line='--css_renaming_map="${json-in-style.soy.outputRenamingMap_JSON}"' />
+      <arg line='--compiler_jar="${closure-compiler.jar}"' />
+      <arg line='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
+      <arg line='--output_file="${json-in-style.soy.compiled.js}"' />
       <arg line="--output_mode COMPILED" />
-      <arg line="--main_source '${json-in-style.js.dir}/jsonstylemanager.js'" />
-      <arg line="--main_source '${json-in-style.js.dir}/main.js'" />
+      <arg line='--main_source "${json-in-style.js.dir}/jsonstylemanager.js"' />
+      <arg line='--main_source "${json-in-style.js.dir}/main.js"' />
       <arg line='--root "${closure-library.dir}"' />
     </java>
 
@@ -385,13 +385,13 @@ limitations under the License.
     </closure-stylesheets>
 
     <java jar="${builderplus.jar}" fork="true" failonerror="true">
-      <arg value="--css_renaming_map_properties_file=${json-in-style.soy.outputRenamingMap_PROPERTIES}" />
-      <arg value="--compiler_jar=${closure-compiler.jar}" />
-      <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
-      <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
+      <arg line='--css_renaming_map_properties_file="${json-in-style.soy.outputRenamingMap_PROPERTIES}"' />
+      <arg line='--compiler_jar="${closure-compiler.jar}"' />
+      <arg line='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
+      <arg line='--output_file="${json-in-style.soy.compiled.js}"' />
       <arg line="--output_mode MANIFEST" />
-      <arg line="--main_source '${json-in-style.js.dir}/jsonstylemanager.js'" />
-      <arg line="--main_source '${json-in-style.js.dir}/main.js'" />
+      <arg line='--main_source "${json-in-style.js.dir}/jsonstylemanager.js"' />
+      <arg line='--main_source "${json-in-style.js.dir}/main.js"' />
       <arg line='--root "${closure-library.dir}"' />
     </java>
 
@@ -422,14 +422,14 @@ limitations under the License.
     <expectfailure>
       <!-- May not specify both JSON and Properties file renaming maps. -->
       <java jar="${builderplus.jar}" fork="true" failonerror="true">
-        <arg value="--css_renaming_map=${json-in-style.soy.outputRenamingMap_JSON}" />
-        <arg value="--css_renaming_map_properties_file=${json-in-style.soy.outputRenamingMap_PROPERTIES}" />
-        <arg value="--compiler_jar=${closure-compiler.jar}" />
-        <arg value='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
-        <arg value='--output_file="${json-in-style.soy.compiled.js}"' />
+        <arg line='--css_renaming_map="${json-in-style.soy.outputRenamingMap_JSON}"' />
+        <arg line='--css_renaming_map_properties_file="${json-in-style.soy.outputRenamingMap_PROPERTIES}"' />
+        <arg line='--compiler_jar="${closure-compiler.jar}"' />
+        <arg line='--output_manifest="${manifest.CLOSURE_COMPILED.txt}"' />
+        <arg line='--output_file="${json-in-style.soy.compiled.js}"' />
         <arg line="--output_mode MANIFEST" />
-        <arg line="--main_source '${json-in-style.js.dir}/jsonstylemanager.js'" />
-        <arg line="--main_source '${json-in-style.js.dir}/main.js'" />
+        <arg line='--main_source "${json-in-style.js.dir}/jsonstylemanager.js"' />
+        <arg line='--main_source "${json-in-style.js.dir}/main.js"' />
         <arg line='--root "${closure-library.dir}"' />
       </java>
     </expectfailure>

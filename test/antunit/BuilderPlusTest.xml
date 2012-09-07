@@ -39,12 +39,12 @@ limitations under the License.
   <import file="${closure-ant.lib.dir}/antunit.xml" />
   <import file="${closure-ant-config.xml}" />
 
+  <import file="${test.dir}/test_projects/project101/project101.xml" />
+  <import file="${test.dir}/test_projects/project_template/project_template.xml" />
+
   <path id="test.classpath">
     <fileset dir="${closure-ant.lib.dir}" includes="**/*.jar" />
   </path>
-
-  <import file="${test.dir}/test_projects/project101/project101.xml" />
-  <import file="${test.dir}/test_projects/project_template/project_template.xml" />
 
   
   <!--
