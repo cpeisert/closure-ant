@@ -58,6 +58,39 @@ import org.closureant.soy.SoyHelper;
  * translation, and generating parse information to make working with
  * templates in Java less error prone.
  *
+ * TODO(cpeisert): Add documentation for Windows users advising to keep project
+ * files on the C drive. Also advise that paths should be sanitized/normalized
+ * as described below.
+ *
+ <!--
+ On Windows, the JavaScript escape character '\' is used a file separator.
+ In order to keep the file paths intact when passed as JSON, ensure that
+ '/' is used as the file separator irrespective of platform. In addition,
+ the Closure Templates URI sanitizer does not recognize standard file URIs
+ such as "file:///c:/Users/smith". However, on windows a file path such
+ as "/Users/smith" will be recognized as "C:\Users\smith". If using
+ Windows, it is recommended to keep project files on the C drive.
+ -->
+ <macrodef name="sanitize-path">
+   <attribute name="property" />
+   <attribute name="path-property" />
+
+   <sequential>
+     <pathconvert property="@{property}" dirsep="/">
+       <propertyresource name="@{path-property}" />
+       <regexpmapper from="^[cC]:(.*)" to="\1" />
+     </pathconvert>
+   </sequential>
+ </macrodef>
+
+ <property name="json-in-style.soy.compiled.js_UNSANITIZED"
+     location="${json-in-style.soy-output.dir}/main.compiled.js" />
+ <sanitize-path property="json-in-style.soy.compiled.js"
+     path-property="json-in-style.soy.compiled.js_UNSANITIZED" />
+ *
+ *
+ *
+ *
  * The default task name is {@code soy} as defined in "task-definitions.xml".
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)

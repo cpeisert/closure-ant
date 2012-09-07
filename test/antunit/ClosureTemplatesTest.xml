@@ -241,7 +241,7 @@ limitations under the License.
     <assertFileExists file="${soy101.output.dir}/executeAll_en.html" />
     <assertFileExists file="${soy101.output.dir}/executeAll_de.html" />
     <assertResourceContains resource="${soy101.output.dir}/executeAll_de.html"
-        value="Morpheus unschädlich für alle Zwecke" />
+        value="alle Zwecke halten werde" />
   </target>
 
 
