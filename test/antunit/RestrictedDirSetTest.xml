@@ -72,6 +72,9 @@ limitations under the License.
   </target>
 
 
+  <property name="fs" value="${file.separator}" />
+
+
   <target name="testNonRecursiveDirectoryMatch">
     <logcapturer />
 
@@ -81,7 +84,7 @@ limitations under the License.
         refid="matchedDirs" />
     <echo message="${dirList}" />
 
-    <assertLogContains text="${restricteddirset.root.dir}/home" />
+    <assertLogContains text="${restricteddirset.root.dir}${fs}home" />
   </target>
 
 
@@ -97,10 +100,12 @@ limitations under the License.
         refid="matchedDirs2" />
     <echo message="${dirList2}" />
 
-    <assertLogContains text="${restricteddirset.root.dir}/home/bob/project/lib/src" />
-    <assertLogContains text="${restricteddirset.root.dir}/home/joe/project/src" />
+    <assertLogContains
+        text="${restricteddirset.root.dir}${fs}home${fs}bob${fs}project${fs}lib${fs}src" />
+    <assertLogContains
+        text="${restricteddirset.root.dir}${fs}home${fs}joe${fs}project${fs}src" />
     <assertLogDoesntContain
-        text="${restricteddirset.root.dir}/home/joe/project/src/subproject/src"
+        text="${restricteddirset.root.dir}${fs}home${fs}joe${fs}project${fs}src${fs}subproject${fs}src"
     />
   </target>
 
