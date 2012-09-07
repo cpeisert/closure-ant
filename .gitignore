@@ -3,7 +3,6 @@
 *.diff
 *.err
 *.exe
-#*.iml  # include IntelliJ IDEA Java module file
 *.ipr
 *.iws
 *.log
@@ -14,6 +13,13 @@
 *.vi
 *~
 \#*#
+
+
+# Intellij IDEA
+#*.iml  # include Java module file
+.idea/dictionaries/
+.idea/workspace.xml
+
 
 # Only include library files not automatically retrieved by Apache Ivy.
 lib/*
@@ -28,12 +34,12 @@ lib/*
 .DS_Store
 .cache
 .directory
-.idea
 META-INF
 nbproject
 .project
 .settings
 thumbs.db
+
 
 # Folders to ignore
 .builder-plus/
