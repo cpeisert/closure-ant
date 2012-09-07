@@ -463,14 +463,12 @@ public final class ClosureBuildUtil {
    */
   private static <E extends ProvidesRequiresSourceFile> void topoSortVisit(
       E source, List<E> sortedSources, Set<E> globalVisited,
-      final Multimap<E, 
-      E> sourceToDependencies,
+      final Multimap<E, E> sourceToDependencies,
       final Map<E, Integer> originalIndex) {
 
     if (!globalVisited.contains(source)) {
       globalVisited.add(source);
-      Collection<E> deps = 
-          sourceToDependencies.get(source);
+      Collection<E> deps = sourceToDependencies.get(source);
 
       if (!deps.isEmpty()) {
         // Priority queue blows up if we give it a size of 0,
