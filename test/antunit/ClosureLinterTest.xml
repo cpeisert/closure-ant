@@ -89,7 +89,7 @@ limitations under the License.
 
     <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
     <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
-        value="${linter_test.dir}/index.html" />
+        value="${linter_test.dir}${file.separator}index.html" />
     <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
         value="E:0240: @param descriptions must end with valid punctuation" />
   </target>
@@ -105,7 +105,7 @@ limitations under the License.
 
     <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
     <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
-        value="${linter_test.dir}/index.html" />
+        value="${linter_test.dir}${file.separator}index.html" />
     <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
         value="no errors found" />
   </target>
@@ -123,26 +123,9 @@ limitations under the License.
 
     <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
     <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
-        value="${linter_test.dir}/indentation_errors.js" />
+        value="${linter_test.dir}${file.separator}indentation_errors.js" />
     <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
         value="Line #1: stack []" />
-  </target>
-
-
-  <target name="testDebugTokens">
-    <expectfailure>
-      <closure-linter debugTokens="true" force="true"
-          linterMode="lint" showCommandLine="true"
-          logfile="${test.build.dir}/antunit/linter.log">
-        <mainsources dir="${linter_test.dir}" includes="lint_errors.js" />
-      </closure-linter>
-    </expectfailure>
-
-    <assertResourceExists resource="${test.build.dir}/antunit/linter.log" />
-    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
-        value="${linter_test.dir}/lint_errors.js" />
-    <assertResourceContains resource="${test.build.dir}/antunit/linter.log"
-        value="&lt;JavaScriptToken: 1" />
   </target>
 
 

@@ -97,11 +97,11 @@ public final class ClosureLinter extends Task {
 
   // Attributes
 
+  // Corresponds to flag --beep defined in gjslint.py.
+  private Boolean beep;
+
   // Corresponds to flag --check_html defined in gjslint.py.
   private Boolean checkJavaScriptInHtmlFiles;
-
-  // Corresponds to flag --debug_tokens defined in checkerbase.py.
-  private Boolean debugTokens;
 
   // Corresponds to flag --disable_indentation_fixing defined in error_fixer.py.
   private Boolean disableIndentationFixing;
@@ -158,8 +158,8 @@ public final class ClosureLinter extends Task {
    */
   public ClosureLinter() {
     // Attributes
+    this.beep = null;
     this.checkJavaScriptInHtmlFiles = null;
-    this.debugTokens = null;
     this.disableIndentationFixing = null;
     this.fixjsstylePythonScript = FIXJSSTYLE;
     this.force = false;
@@ -187,6 +187,16 @@ public final class ClosureLinter extends Task {
   // Attribute setters
 
   /**
+   * Sets whether an audible beep should be emitted when errors are found;
+   * only applicable in {@code LINT} mode.
+   *
+   * @param beep {@code true} to enable beeps. Defaults to {@code true}.
+   */
+  public void setBeep(boolean beep) {
+    this.beep = beep;
+  }
+
+  /**
    * Sets whether to check JavaScript in HTML files; only applicable in
    * {@code LINT} mode.
    *
@@ -195,16 +205,6 @@ public final class ClosureLinter extends Task {
    */
   public void setCheckJSInHtmlFiles(boolean checkJSInHtmlFiles) {
     this.checkJavaScriptInHtmlFiles = checkJSInHtmlFiles;
-  }
-
-  /**
-   * Whether to print all tokens for debugging.
-   *
-   * @param debugTokens {@code true} to print all tokens for debugging.
-   *     Defaults to {@code false}.
-   */
-  public void setDebugTokens(boolean debugTokens) {
-    this.debugTokens = debugTokens;
   }
 
   /**
@@ -630,15 +630,15 @@ public final class ClosureLinter extends Task {
 
     // Attributes
 
+    if(Boolean.TRUE.equals(this.beep)) {
+      cmdline.argument("--beep");
+    } else if (Boolean.FALSE.equals(this.beep)) {
+      cmdline.argument("--nobeep");
+    }
     if(Boolean.TRUE.equals(this.checkJavaScriptInHtmlFiles)) {
       cmdline.argument("--check_html");
     } else if (Boolean.FALSE.equals(this.checkJavaScriptInHtmlFiles)) {
       cmdline.argument("--nocheck_html");
-    }
-    if(Boolean.TRUE.equals(this.debugTokens)) {
-      cmdline.argument("--debug_tokens");
-    } else if (Boolean.FALSE.equals(this.debugTokens)) {
-      cmdline.argument("--nodebug_tokens");
     }
     if(Boolean.TRUE.equals(this.disableIndentationFixing)) {
       cmdline.argument("--disable_indentation_fixing");
