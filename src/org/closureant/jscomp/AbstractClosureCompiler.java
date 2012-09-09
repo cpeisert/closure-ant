@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.jscomp;
 
 import com.google.common.collect.Lists;
 
@@ -22,6 +22,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Parameter;
+import org.closureant.types.NameValuePair;
 
 import java.util.List;
 

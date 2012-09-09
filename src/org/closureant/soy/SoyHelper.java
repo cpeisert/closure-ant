@@ -60,7 +60,7 @@ import org.closureant.util.ClosureBuildUtil;
  * <p>Example Usage</p>
  *
  * <p><pre>{@code
-SoyJsSrcOptions jsSrcOptions = new SoyJsSrcOptions();
+SoyJsSrcOptionsAntType jsSrcOptions = new SoyJsSrcOptionsAntType();
 jsSrcOptions.setShouldProvideRequireSoyNamespaces(true);
 
 File soyFile = new File("./my_templates.soy");

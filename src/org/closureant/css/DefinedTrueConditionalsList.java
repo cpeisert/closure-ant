@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.css;
 
 import org.closureant.types.StringList;
 

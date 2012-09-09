@@ -37,14 +37,14 @@ import org.apache.tools.ant.types.FileSet;
 import org.closureant.base.BuildCache;
 import org.closureant.base.BuildSettings;
 import org.closureant.base.SharedAntProperty;
-import org.closureant.plovr.CompilerOptionsForPlovr;
+import org.closureant.plovr.PlovrCompilerOptions;
 import org.closureant.plovr.Config;
 import org.closureant.plovr.Module;
 import org.closureant.plovr.ModuleCollection;
 import org.closureant.types.ClassNameList;
-import org.closureant.types.CompilerOptionsFactory;
-import org.closureant.types.CompileTimeDefines;
-import org.closureant.types.ExperimentalCompilerOptions;
+import org.closureant.jscomp.CompilerOptionsFactory;
+import org.closureant.jscomp.CompileTimeDefines;
+import org.closureant.plovr.ExperimentalCompilerOptions;
 import org.closureant.types.ExternsList;
 import org.closureant.types.RestrictedDirSet;
 import org.closureant.types.StringNestedElement;
@@ -344,7 +344,7 @@ public final class Plovr extends Task {
   private File testTemplate;
 
   // Nested elements
-  private CompilerOptionsForPlovr compilerOptions;
+  private PlovrCompilerOptions compilerOptions;
   private final List<String> externs;
   private final List<FileSet> inputs;
   private final ModuleCollection modules;
@@ -668,11 +668,11 @@ public final class Plovr extends Task {
   // Nested element setters
 
   /**
-   * @return a new instance of {@link CompilerOptionsForPlovr}
+   * @return a new instance of {@link org.closureant.plovr.PlovrCompilerOptions}
    * @throws BuildException if {@literal <compiler>} nested element already
    *     used in the current plovr Ant task
    */
-  public CompilerOptionsForPlovr createCompiler() {
+  public PlovrCompilerOptions createCompiler() {
     if (this.compilerOptions == null) {
       this.compilerOptions =
           CompilerOptionsFactory.newCompilerOptionsForPlovr();

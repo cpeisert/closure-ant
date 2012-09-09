@@ -40,7 +40,7 @@ import org.closureant.builderplus.BuilderPlusUtil;
 import org.closureant.builderplus.OutputMode;
 import org.closureant.css.CssRenamingMap;
 import org.closureant.deps.ManifestBuilder;
-import org.closureant.types.CompilationLevel;
+import org.closureant.jscomp.CompilationLevel;
 import org.closureant.util.FileUtil;
 
 import org.kohsuke.args4j.CmdLineException;
@@ -130,7 +130,7 @@ public final class BuilderPlusRunner {
    * @throws org.closureant.deps.MultipleProvideException if a
    *     namespace is provided by more than one source file
    * @throws NullPointerException if the manifest file returned by {@link
-   *     #createManifest(org.closureant.types.CompilationLevel, File)} is {@code null}
+   *     #createManifest(org.closureant.jscomp.CompilationLevel, File)} is {@code null}
    */
   public void execute() throws IOException {
     ClosureCompiler compilerTask = null;

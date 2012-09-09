@@ -14,13 +14,14 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.jscomp;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Parameter;
 
 import org.closureant.base.CommandLineBuilder;
+import org.closureant.types.NameValuePair;
 
 import java.util.Set;
 

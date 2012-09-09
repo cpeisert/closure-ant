@@ -14,7 +14,10 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.jscomp;
+
+import org.closureant.types.NameValuePair;
+import org.closureant.types.StringNestedElement;
 
 import java.io.File;
 

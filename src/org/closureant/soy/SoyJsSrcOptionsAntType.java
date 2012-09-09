@@ -21,7 +21,7 @@ import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import org.apache.tools.ant.BuildException;
 
 /**
- * Ant type wrapper for {@link SoyJsSrcOptions} to be used as a nested element
+ * Ant type wrapper for {@link com.google.template.soy.jssrc.SoyJsSrcOptions} to be used as a nested element
  * in Ant tasks.
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
@@ -29,7 +29,7 @@ import org.apache.tools.ant.BuildException;
 public final class SoyJsSrcOptionsAntType {
 
   private String outputPathFormat;
-  private SoyJsSrcOptions jsSrcOptions;
+  private com.google.template.soy.jssrc.SoyJsSrcOptions jsSrcOptions;
 
   /**
    * Constructs a new Ant type to store JavaScript source options for Soy
@@ -37,7 +37,7 @@ public final class SoyJsSrcOptionsAntType {
    */
   public SoyJsSrcOptionsAntType() {
     this.outputPathFormat = null;
-    this.jsSrcOptions = new SoyJsSrcOptions();
+    this.jsSrcOptions = new com.google.template.soy.jssrc.SoyJsSrcOptions();
   }
 
   /**
@@ -82,12 +82,13 @@ public final class SoyJsSrcOptionsAntType {
    * @throws BuildException if {@code codeStyle} is not a valid option
    */
   public void setCodeStyle(String codeStyle) {
-    if (SoyJsSrcOptions.CodeStyle.CONCAT.toString()
+    if (com.google.template.soy.jssrc.SoyJsSrcOptions.CodeStyle.CONCAT.toString()
         .equalsIgnoreCase(codeStyle)) {
-      this.jsSrcOptions.setCodeStyle(SoyJsSrcOptions.CodeStyle.CONCAT);
-    } else if (SoyJsSrcOptions.CodeStyle.STRINGBUILDER.toString()
+      this.jsSrcOptions.setCodeStyle(com.google.template.soy.jssrc
+          .SoyJsSrcOptions.CodeStyle.CONCAT);
+    } else if (com.google.template.soy.jssrc.SoyJsSrcOptions.CodeStyle.STRINGBUILDER.toString()
         .equalsIgnoreCase(codeStyle)) {
-      this.jsSrcOptions.setCodeStyle(SoyJsSrcOptions.CodeStyle.STRINGBUILDER);
+      this.jsSrcOptions.setCodeStyle(com.google.template.soy.jssrc.SoyJsSrcOptions.CodeStyle.STRINGBUILDER);
     } else {
       throw new BuildException("codeStyle expected to be CONCAT or "
           + "STRINGBUILDER but was \""
@@ -96,7 +97,7 @@ public final class SoyJsSrcOptionsAntType {
   }
 
   /** Returns the currently set code style. */
-  public SoyJsSrcOptions.CodeStyle getCodeStyle() {
+  public com.google.template.soy.jssrc.SoyJsSrcOptions.CodeStyle getCodeStyle() {
     return this.jsSrcOptions.getCodeStyle();
   }
 

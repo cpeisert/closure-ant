@@ -35,8 +35,8 @@ import org.apache.tools.ant.types.FileSet;
 import org.closureant.base.SharedAntProperty;
 import org.closureant.base.BuildCache;
 import org.closureant.base.CommandLineBuilder;
-import org.closureant.types.CompilerOptionsComplete;
-import org.closureant.types.CompilerOptionsFactory;
+import org.closureant.jscomp.CompilerOptionsComplete;
+import org.closureant.jscomp.CompilerOptionsFactory;
 import org.closureant.types.RestrictedDirSet;
 import org.closureant.types.StringNestedElement;
 import org.closureant.util.AntUtil;
@@ -127,7 +127,7 @@ import org.closureant.util.AntUtil;
  * <tbody>
  * <tr class="altColor"><td id="compiler"><b>compiler</b></td><td>Options for
  *     the Closure Compiler. For documentation see
- *     {@link org.closureant.types.ClosureCompiler}</td></tr>
+ *     {@link org.closureant.jscomp.ClosureCompiler}</td></tr>
  * <tr class="rowColor"><td id="inputs"><b>inputs</b></td><td>Input files to
  *    be compiled. Each input file and its transitive dependencies will be
  *    included in the compiled output. The {@literal <inputs>} element is an

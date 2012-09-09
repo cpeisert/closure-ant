@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.jscomp;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -38,14 +38,18 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Parameter;
 
 import org.closureant.base.CommandLineBuilder;
-import org.closureant.plovr.CompilerOptionsForPlovr;
+import org.closureant.plovr.ExperimentalCompilerOptions;
+import org.closureant.plovr.PlovrCompilerOptions;
 import org.closureant.plovr.Config;
+import org.closureant.plovr.IdGenerator;
+import org.closureant.types.NameValuePair;
+import org.closureant.types.StringNestedElement;
 import org.closureant.util.AntUtil;
 import org.closureant.util.StringUtil;
 
 /**
  * Static factory class to create new instances of {@link CompilerOptionsBasic},
- * {@link CompilerOptionsComplete}, and {@link org.closureant.plovr.CompilerOptionsForPlovr}.
+ * {@link CompilerOptionsComplete}, and {@link org.closureant.plovr.PlovrCompilerOptions}.
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
@@ -71,12 +75,12 @@ public final class CompilerOptionsFactory {
   }
 
   /**
-   * Create a new {@link org.closureant.plovr.CompilerOptionsForPlovr} instance.
+   * Create a new {@link org.closureant.plovr.PlovrCompilerOptions} instance.
    *
-   * @return a new {@link org.closureant.plovr.CompilerOptionsForPlovr} instance
+   * @return a new {@link org.closureant.plovr.PlovrCompilerOptions} instance
    */
-  public static CompilerOptionsForPlovr newCompilerOptionsForPlovr() {
-    return new CompilerOptionsForPlovrImplementation();
+  public static PlovrCompilerOptions newCompilerOptionsForPlovr() {
+    return new PlovrCompilerOptionsImplementation();
   }
 
 
@@ -939,9 +943,9 @@ public final class CompilerOptionsFactory {
   /**
    * Implementation of {@link CompilerOptionsComplete}.
    */
-  public static class CompilerOptionsForPlovrImplementation
+  public static class PlovrCompilerOptionsImplementation
       extends CompilerOptionsBasicImplementation
-      implements CompilerOptionsForPlovr {
+      implements PlovrCompilerOptions {
 
     // Attributes
 
@@ -967,7 +971,7 @@ public final class CompilerOptionsFactory {
      * Constructs a new instance; should not be called directly. Use
      * {@link CompilerOptionsFactory#newCompilerOptionsForPlovr()} instead.
      */
-    public CompilerOptionsForPlovrImplementation() {
+    public PlovrCompilerOptionsImplementation() {
       super();
 
       // Attributes

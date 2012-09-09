@@ -19,8 +19,7 @@ package org.closureant.plovr;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.Parameter;
 
-import org.closureant.types.CompilerOptionsBasic;
-import org.closureant.types.IdGenerator;
+import org.closureant.jscomp.CompilerOptionsBasic;
 import org.closureant.types.StringNestedElement;
 
 /**

@@ -28,9 +28,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Parameter;
 
-import org.closureant.types.AbstractClosureCompiler;
-import org.closureant.types.ExperimentalCompilerOptions;
-import org.closureant.types.IdGenerator;
+import org.closureant.jscomp.AbstractClosureCompiler;
 import org.closureant.types.NameValuePair;
 import org.closureant.types.StringNestedElement;
 import org.closureant.util.AntUtil;

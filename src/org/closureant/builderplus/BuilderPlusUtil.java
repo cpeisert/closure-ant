@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import org.closureant.types.CompilationLevel;
+import org.closureant.jscomp.CompilationLevel;
 import org.closureant.css.CssRenamingMap;
 import org.closureant.base.JsClosureSourceFile;
 import org.closureant.base.SourceFileFactory;

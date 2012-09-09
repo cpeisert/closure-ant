@@ -23,8 +23,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import java.util.Map;
 
-import org.closureant.types.CompileTimeDefines;
-import org.closureant.types.ExperimentalCompilerOptions;
+import org.closureant.jscomp.CompileTimeDefines;
 
 /**
  * TODO(cpeisert): add support for test-drivers config option

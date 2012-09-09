@@ -40,9 +40,9 @@ import org.closureant.builderplus.BuilderPlusUtil;
 import org.closureant.builderplus.OutputMode;
 import org.closureant.css.CssRenamingMap;
 import org.closureant.deps.ManifestBuilder;
-import org.closureant.types.CompilationLevel;
-import org.closureant.types.CompilerOptionsComplete;
-import org.closureant.types.CompilerOptionsFactory;
+import org.closureant.jscomp.CompilationLevel;
+import org.closureant.jscomp.CompilerOptionsComplete;
+import org.closureant.jscomp.CompilerOptionsFactory;
 import org.closureant.types.NamespaceList;
 import org.closureant.types.RestrictedDirSet;
 import org.closureant.util.AntUtil;
@@ -138,7 +138,7 @@ import org.closureant.util.FileUtil;
  * <tbody>
  * <tr class="altColor"><td id="compiler"><b>compiler</b></td><td>Options for
  *     the Closure Compiler. For documentation see
- *     {@link org.closureant.types.ClosureCompiler}</td></tr>
+ *     {@link org.closureant.jscomp.ClosureCompiler}</td></tr>
  * <tr class="rowColor"><td id="inputs"><b>inputs</b></td><td>Input files to
  *    be compiled. Each input file and its transitive dependencies will be
  *    included in the compiled output. The {@literal <inputs>} element is an

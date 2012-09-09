@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.types;
+package org.closureant.plovr;
 
 /**
  * Data type for attribute {@code idgenerator} of the nested

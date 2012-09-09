@@ -47,9 +47,9 @@ import org.closureant.base.BuildSettings;
 import org.closureant.css.ClosureStylesheetsCompiler;
 import org.closureant.css.OutputRenamingMapFormat;
 import org.closureant.css.RenamingType;
-import org.closureant.types.AllowedNonStandardFunctionsList;
+import org.closureant.css.AllowedNonStandardFunctionsList;
 import org.closureant.types.ClassNameList;
-import org.closureant.types.DefinedTrueConditionalsList;
+import org.closureant.css.DefinedTrueConditionalsList;
 import org.closureant.util.ClosureBuildUtil;
 import org.closureant.util.AntUtil;
 
