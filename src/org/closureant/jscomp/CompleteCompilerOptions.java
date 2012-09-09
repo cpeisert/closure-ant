@@ -55,7 +55,7 @@ import java.io.File;
  * interface.</li>
  * <li>The option offers minimal value in the context of a build process (for
  * example, {@code --version})</li>
- * <li>{@link CompilerOptionsComplete} includes the nested element
+ * <li>{@link CompleteCompilerOptions} includes the nested element
  * {@literal <flag>} that provides a backdoor to pass any Compiler flag
  * defined in <a target="_blank"
  * href="http://code.google.com/p/closure-compiler/source/browse/trunk/src/com/google/javascript/jscomp/CommandLineRunner.java">
@@ -76,7 +76,7 @@ import java.io.File;
 }</pre>
  *
  *
- * <p>The additional compiler options relative to {@link CompilerOptionsBasic}
+ * <p>The additional compiler options relative to {@link BasicCompilerOptions}
  * are as follows:</p>
  *
  * <p><b>Ant Attributes</b></p>
@@ -276,7 +276,7 @@ import java.io.File;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public interface CompilerOptionsComplete extends CompilerOptionsBasic {
+public interface CompleteCompilerOptions extends BasicCompilerOptions {
 
   // Attribute setters
 

@@ -70,7 +70,7 @@ import java.util.Set;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public interface CompilerOptionsBasic {
+public interface BasicCompilerOptions {
 
   // Attribute setters
 

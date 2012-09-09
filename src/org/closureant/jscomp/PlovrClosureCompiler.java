@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.plovr;
+package org.closureant.jscomp;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -29,6 +29,9 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Parameter;
 
 import org.closureant.jscomp.AbstractClosureCompiler;
+import org.closureant.plovr.Config;
+import org.closureant.plovr.ExperimentalCompilerOptions;
+import org.closureant.plovr.IdGenerator;
 import org.closureant.types.NameValuePair;
 import org.closureant.types.StringNestedElement;
 import org.closureant.util.AntUtil;
@@ -618,7 +621,7 @@ public final class PlovrClosureCompiler extends AbstractClosureCompiler {
   }
 
   /**
-   * Creates a {@link Config} object with the compiler options set based
+   * Creates a {@link org.closureant.plovr.Config} object with the compiler options set based
    * on the field values of this {@literal <compiler>} nested element.
    *
    * @return a plovr config file object

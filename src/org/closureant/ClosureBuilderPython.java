@@ -35,7 +35,7 @@ import org.apache.tools.ant.types.FileSet;
 import org.closureant.base.SharedAntProperty;
 import org.closureant.base.BuildCache;
 import org.closureant.base.CommandLineBuilder;
-import org.closureant.jscomp.CompilerOptionsComplete;
+import org.closureant.jscomp.CompleteCompilerOptions;
 import org.closureant.jscomp.CompilerOptionsFactory;
 import org.closureant.types.RestrictedDirSet;
 import org.closureant.types.StringNestedElement;
@@ -196,7 +196,7 @@ public final class ClosureBuilderPython extends Task {
   private String pythonExecutable;
 
   // Nested elements
-  private CompilerOptionsComplete compilerOptions;
+  private CompleteCompilerOptions compilerOptions;
   private final List<FileSet> inputs;
   private final List<StringNestedElement> namespaces;
   private final List<RestrictedDirSet> roots;
@@ -304,11 +304,11 @@ public final class ClosureBuilderPython extends Task {
   // Nested element setters
 
   /**
-   * @return a new instance of {@link CompilerOptionsComplete}
+   * @return a new instance of {@link org.closureant.jscomp.CompleteCompilerOptions}
    * @throws BuildException if {@literal <compiler>} nested element already
    *     used in the current Closure Builder Ant task
    */
-  public CompilerOptionsComplete createCompiler() {
+  public CompleteCompilerOptions createCompiler() {
     if (this.compilerOptions == null) {
       this.compilerOptions =
           CompilerOptionsFactory.newCompilerOptionsComplete();

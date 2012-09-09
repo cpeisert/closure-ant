@@ -14,12 +14,13 @@
  * under the License.
  */
 
-package org.closureant.plovr;
+package org.closureant.jscomp;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.Parameter;
 
-import org.closureant.jscomp.CompilerOptionsBasic;
+import org.closureant.plovr.Config;
+import org.closureant.plovr.IdGenerator;
 import org.closureant.types.StringNestedElement;
 
 /**
@@ -257,7 +258,7 @@ import org.closureant.types.StringNestedElement;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public interface PlovrCompilerOptions extends CompilerOptionsBasic {
+public interface PlovrCompilerOptions extends BasicCompilerOptions {
 
   /** Compilation modes supported by plovr. */
   public static enum PlovrCompilationMode {
@@ -512,7 +513,7 @@ public interface PlovrCompilerOptions extends CompilerOptionsBasic {
   void addTypePrefixToStrip(StringNestedElement typePrefix);
 
   /**
-   * Creates a {@link Config} object with the compiler
+   * Creates a {@link org.closureant.plovr.Config} object with the compiler
    * options set based on the field values of this object.
    *
    * @param project the Ant project

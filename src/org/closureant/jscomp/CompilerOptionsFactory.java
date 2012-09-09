@@ -39,7 +39,6 @@ import org.apache.tools.ant.types.Parameter;
 
 import org.closureant.base.CommandLineBuilder;
 import org.closureant.plovr.ExperimentalCompilerOptions;
-import org.closureant.plovr.PlovrCompilerOptions;
 import org.closureant.plovr.Config;
 import org.closureant.plovr.IdGenerator;
 import org.closureant.types.NameValuePair;
@@ -48,8 +47,8 @@ import org.closureant.util.AntUtil;
 import org.closureant.util.StringUtil;
 
 /**
- * Static factory class to create new instances of {@link CompilerOptionsBasic},
- * {@link CompilerOptionsComplete}, and {@link org.closureant.plovr.PlovrCompilerOptions}.
+ * Static factory class to create new instances of {@link BasicCompilerOptions},
+ * {@link CompleteCompilerOptions}, and {@link PlovrCompilerOptions}.
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
@@ -57,27 +56,27 @@ public final class CompilerOptionsFactory {
   private CompilerOptionsFactory() {}
 
   /**
-   * Create a new {@link CompilerOptionsBasic} instance.
+   * Create a new {@link BasicCompilerOptions} instance.
    *
-   * @return a new {@link CompilerOptionsBasic} instance
+   * @return a new {@link BasicCompilerOptions} instance
    */
-  public static CompilerOptionsBasic newCompilerOptionsBasic() {
-    return new CompilerOptionsBasicImplementation();
+  public static BasicCompilerOptions newCompilerOptionsBasic() {
+    return new BasicCompilerOptionsImplementation();
   }
 
   /**
-   * Create a new {@link CompilerOptionsComplete} instance.
+   * Create a new {@link CompleteCompilerOptions} instance.
    *
-   * @return a new {@link CompilerOptionsComplete} instance
+   * @return a new {@link CompleteCompilerOptions} instance
    */
-  public static CompilerOptionsComplete newCompilerOptionsComplete() {
-    return new CompilerOptionsCompleteImplementation();
+  public static CompleteCompilerOptions newCompilerOptionsComplete() {
+    return new CompleteCompilerOptionsImplementation();
   }
 
   /**
-   * Create a new {@link org.closureant.plovr.PlovrCompilerOptions} instance.
+   * Create a new {@link PlovrCompilerOptions} instance.
    *
-   * @return a new {@link org.closureant.plovr.PlovrCompilerOptions} instance
+   * @return a new {@link PlovrCompilerOptions} instance
    */
   public static PlovrCompilerOptions newCompilerOptionsForPlovr() {
     return new PlovrCompilerOptionsImplementation();
@@ -98,10 +97,10 @@ public final class CompilerOptionsFactory {
   // user.
 
   /**
-   * Implementation of {@link CompilerOptionsBasic}.
+   * Implementation of {@link BasicCompilerOptions}.
    */
-  public static class CompilerOptionsBasicImplementation
-      implements CompilerOptionsBasic {
+  public static class BasicCompilerOptionsImplementation
+      implements BasicCompilerOptions {
 
     // Attributes
 
@@ -128,7 +127,7 @@ public final class CompilerOptionsFactory {
      * Constructs a new instance; should not be called directly. Use
      * {@link CompilerOptionsFactory#newCompilerOptionsBasic()} instead.
      */
-    public CompilerOptionsBasicImplementation() {
+    public BasicCompilerOptionsImplementation() {
 
       // Attributes
       this.customExternsOnly = null;
@@ -404,11 +403,11 @@ public final class CompilerOptionsFactory {
 
 
   /**
-   * Implementation of {@link CompilerOptionsComplete}.
+   * Implementation of {@link CompleteCompilerOptions}.
    */
-  public static class CompilerOptionsCompleteImplementation
-      extends CompilerOptionsBasicImplementation
-      implements CompilerOptionsComplete {
+  public static class CompleteCompilerOptionsImplementation
+      extends BasicCompilerOptionsImplementation
+      implements CompleteCompilerOptions {
 
     private final List<String> flagFileArgs;
 
@@ -450,7 +449,7 @@ public final class CompilerOptionsFactory {
      * Constructs a new instance; should not be called directly. Use
      * {@link CompilerOptionsFactory#newCompilerOptionsComplete()} instead.
      */
-    public CompilerOptionsCompleteImplementation() {
+    public CompleteCompilerOptionsImplementation() {
       super();
 
       this.flagFileArgs = Lists.newArrayList();
@@ -941,10 +940,10 @@ public final class CompilerOptionsFactory {
 
 
   /**
-   * Implementation of {@link CompilerOptionsComplete}.
+   * Implementation of {@link CompleteCompilerOptions}.
    */
   public static class PlovrCompilerOptionsImplementation
-      extends CompilerOptionsBasicImplementation
+      extends BasicCompilerOptionsImplementation
       implements PlovrCompilerOptions {
 
     // Attributes
@@ -1279,7 +1278,7 @@ public final class CompilerOptionsFactory {
     public Config toPlovrConfig(Project project) {
       Config config = new Config();
 
-      // Attributes inherited from CompilerOptionsBasicImplementation
+      // Attributes inherited from BasicCompilerOptionsImplementation
 
       if (this.customExternsOnly != null) {
         config.customExternsOnly = this.customExternsOnly;

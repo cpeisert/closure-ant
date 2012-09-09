@@ -38,7 +38,7 @@ import org.closureant.base.BuildCache;
 import org.closureant.base.BuildSettings;
 import org.closureant.base.CommandLineBuilder;
 import org.closureant.jscomp.CompilationLevel;
-import org.closureant.jscomp.CompilerOptionsComplete;
+import org.closureant.jscomp.CompleteCompilerOptions;
 import org.closureant.jscomp.CompilerOptionsFactory;
 import org.closureant.types.NameValuePair;
 import org.closureant.types.NamespaceList;
@@ -233,9 +233,9 @@ import org.closureant.util.StringUtil;
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
 public final class ClosureCompiler extends Task
-    implements CompilerOptionsComplete {
+    implements CompleteCompilerOptions {
 
-  private CompilerOptionsComplete compilerOptions;
+  private CompleteCompilerOptions compilerOptions;
 
   // Attributes
   private File compilerJar;
@@ -293,7 +293,7 @@ public final class ClosureCompiler extends Task
   }
 
   // Backdoor setter for tasks that wrap/compose the ClosureCompiler.
-  public void protectedSetCompilerOptions(CompilerOptionsComplete options) {
+  public void protectedSetCompilerOptions(CompleteCompilerOptions options) {
     this.compilerOptions = options;
   }
 
@@ -461,7 +461,7 @@ public final class ClosureCompiler extends Task
   }
 
 
-  // CompilerOptionsBasic
+  // BasicCompilerOptions
 
   // Attribute wrappers
   public void setCustomExternsOnly(boolean customExternsOnly) {
@@ -515,7 +515,7 @@ public final class ClosureCompiler extends Task
     return this.compilerOptions.getExterns(project);
   }
   
-  // CompilerOptionsComplete
+  // CompleteCompilerOptions
 
   // Attribute wrappers
   public void setAcceptConstKeyword(boolean acceptConstKeyword) {

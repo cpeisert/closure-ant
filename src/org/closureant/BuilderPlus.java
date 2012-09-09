@@ -41,7 +41,7 @@ import org.closureant.builderplus.OutputMode;
 import org.closureant.css.CssRenamingMap;
 import org.closureant.deps.ManifestBuilder;
 import org.closureant.jscomp.CompilationLevel;
-import org.closureant.jscomp.CompilerOptionsComplete;
+import org.closureant.jscomp.CompleteCompilerOptions;
 import org.closureant.jscomp.CompilerOptionsFactory;
 import org.closureant.types.NamespaceList;
 import org.closureant.types.RestrictedDirSet;
@@ -191,7 +191,7 @@ public final class BuilderPlus extends Task {
   private OutputMode outputMode;
 
   // Nested elements
-  private CompilerOptionsComplete compilerOptions;
+  private CompleteCompilerOptions compilerOptions;
   private final List<FileSet> mainSources; // Program entry points
   private final List<String> namespaces;
   private final List<RestrictedDirSet> roots;
@@ -424,11 +424,11 @@ public final class BuilderPlus extends Task {
   // Nested element setters
 
   /**
-   * @return a new instance of {@link CompilerOptionsComplete}
+   * @return a new instance of {@link org.closureant.jscomp.CompleteCompilerOptions}
    * @throws BuildException if {@literal <compiler>} nested element already
    *     used in the current Closure Builder Ant task
    */
-  public CompilerOptionsComplete createCompiler() {
+  public CompleteCompilerOptions createCompiler() {
     if (this.compilerOptions == null) {
       this.compilerOptions =
           CompilerOptionsFactory.newCompilerOptionsComplete();
