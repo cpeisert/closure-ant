@@ -57,16 +57,23 @@ limitations under the License.
   <property name="javadoc.dir" value="${build.dir}/javadoc" />
 
   <!--
-    To release a new stable version of closure-ant, change
-    release.stamp to "latest" or pass -Drelease.stamp=latest when running ant.
+    To release a new stable version of Closure Ant execute the "release" target.
+    To build the jar for a previous release, verify the release tag by
+    running:
 
-    To release a previous stable version, update release.stamp to the
-    appropriate version tag, which is just the date the version was released
-    formatted as YYYY-MM-DD. To see all the version tags, run:
+        git tag
 
-    $ git tag
+    Checkout the desired revision:
+
+        git checkout <tag name>
+
+    Execute the "release" target and pass the argument:
+
+        -Drelease.stamp=<tag name>
   -->
-  <property name="release.stamp" value="unstable" />
+  <tstamp>
+    <format property="release.stamp" pattern="yyyyMMdd" />
+  </tstamp>
 
 
   <!--
