@@ -292,7 +292,7 @@ public final class ManifestBuilder<S extends ProvidesRequiresSourceFile> {
               this.provideToSource);
 
       // Topologically sort the pruned sources.
-      this.manifest = ClosureBuildUtil.topologicalStableSortDepthFirstSearch(
+      this.manifest = ClosureBuildUtil.topologicalStableSortKahnAlgorithm(
           prunedSources, sourceToDependencies);
     } else {
       this.manifest = prunedSources;

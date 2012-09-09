@@ -30,8 +30,8 @@ limitations under the License.
   <property name="closure-ant-config.xml"
       location="${closure-ant.dir}/build/closure-ant-config.xml" />
 
-  <import file="${closure-ant.lib.dir}/antunit.xml" />
-  <import file="${closure-ant-config.xml}" />
+  <include file="${closure-ant.lib.dir}/antunit.xml" />
+  <include file="${closure-ant-config.xml}" />
   <property name="closure-ant.jar" 
       location="${closure-ant.dir}/build/closure-ant.jar" />
 

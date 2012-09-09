@@ -258,7 +258,7 @@ import org.closureant.types.StringNestedElement;
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
  */
-public interface CompilerOptionsForPlovr extends CompilerOptionsBasic {
+public interface PlovrCompilerOptions extends CompilerOptionsBasic {
 
   /** Compilation modes supported by plovr. */
   public static enum PlovrCompilationMode {
