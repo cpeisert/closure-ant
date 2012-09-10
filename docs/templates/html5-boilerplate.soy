@@ -1,0 +1,124 @@
+{namespace html5boilerplate autoescape="contextual"}
+
+/**
+ * HTML5 Boilerplate (see https://github.com/h5bp/html5-boilerplate) Closure
+ * Templates soy template. This template deviates from the HTML5 Boilerplate
+ * index.html (as of 09/09/2012) by removing the link tags to
+ * "css/normalize.css" and "css/main.css"; removing the script tags for JQuery,
+ * "js/plugins.js", and "js/main.js"; removing the script tags for Google
+ * Analytics; and adding the option to add noscript-tag content.
+ *
+ * @param? title The page title. Defaults to "HTML5 Template".
+ * @param? description The page description. Defaults to "HTML5 Template".
+ * @param? charset The character set. Defaults to UTF-8.
+ * @param? cssFiles A list of css files, where each list element is either
+ *     a URL or a map with the following structure (only the href entry is
+ *     required):
+ *       [href: <css-file-url>, rel: <relationship>, title: <title>,
+ *       media: <media-descriptor>]
+ * @param? scriptFiles A list of script files, where each list element is
+ *     either a URL or a map with the following structure (only the src entry
+ *     is required):
+ *       [src: <script-file-url>, type: <MIME_type>, charset: <character_set>,
+ *       async: "async", defer: "defer"]
+ * @param? contentHtml html content that goes inside the <body> tags
+ * @param? noScriptHtml html content that goes inside <noscript> tags
+ */
+{template .createDocument}
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="{$charset ? $charset : 'utf-8'}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{$title ? $title : 'HTML5 Template'}</title>
+    <meta name="description" content="{$description ? $description :
+        'HTML5 Template'}">
+    <meta name="viewport" content="width=device-width">
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    {if $cssFiles}
+      {call .linkCssFiles data="all" /}
+    {/if}
+    <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+  </head>
+  <body>
+    <!--[if lt IE 7]>
+      <p class="chromeframe">You are using an outdated browser.
+      <a href="http://browsehappy.com/">Upgrade your browser today</a> or
+      <a href="http://www.google.com/chromeframe/?redirect=true">install Google
+      Chrome Frame</a> to better experience this site.</p>
+    <![endif]-->
+    {if $noScriptHtml}
+      <noscript>{$noScriptHtml|noAutoescape}</noscript>
+    {/if}
+    {if $contentHtml}
+      {$contentHtml|noAutoescape}
+    {/if}
+    {if $scriptFiles}
+      {call .importScriptFiles data="all" /}
+    {/if}
+  </body>
+</html>
+{/template}
+
+/**
+ * Given a list of external stylesheets, add <link> tags for each stylesheet.
+ * Each list element is either a URL or a map with the following structure
+ * (only the href entry is required):
+ *
+ *   [href: <css-file-url>, rel: <relationship>, title: <title>, media: <media-descriptor>]
+ *
+ * @param cssFiles A list of stylesheets.
+ */
+{template .linkCssFiles private="true"}
+{foreach $cssFile in $cssFiles}
+  {if not $cssFile.href}
+    <link href="{$cssFile}" rel="stylesheet" type="text/css" />
+  {else}
+    <link
+    href="{$cssFile.href}"
+    rel="{$cssFile.rel ? $cssFile.rel : 'stylesheet'}"
+    {if $cssFile.title}
+      title="{$cssFile.title}"
+    {/if}
+    media="{$cssFile.media ? $cssFile.media : 'all'}"
+    type="text/css" />
+  {/if}
+{/foreach}
+{/template}
+
+/**
+ * Given a list of external scripts, add <script> tags for each script file.
+ * Each list element is either a URL or a map with the following structure
+ * (only the src entry is required):
+ *
+ *   [src: <script-file-url>, type: <MIME_type>, charset: <character_set>,
+ *       async: "async", defer: "defer"]
+ *
+ * @param scriptFiles A list of scripts.
+ */
+{template .importScriptFiles private="true"}
+{foreach $scriptFile in $scriptFiles}
+  {if not $scriptFile.src}
+    <script src="{$scriptFile}" type="text/javascript"></script>
+  {else}
+    <script
+    src="{$scriptFile.src}"
+    type="{$scriptFile.type ? $scriptFile.type : 'text/javascript'}"
+    {if $scriptFile.charset}
+      charset="{$scriptFile.charset}"
+    {/if}
+    {if $scriptFile.async}
+      async="async"
+    {/if}
+    {if $scriptFile.defer}
+      defer="defer"
+    {/if}
+    ></script>
+  {/if}
+{/foreach}
+{/template}

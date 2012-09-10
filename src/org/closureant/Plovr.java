@@ -37,7 +37,7 @@ import org.apache.tools.ant.types.FileSet;
 import org.closureant.base.BuildCache;
 import org.closureant.base.BuildSettings;
 import org.closureant.base.SharedAntProperty;
-import org.closureant.plovr.PlovrCompilerOptions;
+import org.closureant.jscomp.PlovrCompilerOptions;
 import org.closureant.plovr.Config;
 import org.closureant.plovr.Module;
 import org.closureant.plovr.ModuleCollection;
@@ -232,7 +232,7 @@ import org.closureant.util.FileUtil;
  *
  * <tr class="altColor"><td><b>compiler</b></td><td>Options for the Closure 
  *     Compiler. For documentation see
- *     {@link org.closureant.plovr.PlovrClosureCompiler}</td></tr>
+ *     {@link org.closureant.jscomp.PlovrClosureCompiler}</td></tr>
  * <tr class="rowColor"><td><b>inputs</b></td><td>Input files to be
  *     compiled. Each input file and its transitive dependencies will be
  *     included in the compiled output. The {@literal <inputs>} element is an
@@ -668,7 +668,7 @@ public final class Plovr extends Task {
   // Nested element setters
 
   /**
-   * @return a new instance of {@link org.closureant.plovr.PlovrCompilerOptions}
+   * @return a new instance of {@link org.closureant.jscomp.PlovrCompilerOptions}
    * @throws BuildException if {@literal <compiler>} nested element already
    *     used in the current plovr Ant task
    */
