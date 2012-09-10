@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.closureant.base;
+package org.closureant.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

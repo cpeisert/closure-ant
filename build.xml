@@ -364,4 +364,45 @@ generates JavaDoc.">
     <ant dir="${test.dir}" target="clean" inheritAll="false" />
     <ant dir="${test.dir}" target="test" inheritAll="false" />
   </target>
+
+
+<!--
+==============================================================================
+  Hidden target to build a plovr jar including only Config and ConfigOption
+  and their dependencies (however, all Closure Templates deps and Closure
+  Compiler debugging deps are excluded). This stripped-down jar is used to
+  automatically generate documentation mapping the plovr config options to the
+  corresponding plovr Ant task attributes and nested elements.
+==============================================================================
+-->
+  <!-- Change plovr.dir to point to your local copy of the plovr source code.-->
+  <property name="plovr.dir" location="/usr/local/closure-tools/plovr" />
+
+  <property name="plovr.classes.dir" location="${plovr.dir}/build/classes" />
+  <property name="plovr-config.jar" location="${lib.dir}/plovr-config.jar" />
+
+  <target name="plovr-config-jar">
+    <manifest file="${build.dir}/PLOVR_CONFIG_MANIFEST.MF">
+      <attribute name="Built-By" value="${user.name}" />
+      <attribute name="Built-Date" value="${DATE_TODAY}" />
+      <attribute name="Main-Class"
+          value="org.closureant.builderplus.cli.Main" />
+      <attribute name="Release" value="${release.stamp}" />
+    </manifest>
+
+    <ant dir="${plovr.dir}" target="compile" inheritAll="false"
+        useNativeBasedir="true" />
+
+    <classfileset id="plovr-config-deps" dir="${plovr.classes.dir}"
+        excludes="**/google/template/**,**/google/debugging/**">
+      <rootfileset dir="${plovr.classes.dir}"
+          includes="org/plovr/Config.class" />
+      <rootfileset dir="${plovr.classes.dir}"
+          includes="org/plovr/ConfigOption.class" />
+    </classfileset>
+
+    <jar destfile="${plovr-config.jar}" update="true">
+      <fileset refid="plovr-config-deps" />
+    </jar>
+  </target>
 </project>
