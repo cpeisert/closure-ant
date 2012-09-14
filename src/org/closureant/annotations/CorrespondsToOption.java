@@ -27,9 +27,9 @@ import java.lang.annotation.Target;
  * example, {@code setMyAttribute(String)}) or an Ant nested element (for
  * example, {@code addMyNestedElement(NestedElementType)}) indicates that the
  * attribute or element corresponds to the option named by the annotation
- * value. For example, the Ant task "Javac" has an attribute {@code desdir}
+ * value. For example, the Ant task "Javac" has an attribute {@code destdir}
  * that corresponds to the javac command line option {@code -d}. The
- * definition of the {@code desdir} attribute could be annotated as follows:
+ * definition of the {@code destdir} attribute could be annotated as follows:
  *
  * <p><pre>{@literal @CorrespondsToOption("-d")
 public void setDestdir(File destDir) {
