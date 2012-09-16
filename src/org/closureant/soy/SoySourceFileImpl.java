@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.base.SoySyntaxException;
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
@@ -30,6 +31,7 @@ import com.google.template.soy.shared.SoyGeneralOptions;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
 
@@ -53,14 +55,13 @@ class SoySourceFileImpl implements SoySourceFile {
   private volatile String jsSourceCode;
   private volatile ImmutableMap<String, String> localeToJsSourceCode;
 
+  private final String filePath;
   private final SoyJsSrcOptions jsSrcOptions;
   private final Set<SoyMsgBundle> msgBundleSet;
   private final String parseInfoJavaClassname;
   private final String parseInfoJavaPackage;
   private final Set<String> provides;
   private final Set<String> requires;
-  private final File soyFile;
-  private final String soyFileName;
   private final SoyFileSet soyFileSet;
   private final String soyNamespace;
   private final String soySourceCode;
@@ -68,49 +69,125 @@ class SoySourceFileImpl implements SoySourceFile {
   /**
    * Constructs a {@link SoySourceFile} for the given file.
    *
-   * @param soyFile the physical Soy file
-   * @param generalOptions general options including: {@code
-   *     allowExternalCalls, compileTimeGlobals, and cssHandlingScheme}
-   * @param jsSrcOptions the options for compiling this Soy file to JavaScript
-   * @param msgBundleSet the set of message bundles, each of which contains
-   *     a complete set of messages for some language/locale
-   * @throws IOException if there is an error reading the Soy file
-   * @throws NullPointerException if any of the parameters are {@code null}
+   * @param soyFile The Soy file.
+   * @param generalOptions General options including: {@code
+   *     allowExternalCalls, compileTimeGlobals, and cssHandlingScheme}.
+   * @param jsSrcOptions The options for compiling this Soy file to JavaScript.
+   * @param msgBundleSet The set of message bundles, each of which contains
+   *     a complete set of messages for some language/locale.
+   * @throws IOException If there is an error reading the Soy file.
+   * @throws NullPointerException If any of the parameters are {@code null}.
    */
   SoySourceFileImpl(File soyFile, SoyGeneralOptions generalOptions,
       SoyJsSrcOptions jsSrcOptions, Set<SoyMsgBundle> msgBundleSet)
       throws IOException {
-    this(soyFile, generalOptions, jsSrcOptions, msgBundleSet, null, null);
+    this(Files.toString(soyFile, Charsets.UTF_8), soyFile.getCanonicalPath(),
+        generalOptions, jsSrcOptions, msgBundleSet, null, null);
   }
 
   /**
    * Constructs a {@link SoySourceFile} for the given file.
    *
-   * @param soyFile the physical Soy file
-   * @param generalOptions general options including: {@code
-   *     allowExternalCalls, compileTimeGlobals, and cssHandlingScheme}
-   * @param jsSrcOptions the options for compiling this Soy file to JavaScript
-   * @param msgBundleSet the set of message bundles, each of which contains
-   *     a complete set of messages for some language/locale
+   * @param soyFile The Soy file.
+   * @param generalOptions General options including: {@code
+   *     allowExternalCalls, compileTimeGlobals, and cssHandlingScheme}.
+   * @param jsSrcOptions The options for compiling this Soy file to JavaScript.
+   * @param msgBundleSet The set of message bundles, each of which contains
+   *     a complete set of messages for some language/locale.
    * @param parseInfoJavaPackage The Java package for the generated classes.
    *     May be {@code null}.
    * @param parseInfoJavaClassname Source of the generated Java class names.
    *     Must be one of "filename", "namespace", or "generic". May be
    *     {@code null}.
-   * @throws IOException if there is an error reading the Soy file
-   * @throws NullPointerException if {@code soyFile}, {@code generalOptions},
-   *     {@code jsSrcOption}, or {@code msgBundleSet} is {@code null}
+   * @throws IOException If there is an error reading the Soy file.
+   * @throws NullPointerException If any of the parameters are {@code null}.
    */
   SoySourceFileImpl(File soyFile, SoyGeneralOptions generalOptions,
       SoyJsSrcOptions jsSrcOptions, Set<SoyMsgBundle> msgBundleSet,
       String parseInfoJavaClassname, String parseInfoJavaPackage)
       throws IOException {
+    this(Files.toString(soyFile, Charsets.UTF_8), soyFile.getCanonicalPath(),
+        generalOptions, jsSrcOptions, msgBundleSet, parseInfoJavaClassname,
+        parseInfoJavaPackage);
+  }
 
-    Preconditions.checkNotNull(soyFile, "soyFile was null");
+  /**
+   * Constructs a {@link SoySourceFile} for a resource URL.
+   *
+   * @param soyFileURL URL for the Soy file.
+   * @param generalOptions General options including: {@code
+   *     allowExternalCalls, compileTimeGlobals, and cssHandlingScheme}.
+   * @param jsSrcOptions The options for compiling this Soy file to JavaScript.
+   * @param msgBundleSet The set of message bundles, each of which contains
+   *     a complete set of messages for some language/locale.
+   * @throws IOException If there is an error reading the Soy file.
+   * @throws NullPointerException If any of the parameters are {@code null}.
+   */
+  SoySourceFileImpl(URL soyFileURL, SoyGeneralOptions generalOptions,
+                    SoyJsSrcOptions jsSrcOptions, Set<SoyMsgBundle> msgBundleSet)
+      throws IOException {
+    this(Resources.toString(soyFileURL, Charsets.UTF_8), soyFileURL.getPath(),
+        generalOptions, jsSrcOptions, msgBundleSet, null, null);
+  }
+
+  /**
+   * Constructs a {@link SoySourceFile} for a resource URL.
+   *
+   * @param soyFileURL URL for the Soy file.
+   * @param generalOptions General options including: {@code
+   *     allowExternalCalls, compileTimeGlobals, and cssHandlingScheme}.
+   * @param jsSrcOptions The options for compiling this Soy file to JavaScript.
+   * @param msgBundleSet The set of message bundles, each of which contains
+   *     a complete set of messages for some language/locale.
+   * @param parseInfoJavaPackage The Java package for the generated classes.
+   *     May be {@code null}.
+   * @param parseInfoJavaClassname Source of the generated Java class names.
+   *     Must be one of "filename", "namespace", or "generic". May be
+   *     {@code null}.
+   * @throws IOException If there is an error reading the Soy file.
+   * @throws NullPointerException If any of the parameters are {@code null}.
+   */
+  SoySourceFileImpl(URL soyFileURL, SoyGeneralOptions generalOptions,
+      SoyJsSrcOptions jsSrcOptions, Set<SoyMsgBundle> msgBundleSet,
+      String parseInfoJavaClassname, String parseInfoJavaPackage)
+      throws IOException {
+    this(Resources.toString(soyFileURL, Charsets.UTF_8), soyFileURL.getPath(),
+        generalOptions, jsSrcOptions, msgBundleSet, parseInfoJavaClassname,
+        parseInfoJavaPackage);
+  }
+
+  /**
+   * Constructs a {@link SoySourceFile} for the given file.
+   *
+   * @param content The Soy file content.
+   * @param filePath The path to the Soy file (used for messages only).
+   * @param generalOptions General options including: {@code
+   *     allowExternalCalls, compileTimeGlobals, and cssHandlingScheme}.
+   * @param jsSrcOptions Options for compiling this Soy file to JavaScript.
+   * @param msgBundleSet The set of message bundles, each of which contains
+   *     a complete set of messages for some language/locale.
+   * @param parseInfoJavaPackage The Java package for the generated classes.
+   *     May be {@code null}.
+   * @param parseInfoJavaClassname Source of the generated Java class names.
+   *     Must be one of "filename", "namespace", or "generic". May be
+   *     {@code null}.
+   * @throws IOException If there is an error reading the Soy file.
+   * @throws NullPointerException If {@code soyFile}, {@code generalOptions},
+   *     {@code jsSrcOption}, or {@code msgBundleSet} is {@code null}.
+   */
+  SoySourceFileImpl(CharSequence content, String filePath,
+      SoyGeneralOptions generalOptions,
+      SoyJsSrcOptions jsSrcOptions, Set<SoyMsgBundle> msgBundleSet,
+      String parseInfoJavaClassname, String parseInfoJavaPackage)
+      throws IOException {
+
+    Preconditions.checkNotNull(content, "content was null");
     Preconditions.checkNotNull(generalOptions, "generalOptions was null");
     Preconditions.checkNotNull(jsSrcOptions, "jsSrcOption was null");
     Preconditions.checkNotNull(msgBundleSet, "msgBundleSet was null");
 
+    this.filePath = filePath;
+    this.soySourceCode = content.toString();
     this.generatedParseInfo = null;
     this.jsSourceCode = null;
     this.jsSrcOptions = jsSrcOptions;
@@ -119,7 +196,7 @@ class SoySourceFileImpl implements SoySourceFile {
     this.parseInfoJavaPackage = parseInfoJavaPackage;
 
     this.soyFileSet = new SoyFileSet.Builder()
-        .add(soyFile)
+        .add(this.soySourceCode, this.filePath)
         .setAllowExternalCalls(generalOptions.allowExternalCalls())
         .setCompileTimeGlobals(generalOptions.getCompileTimeGlobals())
         .setCssHandlingScheme(generalOptions.getCssHandlingScheme())
@@ -132,19 +209,18 @@ class SoySourceFileImpl implements SoySourceFile {
     options.setCodeStyle(SoyJsSrcOptions.CodeStyle.CONCAT);
     options.setShouldProvideRequireSoyNamespaces(true);
 
-    SoyFileSet tempFileSet = new SoyFileSet.Builder().add(soyFile)
-        .setAllowExternalCalls(true).build();
+    SoyFileSet tempFileSet = new SoyFileSet.Builder()
+        .add(this.soySourceCode, this.filePath)
+        .setAllowExternalCalls(true)
+        .build();
 
     String jsCode = tempFileSet.compileToJsSrc(options, null).get(0);
 
     JsClosureSourceFile jsSourceFile =
-        SourceFileFactory.newJsClosureSourceFile(soyFile.getName(), jsCode);
+        SourceFileFactory.newJsClosureSourceFile(this.filePath, jsCode);
     this.provides = Sets.newHashSet(jsSourceFile.getProvides());
     this.requires = Sets.newHashSet(jsSourceFile.getRequires());
-    this.soyFile = soyFile;
-    this.soyFileName = soyFile.getName();
     this.soyNamespace = this.provides.iterator().next();
-    this.soySourceCode = Files.toString(soyFile, Charsets.UTF_8);
   }
 
   public String compileToJsSrc() {
@@ -211,11 +287,7 @@ class SoySourceFileImpl implements SoySourceFile {
   }
 
   public String getAbsolutePath() {
-    try {
-      return this.soyFile.getCanonicalPath();
-    } catch (IOException e) {
-      return this.soyFile.getAbsolutePath();
-    }
+    return this.filePath;
   }
 
   public String getCode() {
@@ -223,19 +295,20 @@ class SoySourceFileImpl implements SoySourceFile {
   }
 
   public String getDirectory() {
-    return this.soyFile.getParent();
+    return getParentDirectory(this.filePath);
   }
 
   public String getName() {
-    return this.soyFileName;
+    return getFileNameFromAbsolutePath(this.filePath);
   }
 
   public String getNameNoExtension() {
-    int lastDotIndex = this.soyFileName.lastIndexOf('.');
+    String fileName = getFileNameFromAbsolutePath(this.filePath);
+    int lastDotIndex = fileName.lastIndexOf('.');
     if (lastDotIndex == -1) {
-      lastDotIndex = this.soyFileName.length();
+      lastDotIndex = fileName.length();
     }
-    return this.soyFileName.substring(0, lastDotIndex);
+    return fileName.substring(0, lastDotIndex);
   }
 
   public String getNamespace() {
@@ -250,8 +323,50 @@ class SoySourceFileImpl implements SoySourceFile {
     return ImmutableSet.copyOf(this.requires);
   }
 
-  public String getRelativePath() {
-    return this.soyFile.getPath();
+  /**
+   * Returns the file name.
+   *
+   * @return the string form of this JavaScript source file
+   */
+  @Override public String toString() {
+    return getFileNameFromAbsolutePath(this.filePath);
+  }
+
+  /**
+   * Gets the file name including the extension from the specified file path.
+   * If a file separator (that is, a forward slash or backslash) is not found,
+   * the specified path is returned.
+   *
+   * @param absolutePath The absolute path.
+   * @return The file name including the extension.
+   */
+  private String getFileNameFromAbsolutePath(String absolutePath) {
+    int index = getLastIndexOfFileSeparator(absolutePath);
+    if (index == -1) {
+      return absolutePath;
+    }
+    return absolutePath.substring(index + 1);
+  }
+
+  /**
+   * Gets the parent directory of the specified file path. If a file
+   * separator (that is, a forward slash or backslash) is not found, the empty
+   * string is returned.
+   *
+   * @param absolutePath The absolute path.
+   * @return The parent directory of the specified file.
+   */
+  private String getParentDirectory(String absolutePath) {
+    int index = getLastIndexOfFileSeparator(absolutePath);
+    if (index == -1) {
+      return "";
+    }
+    return absolutePath.substring(0, index);
+  }
+
+  private int getLastIndexOfFileSeparator(String path) {
+    int index = path.lastIndexOf('/');
+    return (index != -1) ? index : path.lastIndexOf('\\');
   }
 
   @Override
@@ -259,27 +374,38 @@ class SoySourceFileImpl implements SoySourceFile {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof SoySourceFileImpl)) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 
     SoySourceFileImpl that = (SoySourceFileImpl) o;
 
-    if (!jsSrcOptions.equals(that.jsSrcOptions)) {
+    if (filePath != null ? !filePath.equals(that.filePath) : that.filePath !=
+        null) {
       return false;
     }
-    if (!msgBundleSet.equals(that.msgBundleSet)) {
+    if (generatedParseInfo != null ? !generatedParseInfo.equals(that
+        .generatedParseInfo) : that.generatedParseInfo != null) {
       return false;
     }
-    if (parseInfoJavaClassname != null ? !parseInfoJavaClassname.equals
-        (that.parseInfoJavaClassname) : that.parseInfoJavaClassname != null) {
+    if (jsSrcOptions != null ? !jsSrcOptions.equals(that.jsSrcOptions) : that
+        .jsSrcOptions != null) {
+      return false;
+    }
+    if (localeToJsSourceCode != null ? !localeToJsSourceCode.equals(that
+        .localeToJsSourceCode) : that.localeToJsSourceCode != null) {
+      return false;
+    }
+    if (msgBundleSet != null ? !msgBundleSet.equals(that.msgBundleSet) : that
+        .msgBundleSet != null) {
+      return false;
+    }
+    if (parseInfoJavaClassname != null ? !parseInfoJavaClassname.equals(that
+        .parseInfoJavaClassname) : that.parseInfoJavaClassname != null) {
       return false;
     }
     if (parseInfoJavaPackage != null ? !parseInfoJavaPackage.equals(that
         .parseInfoJavaPackage) : that.parseInfoJavaPackage != null) {
-      return false;
-    }
-    if (!soyFile.equals(that.soyFile)) {
       return false;
     }
     if (soySourceCode != null ? !soySourceCode.equals(that.soySourceCode) :
@@ -292,22 +418,16 @@ class SoySourceFileImpl implements SoySourceFile {
 
   @Override
   public int hashCode() {
-    int result = jsSrcOptions.hashCode();
-    result = 31 * result + msgBundleSet.hashCode();
+    int result = generatedParseInfo != null ? generatedParseInfo.hashCode() : 0;
+    result = 31 * result + (localeToJsSourceCode != null ?
+        localeToJsSourceCode.hashCode() : 0);
+    result = 31 * result + (filePath != null ? filePath.hashCode() : 0);
+    result = 31 * result + (jsSrcOptions != null ? jsSrcOptions.hashCode() : 0);
+    result = 31 * result + (msgBundleSet != null ? msgBundleSet.hashCode() : 0);
     result = 31 * result + (parseInfoJavaClassname != null ?
         parseInfoJavaClassname.hashCode() : 0);
     result = 31 * result + (parseInfoJavaPackage != null ? parseInfoJavaPackage.hashCode() : 0);
-    result = 31 * result + soyFile.hashCode();
     result = 31 * result + (soySourceCode != null ? soySourceCode.hashCode() : 0);
     return result;
-  }
-
-  /**
-   * Returns the file name.
-   *
-   * @return the string form of this JavaScript source file
-   */
-  @Override public String toString() {
-    return this.soyFileName;
   }
 }

@@ -59,10 +59,11 @@ limitations under the License.
 
   <target name="init" description=
       "Initialize the build directory and compile closureant if out of date.">
+    <available property="exists.closure-ant.jar" file="${closure-ant.jar}" />
+    <fail unless="exists.closure-ant.jar"
+        message="closure-ant.jar does not exist. Build the jar prior to testing."/>
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${test.classes.dir}" />
-    <ant dir="${closure-ant.dir}" target="compile" inheritAll="false"
-        useNativeBasedir="true" />
   </target>
 
 

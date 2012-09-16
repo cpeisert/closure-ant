@@ -199,10 +199,6 @@ public final class SourceFileFactory {
       return ImmutableSet.copyOf(this.provides);
     }
 
-    public String getRelativePath() {
-      return this.inputFile.getPath();
-    }
-
     public Collection<String> getRequires() {
       return ImmutableSet.copyOf(this.requires);
     }

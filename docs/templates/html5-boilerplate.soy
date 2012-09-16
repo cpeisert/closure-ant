@@ -1,12 +1,12 @@
 {namespace html5boilerplate autoescape="contextual"}
 
 /**
- * HTML5 Boilerplate (see https://github.com/h5bp/html5-boilerplate) Closure
- * Templates soy template. This template deviates from the HTML5 Boilerplate
- * index.html (as of 09/09/2012) by removing the link tags to
- * "css/normalize.css" and "css/main.css"; removing the script tags for JQuery,
- * "js/plugins.js", and "js/main.js"; removing the script tags for Google
- * Analytics; and adding the option to add noscript-tag content.
+ * HTML5 Boilerplate (see https://github.com/h5bp/html5-boilerplate) soy
+ * template. This template deviates from the HTML5 Boilerplate index.html (as
+ * of 09/09/2012) by removing the link tags to "css/normalize.css" and
+ * "css/main.css"; removing the script tags for JQuery, "js/plugins.js", and
+ * "js/main.js"; removing the script tags for Google Analytics; and adding
+ * the option to specify <noscript> HTML.
  *
  * @param? title The page title. Defaults to "HTML5 Template".
  * @param? description The page description. Defaults to "HTML5 Template".
@@ -21,8 +21,8 @@
  *     is required):
  *       [src: <script-file-url>, type: <MIME_type>, charset: <character_set>,
  *       async: "async", defer: "defer"]
- * @param? contentHtml html content that goes inside the <body> tags
- * @param? noScriptHtml html content that goes inside <noscript> tags
+ * @param? contentHtml html content that goes inside the <body> tag
+ * @param? noScriptHtml html content that goes inside <noscript> tag
  */
 {template .createDocument}
 <!DOCTYPE html>
@@ -70,7 +70,8 @@
  * Each list element is either a URL or a map with the following structure
  * (only the href entry is required):
  *
- *   [href: <css-file-url>, rel: <relationship>, title: <title>, media: <media-descriptor>]
+ *   [href: <css-file-url>, rel: <relationship>, title: <title>,
+ *       media: <media-descriptor>]
  *
  * @param cssFiles A list of stylesheets.
  */

@@ -675,7 +675,7 @@ public final class Plovr extends Task {
   public PlovrCompilerOptions createCompiler() {
     if (this.compilerOptions == null) {
       this.compilerOptions =
-          CompilerOptionsFactory.newCompilerOptionsForPlovr();
+          CompilerOptionsFactory.newPlovrCompilerOptions();
     } else {
       throw new BuildException("nested element <compiler> may only be used "
           + "once per <" + getTaskName() + "> task");

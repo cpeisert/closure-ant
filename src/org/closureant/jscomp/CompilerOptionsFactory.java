@@ -60,7 +60,7 @@ public final class CompilerOptionsFactory {
    *
    * @return a new {@link BasicCompilerOptions} instance
    */
-  public static BasicCompilerOptions newCompilerOptionsBasic() {
+  public static BasicCompilerOptions newBasicCompilerOptions() {
     return new BasicCompilerOptionsImplementation();
   }
 
@@ -69,7 +69,7 @@ public final class CompilerOptionsFactory {
    *
    * @return a new {@link CompleteCompilerOptions} instance
    */
-  public static CompleteCompilerOptions newCompilerOptionsComplete() {
+  public static CompleteCompilerOptions newCompleteCompilerOptions() {
     return new CompleteCompilerOptionsImplementation();
   }
 
@@ -78,7 +78,7 @@ public final class CompilerOptionsFactory {
    *
    * @return a new {@link PlovrCompilerOptions} instance
    */
-  public static PlovrCompilerOptions newCompilerOptionsForPlovr() {
+  public static PlovrCompilerOptions newPlovrCompilerOptions() {
     return new PlovrCompilerOptionsImplementation();
   }
 
@@ -125,7 +125,7 @@ public final class CompilerOptionsFactory {
 
     /**
      * Constructs a new instance; should not be called directly. Use
-     * {@link CompilerOptionsFactory#newCompilerOptionsBasic()} instead.
+     * {@link CompilerOptionsFactory#newBasicCompilerOptions()} instead.
      */
     public BasicCompilerOptionsImplementation() {
 
@@ -447,7 +447,7 @@ public final class CompilerOptionsFactory {
 
     /**
      * Constructs a new instance; should not be called directly. Use
-     * {@link CompilerOptionsFactory#newCompilerOptionsComplete()} instead.
+     * {@link CompilerOptionsFactory#newCompleteCompilerOptions()} instead.
      */
     public CompleteCompilerOptionsImplementation() {
       super();
@@ -968,7 +968,7 @@ public final class CompilerOptionsFactory {
 
     /**
      * Constructs a new instance; should not be called directly. Use
-     * {@link CompilerOptionsFactory#newCompilerOptionsForPlovr()} instead.
+     * {@link CompilerOptionsFactory#newPlovrCompilerOptions()} instead.
      */
     public PlovrCompilerOptionsImplementation() {
       super();

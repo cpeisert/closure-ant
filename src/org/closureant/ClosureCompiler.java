@@ -273,7 +273,7 @@ public final class ClosureCompiler extends Task
     if (owner != null) {
       bindToOwner(owner);
     }
-    this.compilerOptions = CompilerOptionsFactory.newCompilerOptionsComplete();
+    this.compilerOptions = CompilerOptionsFactory.newCompleteCompilerOptions();
 
     // Attributes
     this.compilerJar = null;

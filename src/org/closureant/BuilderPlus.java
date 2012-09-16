@@ -431,7 +431,7 @@ public final class BuilderPlus extends Task {
   public CompleteCompilerOptions createCompiler() {
     if (this.compilerOptions == null) {
       this.compilerOptions =
-          CompilerOptionsFactory.newCompilerOptionsComplete();
+          CompilerOptionsFactory.newCompleteCompilerOptions();
     } else {
       throw new BuildException("nested element <compiler> may only be used "
           + "once per <" + getTaskName() + "> task");

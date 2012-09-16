@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.gson.JsonParseException;
+import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import com.google.template.soy.shared.SoyGeneralOptions;
 
 import java.io.File;
@@ -105,7 +106,7 @@ public final class ClosureTemplates extends Task {
   // Nested elements
   private final Set<String> activeDelegatePackageNames;
   private JavaParseInfo javaParseInfo;
-  private com.google.template.soy.jssrc.SoyJsSrcOptions jsSrcOptions;
+  private SoyJsSrcOptions jsSrcOptions;
   private final List<String> pluginModules;
   private final List<FileSet> soyFileSets;
   private final List<TemplateRenderOptions> templatesToBeRendered;
@@ -371,7 +372,7 @@ public final class ClosureTemplates extends Task {
   public void addConfiguredCompileToJs(
       SoyJsSrcOptionsAntType soyToJsCompileOptions) {
     if (this.jsSrcOptions == null) {
-      this.jsSrcOptions = new com.google.template.soy.jssrc.SoyJsSrcOptions();
+      this.jsSrcOptions = new SoyJsSrcOptions();
 
       this.jsOutputPathFormat = soyToJsCompileOptions.getOutputPathFormat();
       if (this.jsOutputPathFormat == null) {

@@ -60,7 +60,7 @@ import org.closureant.util.ClosureBuildUtil;
  * <p>Example Usage</p>
  *
  * <p><pre>{@code
-SoyJsSrcOptionsAntType jsSrcOptions = new SoyJsSrcOptionsAntType();
+SoyJsSrcOptions jsSrcOptions = new SoyJsSrcOptions();
 jsSrcOptions.setShouldProvideRequireSoyNamespaces(true);
 
 File soyFile = new File("./my_templates.soy");
@@ -71,7 +71,7 @@ SoyHelper helper = new SoyHelper.Builder()
     .build();
 
 SoyMapData params = new SoyMapData("param_name", 42);
-String renderedContent = helper.render("my.template", params, null);
+String renderedContent = helper.render("my.template", params);
  * }</pre></p>
  *
  * @author cpeisert{at}gmail{dot}com (Christopher Peisert)
@@ -237,15 +237,50 @@ public final class SoyHelper {
   }
 
   /**
+   * Renders a template with no data using the messages in the original Soy
+   * file (that is, any message bundles added to the {@link SoyHelper} are
+   * ignored).
+   *
+   * @param templateName the full name of the template including the namespace
+   * @return a new renderer for the given template
+   * @see #renderForEachLocale(String, com.google.template.soy.data.SoyMapData,
+   *     com.google.template.soy.data.SoyMapData)
+   * @see #render(String, com.google.template.soy.data.SoyMapData,
+   *     com.google.template.soy.data.SoyMapData)
+   */
+  public String render(String templateName) {
+    return render(templateName, null, null);
+  }
+
+  /**
    * Renders a template using the messages in the original Soy file (that is,
    * any message bundles added to the {@link SoyHelper} are ignored).
    *
    * @param templateName the full name of the template including the namespace
    * @param data the data to call the template with. May be {@code null} if
    *     the template has no parameters.
-   * @param ijData the injected data to call the template with. Can be
+   * @return a new renderer for the given template
+   * @see #renderForEachLocale(String, com.google.template.soy.data.SoyMapData,
+   *     com.google.template.soy.data.SoyMapData)
+   * @see #render(String, com.google.template.soy.data.SoyMapData,
+   *     com.google.template.soy.data.SoyMapData)
+   */
+  public String render(String templateName, SoyMapData data) {
+    return render(templateName, data, null);
+  }
+
+  /**
+   * Renders a template using the messages in the original Soy file (that is,
+   * any message bundles added to the {@link SoyHelper} are ignored).
+   *
+   * @param templateName the full name of the template including the namespace
+   * @param data the data to call the template with. May be {@code null} if
+   *     the template has no parameters.
+   * @param ijData the injected data to call the template with. May be
    *     {@code null} if not used.
    * @return a new renderer for the given template
+   * @see #renderForEachLocale(String, com.google.template.soy.data.SoyMapData,
+   *     com.google.template.soy.data.SoyMapData)
    */
   public String render(String templateName, SoyMapData data,
       SoyMapData ijData) {
@@ -343,6 +378,7 @@ public final class SoyHelper {
     private boolean soyHelperBuilt;
     private final Set<SoySourceFile> soySourceFiles;
     private final Set<File> tempSourceFiles;
+    private final Set<URL> tempSourceURLs;
     private final Set<File> translationFiles;
 
     public Builder() {
@@ -369,6 +405,7 @@ public final class SoyHelper {
       this.soyHelperBuilt = false;
       this.soySourceFiles = Sets.newHashSet();
       this.tempSourceFiles = Sets.newHashSet();
+      this.tempSourceURLs = Sets.newHashSet();
       this.translationFiles = Sets.newHashSet();
     }
 
@@ -442,6 +479,12 @@ public final class SoyHelper {
 
       for (File source : this.tempSourceFiles) {
         SoySourceFile soySourceFile = new SoySourceFileImpl(source,
+            optionsForFiles, this.jsSrcOptions, this.msgBundleSet,
+            this.parseInfoJavaClassname, this.parseInfoJavaPackage);
+        internalAddSoySourceFile(soySourceFile);
+      }
+      for (URL url : this.tempSourceURLs) {
+        SoySourceFile soySourceFile = new SoySourceFileImpl(url,
             optionsForFiles, this.jsSrcOptions, this.msgBundleSet,
             this.parseInfoJavaClassname, this.parseInfoJavaPackage);
         internalAddSoySourceFile(soySourceFile);
@@ -804,6 +847,19 @@ public final class SoyHelper {
     }
 
     /**
+     * Adds a Soy file specified by a URL.
+     *
+     * @param url the URL specifying a Soy file
+     * @return this {@link Builder}
+     * @throws MultipleDeclarationException if a namespace is declared in more
+     *     than one Soy file
+     */
+    public Builder sourceFile(URL url) {
+      this.tempSourceURLs.add(url);
+      return this;
+    }
+
+    /**
      * Adds all the specified Soy files.
      *
      * @param soyFiles the Soy files
@@ -814,6 +870,26 @@ public final class SoyHelper {
     public Builder sourceFiles(Collection<File> soyFiles) {
       for (File file : soyFiles) {
         this.sourceFile(file);
+      }
+      return this;
+    }
+
+    /**
+     * Adds all the specified Soy file URLs.
+     *
+     * @param soyURLs the Soy file URLs
+     * @param ignore Parameter used to differentiate between the method that
+     *     accepts a Collection of Files and the method that accepts a
+     *     Collection of URLs. See <a target="_blank"
+     *     href="http://michid.wordpress.com/2010/05/30/working-around-type-erasure-ambiguities/">
+     *     Working around type erasure ambiguities</a>
+     * @return this {@link Builder}
+     * @throws MultipleDeclarationException if a namespace is declared in more
+     *     than one Soy file
+     */
+    public Builder sourceFiles(Collection<URL> soyURLs, URL... ignore) {
+      for (URL url : soyURLs) {
+        this.sourceFile(url);
       }
       return this;
     }

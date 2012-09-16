@@ -16,6 +16,7 @@
 
 package org.closureant;
 
+import com.google.common.io.Resources;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
@@ -33,6 +34,7 @@ public final class ClosureAntDoc extends Task {
   // Attributes
 
   private File antMetaDocFile;
+  private File html5BoilerplateSoyTemplate;
   private File outputDirectory;
 
   // Nested elements
@@ -45,6 +47,8 @@ public final class ClosureAntDoc extends Task {
   public ClosureAntDoc() {
     // Attributes
     this.antMetaDocFile = null;
+    this.html5BoilerplateSoyTemplate = Resources.getResource(getClass(),
+        "html5-boilerplate.soy");
     this.outputDirectory = new File(".");
 
     // Nested elements

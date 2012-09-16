@@ -32,9 +32,6 @@ public interface SourceFile {
   /** The source file name. */
   String getName();
 
-  /** The relative file path. */
-  String getRelativePath();
-
   @Override
   boolean equals(Object o);
 
