@@ -26,7 +26,6 @@ lib/*
 !lib/ant-antunit*
 !lib/antunit*
 !lib/closure*
-!lib/ivy*
 !lib/soy*
 
 

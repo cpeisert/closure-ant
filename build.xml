@@ -33,10 +33,21 @@ limitations under the License.
     <fileset dir="${basedir}" includes="**/*.jar" />
   </path>
 
+  <property name="ivy-revision" value="2.3.0-rc1" />
+  <property name="ivy.jar" value="ivy-${ivy-revision}.jar" />
+  <available file="${lib.dir}/${ivy.jar}" property="ivy.jar.present" />
+
   <!-- Import Apache Ivy Ant tasks. -->
   <taskdef resource="org/apache/ivy/ant/antlib.xml"
-      classpath="${lib.dir}/ivy-2.2.0.jar" />
+      classpath="${lib.dir}/${ivy.jar}" />
 
+  <!--
+    Test for presence of Jakarta BCEL library in user's home directory under
+    .ant/lib, which is required to use ClassFileSet.
+  -->
+  <fileset id="bcel.jar.id" dir="${basedir}" includes="lib/bcel*.jar" />
+  <property name="bcel.jar" refid="bcel.jar.id" />
+  <available file="${user.home}/.ant/${bcel.jar}" property="bcel.lib.present" />
 
   <!--
   ==============================================================================
@@ -83,6 +94,10 @@ limitations under the License.
   -->
 
   <target name="init">
+
+    <antcall target="bootstrap-ivy" />
+    <antcall target="bootstrap-jakarta-bcel" />
+
     <!-- Use Apache Ivy to retrieve dependencies. -->
     <retrieve />
 
@@ -178,22 +193,24 @@ limitations under the License.
     <unjar dest="${classes.dir}" src="${javax.inject.jar}"
         failonemptyarchive="true" />
     <unjar dest="${classes.dir}" src="${soy.jar}" failonemptyarchive="true" />
+  </target>
 
-    <!--
-      To use Ant's ClassFileSet, copy the jakarta-BCEL library to the current
-      user's home directory under ".ant/lib".
-    -->
+
+  <!-- Downloads Apache Ivy to the lib directory. -->
+  <target name="bootstrap-ivy" unless="ivy.jar.present">
+    <echo message="Adding Apache Ivy jar file to ${lib.dir}." />
+    <get dest="${lib.dir}/${ivy.jar}"
+        src="http://search.maven.org/remotecontent?filepath=org/apache/ivy/ivy/${ivy-revision}/${ivy.jar}" />
+    <fail message="Please rerun the Ant build now that Ivy has been downloaded." />
+  </target>
+
+
+  <target name="bootstrap-jakarta-bcel" unless="bcel.lib.present">
     <mkdir dir="${user.home}/.ant/lib" />
-    <fileset id="bcel.jar.id" dir="${basedir}" includes="lib/bcel*.jar" />
-    <property name="bcel.jar" refid="bcel.jar.id" />
-    <available file="${user.home}/.ant/${bcel.jar}"
-        property="bcel.lib.present" />
     <copy file="${bcel.jar}" todir="${user.home}/.ant/lib" />
-    <fail unless="${bcel.lib.present}"
-        message="The Jakarta-BCEL library (which is required to create the
+    <fail message="The Jakarta-BCEL library (which is required to create the
 Closure Ant jar file) was just copied to your home directory under .ant/lib.
-Try running Ant again now that the BCEL library is included in the Ant runtime
-classpath." />
+Run the Ant build again now that the library is available on Ant's classpath." />
   </target>
 
 
