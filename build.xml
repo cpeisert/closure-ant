@@ -95,8 +95,7 @@ limitations under the License.
 
   <target name="init">
 
-    <antcall target="bootstrap-ivy" />
-    <antcall target="bootstrap-jakarta-bcel" />
+    <antcall target="bootstrap" />
 
     <!-- Use Apache Ivy to retrieve dependencies. -->
     <retrieve />
@@ -196,22 +195,40 @@ limitations under the License.
   </target>
 
 
-  <!-- Downloads Apache Ivy to the lib directory. -->
-  <target name="bootstrap-ivy" unless="ivy.jar.present">
+  <!--
+    Downloads Apache Ivy to the lib directory, downloads dependencies from
+    the Maven repository, copies the Jarkarta BCEL library to the user's home
+    directory under .ant/lib, and executes the default target "build". -->
+  <target name="bootstrap" unless="ivy.jar.present">
     <echo message="Adding Apache Ivy jar file to ${lib.dir}." />
     <get dest="${lib.dir}/${ivy.jar}"
         src="http://search.maven.org/remotecontent?filepath=org/apache/ivy/ivy/${ivy-revision}/${ivy.jar}" />
-    <fail message="Please rerun the Ant build now that Ivy has been downloaded." />
+    <ant antfile="${ant.file}" target="retrieve-deps" />
+    <exec executable="ant">
+      <arg line='-f "${ant.file}"' />
+      <arg line="bootstrap-jakarta-bcel" />
+    </exec>
+
+    <exec executable="ant">
+      <arg line='-f "${ant.file}"' />
+      <arg line="build" />
+    </exec>
+    <fail message="Ivy was downloaded and BCEL library installed. In order to
+create the closure-ant JAR file, the Ant build was restarted. Despite error
+messages, if the file build/closure-ant.jar exists and the last modified time
+is current, then the build succeeded. Now that Ivy has been downloaded and the
+BCEL library installed, future build runs should not generate any errors." />
   </target>
 
+  <target name="retrieve-deps">
+    <retrieve />
+  </target>
 
-  <target name="bootstrap-jakarta-bcel" unless="bcel.lib.present">
+  <target name="bootstrap-jakarta-bcel">
     <mkdir dir="${user.home}/.ant/lib" />
     <copy file="${bcel.jar}" todir="${user.home}/.ant/lib" />
-    <fail message="The Jakarta-BCEL library (which is required to create the
-Closure Ant jar file) was just copied to your home directory under .ant/lib.
-Run the Ant build again now that the library is available on Ant's classpath." />
   </target>
+
 
 
   <target name="clean" description="Deletes all files created by this script.">
