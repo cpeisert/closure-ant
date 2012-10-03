@@ -245,7 +245,7 @@ Apache Ivy cache.">
 
   <target name="compile" depends="init" description="Compiles the Java source.">
     <javac srcdir="${src.dir}" destdir="${classes.dir}"
-        classpathref="classpath" debug="on" deprecation="on"
+        classpathref="classpath" debug="on" deprecation="on" fork="true"
         includeantruntime="false"
         source="1.6" target="1.6">
       <compilerarg value="-Xlint" />
