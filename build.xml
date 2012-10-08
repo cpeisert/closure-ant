@@ -243,6 +243,8 @@ Apache Ivy cache.">
   </target>
 
 
+  <!-- Note: fork must be set to true in order for the javac task to use the
+       system default JDK. -->
   <target name="compile" depends="init" description="Compiles the Java source.">
     <javac srcdir="${src.dir}" destdir="${classes.dir}"
         classpathref="classpath" debug="on" deprecation="on" fork="true"
