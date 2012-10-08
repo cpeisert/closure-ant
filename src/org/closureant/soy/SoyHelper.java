@@ -241,7 +241,7 @@ public final class SoyHelper {
    * file (that is, any message bundles added to the {@link SoyHelper} are
    * ignored).
    *
-   * @param templateName the full name of the template including the namespace
+   * @param templateName the fully qualified template name (including namespace)
    * @return a new renderer for the given template
    * @see #renderForEachLocale(String, com.google.template.soy.data.SoyMapData,
    *     com.google.template.soy.data.SoyMapData)
@@ -256,9 +256,11 @@ public final class SoyHelper {
    * Renders a template using the messages in the original Soy file (that is,
    * any message bundles added to the {@link SoyHelper} are ignored).
    *
-   * @param templateName the full name of the template including the namespace
+   * @param templateName the fully qualified template name (including namespace)
    * @param data the data to call the template with. May be {@code null} if
-   *     the template has no parameters.
+   *     the template has no parameters. <b>NOTE:</b> to pass JSON data use
+   *     {@link ExtraSoyUtils#parseJsonToSoyMapData(String)} to convert JSON
+   *     maps to {@link SoyMapData}.
    * @return a new renderer for the given template
    * @see #renderForEachLocale(String, com.google.template.soy.data.SoyMapData,
    *     com.google.template.soy.data.SoyMapData)
@@ -273,9 +275,11 @@ public final class SoyHelper {
    * Renders a template using the messages in the original Soy file (that is,
    * any message bundles added to the {@link SoyHelper} are ignored).
    *
-   * @param templateName the full name of the template including the namespace
+   * @param templateName the fully qualified template name (including namespace)
    * @param data the data to call the template with. May be {@code null} if
-   *     the template has no parameters.
+   *     the template has no parameters. <b>NOTE:</b> to pass JSON data use
+   *     {@link ExtraSoyUtils#parseJsonToSoyMapData(String)} to convert JSON
+   *     maps to {@link SoyMapData}.
    * @param ijData the injected data to call the template with. May be
    *     {@code null} if not used.
    * @return a new renderer for the given template
@@ -295,9 +299,11 @@ public final class SoyHelper {
    * message bundles are set, the returned map will contain one entry with
    * the default locale "en".
    *
-   * @param templateName the full name of the template including the namespace
+   * @param templateName the fully qualified template name (including namespace)
    * @param data the data to call the template with. May be {@code null} if
-   *     the template has no parameters.
+   *     the template has no parameters. <b>NOTE:</b> to pass JSON data use
+   *     {@link ExtraSoyUtils#parseJsonToSoyMapData(String)} to convert JSON
+   *     maps to {@link SoyMapData}.
    * @param ijData the injected data to call the template with. Can be
    *     {@code null} if not used.
    * @return a map from locale string (returned by {@link
@@ -328,7 +334,9 @@ public final class SoyHelper {
    *
    * @param templateName the full name of the template including the namespace
    * @param data the data to call the template with. May be {@code null} if
-   *     the template has no parameters.
+   *     the template has no parameters. <b>NOTE:</b> to pass JSON data use
+   *     {@link ExtraSoyUtils#parseJsonToSoyMapData(String)} to convert JSON
+   *     maps to {@link SoyMapData}.
    * @param ijData the injected data to call the template with. Can be
    *     {@code null} if not used.
    * @return a {@link SoyTofu.Renderer} for the specified template
