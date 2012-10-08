@@ -21,7 +21,6 @@ import com.google.template.soy.data.SoyMapData;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.closureant.soy.ExtraSoyUtils;
 import org.closureant.types.JsonText;
 
 /**
