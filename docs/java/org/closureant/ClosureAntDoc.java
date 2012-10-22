@@ -17,8 +17,8 @@
 package org.closureant;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
 import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -38,7 +38,7 @@ import java.io.IOException;
 public final class ClosureAntDoc extends Task {
 
   private static final String ANT_DOC_TEMPLATE = "antdoc.createClassDoc";
-  private static final String HTML_DOC_TEMPLATE = "htmldoc.createDocument";
+  private static final String HTML_DOC_TEMPLATE = "html.createDocument";
 
   private final SoyHelper.Builder soyHelperBuilder;
 
@@ -103,7 +103,7 @@ public final class ClosureAntDoc extends Task {
    * Sets the Soy template to use for generating the HTML document outline.
    * This template should provide the basic components of an HTML document such
    * as {@code DOCTYPE, html, head, title} and {@code body} tags. The Soy
-   * template namespace must be {@code htmldoc} and it must have a template
+   * template namespace must be {@code html} and it must have a template
    * named {@code .createDocument} that accepts the following parameters:
    *
    * <ul>
@@ -154,22 +154,27 @@ public final class ClosureAntDoc extends Task {
   @Override
   public void execute() {
     try {// execute() cannot throw checked IOException due to parent definition
-      if (this.antDocSoyTemplate == null) {
-        throw new BuildException("required attribute antDocSoyTemplate not set");
-      }
       if (this.antMetaDocJsonFile == null) {
         throw new BuildException("required attribute antMetaDocJsonFile not set");
-      }
-      if (this.htmlDocSoyTemplate == null) {
-        throw new BuildException("required attribute htmlDocSoyTemplate not set");
       }
       if (!this.outputDirectory.isDirectory()) {
         throw new BuildException("Attribute outputDirectory must be a "
             + "directory. Found value: " + outputDirectory.getAbsolutePath());
       }
 
-      this.soyHelperBuilder.sourceFile(this.antDocSoyTemplate);
-      this.soyHelperBuilder.sourceFile(this.htmlDocSoyTemplate);
+      if (this.antDocSoyTemplate != null) {
+        this.soyHelperBuilder.sourceFile(this.antDocSoyTemplate);
+      } else {
+        this.soyHelperBuilder.sourceFile(Resources.getResource(getClass(),
+            ANT_DOC_TEMPLATE));
+      }
+      if (this.htmlDocSoyTemplate != null) {
+        this.soyHelperBuilder.sourceFile(this.htmlDocSoyTemplate);
+      } else {
+        this.soyHelperBuilder.sourceFile(Resources.getResource(getClass(),
+            HTML_DOC_TEMPLATE));
+      }
+
       SoyHelper soyHelper = this.soyHelperBuilder.build();
 
       JsonParser jsonParser = new JsonParser();
