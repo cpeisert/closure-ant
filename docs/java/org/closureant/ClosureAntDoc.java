@@ -22,13 +22,16 @@ import com.google.common.io.Resources;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.template.soy.data.SoyMapData;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.closureant.annotations.Required;
+import org.closureant.soy.ExtraSoyUtils;
 import org.closureant.soy.SoyHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Ant task to generate HTML documentation for the Closure Ant project.
@@ -189,9 +192,21 @@ public final class ClosureAntDoc extends Task {
         throw new BuildException("Ant Meta Doc file must contain a JSON "
             + "object. File: " + this.antMetaDocJsonFile.getCanonicalPath());
       }
+
       JsonObject jsonMap = rootElement.getAsJsonObject();
 
+      for (Map.Entry<String, JsonElement> entry : jsonMap.entrySet()) {
+        JsonObject antClass = entry.getValue().getAsJsonObject();
+        String antClassJson = antClass.toString();
+        SoyMapData antClassSoyMap =
+            ExtraSoyUtils.parseJsonToSoyMapData(antClassJson);
 
+        String antDocFileName = antClass.get("docURL").getAsString();
+        String antDocHtml =
+            soyHelper.render("antDoc.createClassDoc", antClassSoyMap);
+        Files.write(antDocHtml, new File(this.outputDirectory, antDocFileName),
+            Charsets.UTF_8);
+      }
 
     } catch (IOException e) {
       throw new BuildException(e);
