@@ -1,12 +1,16 @@
-#Closure Ant
+# Closure Ant
 
 Closure Ant is an [Apache Ant](http://ant.apache.org/) library consisting of
-tasks for [Google Closure Tools](https://developers.google.com/closure/) and
-[plovr](http://plovr.com/).
+Ant tasks for the [Google Closure Tools](https://developers.google.com/closure/).
+These tasks provide a build system for creating web applications leveraging
+Closure Tools, such as the [Closure Compiler](https://developers.google.com/closure/compiler).
 
+See example web project
+[project_template](https://github.com/cpeisert/closure-ant/tree/master/test/test_projects/project_template).
+that uses an Ant build file with the Closure Ant tasks.
 
 - - - - -
-Copyright 2012 Christopher Peisert. All Rights Reserved.
+Copyright 2012-2021 Christopher Peisert. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
